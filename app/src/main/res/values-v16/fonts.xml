@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Pizza.Display4" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/display4_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="Pizza.Display3" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/display3_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Display2" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/display2_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Display1" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/display1_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Headline" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/headline_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Title" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/title_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Pizza.Subhead" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/subhead_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Body2" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/body2_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Pizza.Body1" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/body1_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Caption" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/caption_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Pizza.Menu" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/menu_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Pizza.Button" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/button_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+</resources>

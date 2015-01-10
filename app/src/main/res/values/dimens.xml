@@ -1,0 +1,79 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
+
+    <!-- List items, per the Android L Design guidelines.
+    http://www.google.com/design/spec/components/lists.html#lists-keylines -->
+    <dimen name="list_item_single_line_height">48dp</dimen>
+    <dimen name="list_item_single_line_and_image_height">56dp</dimen>
+    <dimen name="list_item_double_line_height">72dp</dimen>
+    <dimen name="list_item_top_bottom_padding">8dp</dimen>
+    <dimen name="list_item_padding">16dp</dimen>
+    <dimen name="list_item_icon_dimen">24dp</dimen>
+    <dimen name="list_item_padding_to_icon">32dp</dimen>
+
+    <dimen name="list_item_primary_text">16sp</dimen>
+    <dimen name="list_item_secondary_text">14sp</dimen>
+
+    <!-- Typography, per the Android L Design guidelines.
+    http://www.google.com/design/spec/style/typography.html -->
+
+    <!--
+    android:fontFamily="sans-serif"           Roboto regular
+    android:fontFamily="sans-serif-light"     Roboto light
+    android:fontFamily="sans-serif-condensed" Roboto condensed
+    android:fontFamily="sans-serif-thin"      Roboto thin (android 4.2)
+    android:fontFamily="sans-serif-medium"    Roboto medium (android 5.0) -->
+
+    <dimen name="display4_text">112sp</dimen>
+    <!-- Light -->
+    <dimen name="display3_text">56sp</dimen>
+    <!-- Regular -->
+    <dimen name="display2_text">45sp</dimen>
+    <!-- Regular -->
+    <dimen name="display1_text">34sp</dimen>
+    <!-- Regular -->
+    <dimen name="headline_text">24sp</dimen>
+    <!-- Regular -->
+    <dimen name="title_text">20sp</dimen>
+    <!-- Medium -->
+    <dimen name="subhead_text">16sp</dimen>
+    <!-- Regular -->
+    <dimen name="body2_text">14sp</dimen>
+    <!-- Medium -->
+    <dimen name="body1_text">14sp</dimen>
+    <!-- Regular -->
+    <dimen name="caption_text">12sp</dimen>
+    <!-- Regular -->
+    <dimen name="menu_text">14sp</dimen>
+    <!-- Medium -->
+    <dimen name="button_text">14sp</dimen>
+    <!-- Medium ALL CAPS -->
+
+    <!-- Margin app bar, per the Android L Design guidelines.
+    http://www.google.co.uk/design/spec/layout/structure.html#structure-app-bar -->
+    <dimen name="app_bar_left_padding">56dp</dimen>
+    <!-- 72 = 56 + 16 -->
+    <dimen name="app_bar_right_padding">16dp</dimen>
+    <dimen name="app_bar_top_padding">56dp</dimen>
+    <dimen name="app_bar_bottom_padding">20dp</dimen>
+    <!-- custom is better -->
+    <dimen name="app_bar_divider">8dp</dimen>
+    <dimen name="app_bar_element_height">80dp</dimen>
+    <dimen name="app_bar_elevation">2dp</dimen>
+
+    <!-- Margin content, per the Android L Design guidelines.
+    http://www.google.co.uk/design/spec/layout/metrics-and-keylines.html -->
+    <dimen name="content_top_padding">8dp</dimen>
+
+    <!-- Fab -->
+    <dimen name="fab_elevation">5dp</dimen>
+    <dimen name="fab_normal_margin_toolbar">-33dp</dimen>
+    <dimen name="fab_mini_margin_toolbar">-20dp</dimen>
+
+</resources>

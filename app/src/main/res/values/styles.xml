@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="PrimeTimeTheme.Base" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+
+        <!-- PagerSlidingTabStrip -->
+        <item name="pstsIndicatorColor">@color/accent</item>
+        
+    </style>
+    
+    <style name="PrimeTimeTheme" parent="PrimeTimeTheme.Base">
+
+        
+    </style>
+    <!-- TODO: Use https://github.com/chrisjenx/Calligraphy in order to use Roboto font -->
+
+</resources>

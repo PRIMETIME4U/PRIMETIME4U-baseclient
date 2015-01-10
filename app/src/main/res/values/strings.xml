@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PRIMETIME4U</string>
+    <string name="action_settings">Settings</string>
+    <string name="proposal_tab">Proposal</string>
+    <string name="tastes_tab">Tastes</string>
+    <string name="watched_tab">Watched</string>
+
+</resources>
