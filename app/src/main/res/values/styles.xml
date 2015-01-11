@@ -11,13 +11,16 @@
 
         <!-- PagerSlidingTabStrip -->
         <item name="pstsIndicatorColor">@color/accent</item>
+        <item name="android:textViewStyle">@style/PrimeTimeTheme</item>
         
     </style>
-    
+
     <style name="PrimeTimeTheme" parent="PrimeTimeTheme.Base">
 
-        
+
+        <item name="fontPath">fonts/Roboto-ThinItalic.ttf</item>
+
     </style>
-    <!-- TODO: Use https://github.com/chrisjenx/Calligraphy in order to use Roboto font -->
+
 
 </resources>

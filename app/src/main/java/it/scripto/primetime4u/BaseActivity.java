@@ -1,8 +1,12 @@
 package it.scripto.primetime4u;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Base actionbar activity with logging.
@@ -22,6 +26,11 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/Roboto-RobotoRegular.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
 
         setContentView(getLayoutResourceId());
 
@@ -62,5 +71,10 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void onDestroy() {
         super.onDestroy();
         if (BuildConfig.DEBUG) Log.v(TAG, "onDestroy");
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }
