@@ -29,8 +29,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         // Get and set toolbar as action bar
-        Toolbar reservation_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
-        setSupportActionBar(reservation_activity_toolbar);
+        Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
+        setSupportActionBar(main_activity_toolbar);
  
         // Initialize the ViewPager and set an adapter
         ViewPager pager = (ViewPager) findViewById(R.id.main_activity_view_pager);
