@@ -3,9 +3,9 @@ package it.scripto.primetime4u;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.dexafree.materialList.cards.view.BaseButtonsCardItemView;
+import com.dexafree.materialList.view.BasicButtonsCardItemView;
 
-public class ProposalCardItemView extends BaseButtonsCardItemView<ProposalCard> {
+public class ProposalCardItemView extends BasicButtonsCardItemView{
     
     public ProposalCardItemView(Context context) {
         super(context);

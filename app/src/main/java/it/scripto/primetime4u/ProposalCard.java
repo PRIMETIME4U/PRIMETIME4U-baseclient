@@ -2,12 +2,13 @@ package it.scripto.primetime4u;
 
 import android.content.Context;
 
-import com.dexafree.materialList.cards.model.BigImageButtonsCard;
+
+import com.dexafree.materialList.model.BigImageButtonsCard;
 
 public class ProposalCard extends BigImageButtonsCard {
     
     public ProposalCard(Context context) {
-        super(context);
+
     }
 
     @Override
