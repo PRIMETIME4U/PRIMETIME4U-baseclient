@@ -18,6 +18,7 @@ import com.dexafree.materialList.model.BasicImageButtonsCard;
 import com.dexafree.materialList.model.BigImageButtonsCard;
 import com.dexafree.materialList.model.Card;
 import com.dexafree.materialList.model.SmallImageCard;
+import com.dexafree.materialList.view.IMaterialView;
 import com.dexafree.materialList.view.MaterialListView;
 
 import com.android.volley.Request;
@@ -46,11 +47,14 @@ public class ProposalFragment extends BaseFragment {
      *
      * @return A new instance of fragment ProposalFragment.
      */
-    //URL for free channels suggestions
+
+    //URL for free and paytv channels suggestions
     private static final String freeurl = "http://hale-kite-786.appspot.com/schedule/free/today";
+    private static final String skyurl = "http://hale-kite-786.appspot.com/schedule/sky/today";
     //list of movies
     private List<Movie> movieList;
     private MaterialListView proposal_material_list_view;
+    boolean first=true;
 
     public static ProposalFragment newInstance() {
         return new ProposalFragment();
@@ -77,11 +81,11 @@ public class ProposalFragment extends BaseFragment {
 
         //setting up the materiallistview and movie array
         proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
+        proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
         movieList = new ArrayList<Movie>();
 
 
-        //asynchronous task for http request
-        new JsonRequest().execute(freeurl);
+
 
         /*NOTE:
         Siccome usiamo a quanto pare due versioni diverse di materialList, ho riportato quella che avevo nel vecchio progetto
@@ -99,26 +103,36 @@ public class ProposalFragment extends BaseFragment {
 
         */
 
-        BigImageButtonsCard card = new BigImageButtonsCard();
-        card.setTitle("Your title");
+        final BigImageButtonsCard card = new BigImageButtonsCard();
+        card.setTitle("PRIMETIME4U");
         card.setBitmap(context,R.drawable.ic_launcher);
-        card.setDescription("Your description");
-        card.setLeftButtonText("Detail");
-        card.setRightButtonText("I'll watch it");
+        card.setDescription("Scegli tra free tv e pay-tv per vedere i suggerimenti di oggi");
+        card.setLeftButtonText("Free");
+        card.setRightButtonText("Pay-tv");
         card.setDismissible(false);
 
         card.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(TextView t) {
-                Toast.makeText(context, "You have pressed the right button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+
+                if (!first) emptyList(proposal_material_list_view,card);
+                movieList = new ArrayList<Movie>();
+                first=false;
+                new JsonRequest().execute(skyurl);
+
             }
         });
 
         card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(TextView t) {
-                Toast.makeText(context, "You have pressed the left button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
+                if (!first) emptyList(proposal_material_list_view,card);
+                movieList = new ArrayList<Movie>();
+                first=false;
+                new JsonRequest().execute(freeurl);
             }
         });
 
@@ -126,11 +140,16 @@ public class ProposalFragment extends BaseFragment {
 
         return view;
     }
+    private void emptyList(MaterialListView list, Card starting){
 
+        list.removeAllViewsInLayout();
+        list.getAdapter().clear();
+        list.add(starting);
+    }
     private void drawResult() {
         //System.out.println("Size is: "+ movieList.size());
         for (int i = 0; i < movieList.size(); i++) {
-            BasicImageButtonsCard currentcard = new BasicImageButtonsCard();
+            final BasicImageButtonsCard currentcard = new BasicImageButtonsCard();
             Movie currentmovie = movieList.get(i);
 
             String title = currentmovie.getTitle();
@@ -149,7 +168,8 @@ public class ProposalFragment extends BaseFragment {
             currentcard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(TextView t) {
-                    Toast.makeText(context, "You have pressed the right button", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "You have pressed " + currentcard.getTitle(), Toast.LENGTH_SHORT).show();
+
                 }
             });
 
@@ -178,12 +198,12 @@ public class ProposalFragment extends BaseFragment {
 
             final String TAG = ProposalFragment.class.getSimpleName();
 
-            JsonObjectRequest movieReq = new JsonObjectRequest(Request.Method.GET, freeurl, null,
+            JsonObjectRequest movieReq = new JsonObjectRequest(Request.Method.GET, params[0], null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());
-                            System.out.println("I'm in the asynctask here2");
+
 
                             try {
 
