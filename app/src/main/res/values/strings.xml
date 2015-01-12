@@ -11,5 +11,6 @@
     <string name="welcome_text">Welcome back!</string>
     <string name="movie_info_text">Channel: %1$s Time: %2$s</string>
     <string name="feedback_text">Did you like "%1$s" last night?</string>
+    <string name="poster_content_description">Poster</string>
 
 </resources>

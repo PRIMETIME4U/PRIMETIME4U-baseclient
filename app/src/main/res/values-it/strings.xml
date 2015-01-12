@@ -10,4 +10,5 @@
     <string name="welcome_text">Bentornato!</string>
     <string name="movie_info_text">Canale: %1$s Orario: %2$s</string>
     <string name="feedback_text">Ti è piaciuto "%1$s" ieri sera?</string>
+    <string name="poster_content_description">Poster</string>
 </resources>
