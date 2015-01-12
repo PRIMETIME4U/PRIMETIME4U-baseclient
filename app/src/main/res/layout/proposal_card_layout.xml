@@ -36,11 +36,18 @@
                 style="@style/CardTitle"
                 android:id="@+id/titleTextView"
                 tools:text="Title"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_above="@+id/movie_info_text_view"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:background="@drawable/shadow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/big_padding"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:paddingRight="@dimen/big_padding"
+                android:paddingLeft="@dimen/big_padding" />
 
             <View
                 android:id="@+id/cardDivider"
@@ -69,10 +76,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Small Text"
+                tools:text="Movie info"
                 android:id="@+id/movie_info_text_view"
                 android:textColor="@color/accent"
                 android:paddingLeft="@dimen/big_padding"
+                android:paddingTop="@dimen/small_padding"
                 android:textStyle="bold"
                 android:layout_below="@+id/imageView"
                 android:layout_alignParentLeft="true"
@@ -84,7 +92,7 @@
                 android:id="@+id/descriptionTextView"
                 android:textColor="@color/black_button"
                 android:textSize="@dimen/description_size"
-                tools:text="Test description"
+                tools:text="Description"
                 android:layout_below="@+id/movie_info_text_view"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"

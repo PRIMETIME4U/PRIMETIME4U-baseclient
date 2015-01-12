@@ -126,14 +126,14 @@ public class ProposalFragment extends BaseFragment {
             else
                 currentcard.setDescription(currentmovie.getTime() + "\n" + currentmovie.getChannel());
             
-            currentcard.setMovieInfoText("Channel: " + currentmovie.getChannel() + " Time: " + currentmovie.getTime());
+            currentcard.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), currentmovie.getChannel(), currentmovie.getTime()));
             
             currentcard.setTitle(title);
             currentcard.setDrawable(R.drawable.ic_launcher);
             currentcard.setFullWidthDivider(true);
             currentcard.setDividerVisible(true);
-            currentcard.setLeftButtonText("Detail");
-            currentcard.setRightButtonText("I'll watch it");
+            currentcard.setLeftButtonText(getResources().getString(R.string.detail_text));
+            currentcard.setRightButtonText(getResources().getString(R.string.watch_text));
             currentcard.setDismissible(false);
             currentcard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override

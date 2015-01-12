@@ -6,5 +6,10 @@
     <string name="proposal_tab">Proposal</string>
     <string name="tastes_tab">Tastes</string>
     <string name="watched_tab">Watched</string>
+    <string name="detail_text">Detail</string>
+    <string name="watch_text">I\'ll watch it</string>
+    <string name="welcome_text">Welcome back!</string>
+    <string name="movie_info_text">Channel: %1$s Time: %2$s</string>
+    <string name="feedback_text">Did you like "%1$s" last night?</string>
 
 </resources>
