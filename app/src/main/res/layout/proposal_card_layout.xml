@@ -27,33 +27,71 @@
                 android:adjustViewBounds="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:id="@+id/imageView"/>
+                android:id="@+id/imageView"
+                tools:src="@drawable/ic_launcher"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
             <TextView
                 style="@style/CardTitle"
-                android:layout_alignBottom="@+id/imageView"
                 android:id="@+id/titleTextView"
-                tools:text="Title"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/descriptionTextView"
-                android:textColor="@color/description_color"
-                android:padding="@dimen/big_padding"
-                android:textSize="@dimen/description_size"
-                android:layout_below="@+id/imageView"
-                tools:text="Test description"/>
+                tools:text="Title"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_above="@+id/movie_info_text_view"
+                android:textStyle="bold" />
 
             <View
                 android:id="@+id/cardDivider"
                 android:layout_width="fill_parent"
                 android:layout_height="1px"
-                android:background="@color/divider_grey"
-                android:layout_below="@id/descriptionTextView"
-                android:layout_alignLeft="@id/titleTextView"
-                android:layout_alignStart="@id/titleTextView"
-                android:visibility="visible"/>
+                android:background="@color/primary_material_light"
+                android:visibility="visible"
+                android:layout_below="@+id/descriptionTextView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/right_text_button"
+                android:paddingLeft="@dimen/small_padding"
+                android:paddingBottom="@dimen/small_padding"
+                style="@style/RightButtonBaseStyle"
+                tools:text="Right button"
+                android:textColor="@color/accent"
+                android:layout_alignTop="@id/left_text_button"
+                android:layout_toRightOf="@id/left_text_button"
+                android:layout_toEndOf="@id/left_text_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Small Text"
+                android:id="@+id/movie_info_text_view"
+                android:textColor="@color/accent"
+                android:paddingLeft="@dimen/big_padding"
+                android:textStyle="bold"
+                android:layout_below="@+id/imageView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/descriptionTextView"
+                android:textColor="@color/black_button"
+                android:textSize="@dimen/description_size"
+                tools:text="Test description"
+                android:layout_below="@+id/movie_info_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingBottom="@dimen/small_padding" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,29 +105,6 @@
                 android:paddingBottom="@dimen/small_padding"
                 style="@style/LeftButtonBaseStyle"
                 tools:text="Left button"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/right_text_button"
-                android:paddingLeft="@dimen/small_padding"
-                android:paddingBottom="@dimen/small_padding"
-                style="@style/RightButtonBaseStyle"
-                tools:text="Right button"
-                android:layout_alignTop="@id/left_text_button"
-                android:layout_toRightOf="@id/left_text_button"
-                android:layout_toEndOf="@id/left_text_button" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Small Text"
-                android:id="@+id/textView"
-                android:layout_alignBottom="@+id/descriptionTextView"
-                android:layout_alignRight="@+id/right_text_button"
-                android:layout_alignEnd="@+id/right_text_button"
-                android:textColor="@color/accent" />
 
         </RelativeLayout>
 

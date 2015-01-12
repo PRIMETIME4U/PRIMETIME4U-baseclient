@@ -1,37 +1,25 @@
 package it.scripto.primetime4u;
 
-import android.app.DownloadManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.dexafree.materialList.model.BasicButtonsCard;
-import com.dexafree.materialList.controller.OnButtonPressListener;
-import com.dexafree.materialList.model.BasicImageButtonsCard;
-import com.dexafree.materialList.model.BigImageButtonsCard;
-import com.dexafree.materialList.model.Card;
-import com.dexafree.materialList.model.SmallImageCard;
-import com.dexafree.materialList.view.IMaterialView;
-import com.dexafree.materialList.view.MaterialListView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.dexafree.materialList.cards.model.Card;
+import com.dexafree.materialList.controller.OnButtonPressListener;
+import com.dexafree.materialList.view.MaterialListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,21 +29,22 @@ import primetime4u.model.Movie;
 
 public class ProposalFragment extends BaseFragment {
 
+    
+
+    //URL for free and paytv channels suggestions
+    private static final String freeurl = "http://hale-kite-786.appspot.com/api/schedule/free/today";
+    private static final String skyurl = "http://hale-kite-786.appspot.com/api/schedule/sky/today";
+    //list of movies
+    private List<Movie> movieList;
+    private MaterialListView proposal_material_list_view;
+    boolean first=true;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment.
      *
      * @return A new instance of fragment ProposalFragment.
      */
-
-    //URL for free and paytv channels suggestions
-    private static final String freeurl = "http://hale-kite-786.appspot.com/schedule/free/today";
-    private static final String skyurl = "http://hale-kite-786.appspot.com/schedule/sky/today";
-    //list of movies
-    private List<Movie> movieList;
-    private MaterialListView proposal_material_list_view;
-    boolean first=true;
-
     public static ProposalFragment newInstance() {
         return new ProposalFragment();
     }
@@ -81,31 +70,10 @@ public class ProposalFragment extends BaseFragment {
 
         //setting up the materiallistview and movie array
         proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
-        proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
         movieList = new ArrayList<Movie>();
 
-
-
-
-        /*NOTE:
-        Siccome usiamo a quanto pare due versioni diverse di materialList, ho riportato quella che avevo nel vecchio progetto
-        La personalizzata "ProposalCard" genera errori di casting, c'è qualche problema nell'ereditarietà dalla BigImageButtonCard
-
-        Se uso le BigImageButtonCard il titolo, visualizzato in bianco, non compare correttamente:
-        - non compare se non ci sono immagini allegate
-        - se uso un'immagine a fondo bianco, il titolo esce in bianco e se lungo, va troppo in alto e viene tagliato
-        - lascio la prima card per farvi vedere cosa intendo
-
-
-        Ho usato una BasicImageButtonCard per l'elenco dei film
-
-        Giovanni - 16.05, 11.1.2015
-
-        */
-
-        final BigImageButtonsCard card = new BigImageButtonsCard();
+        final ProposalCard card = new ProposalCard(context);
         card.setTitle("PRIMETIME4U");
-        card.setBitmap(context,R.drawable.ic_launcher);
         card.setDescription("Scegli tra free tv e pay-tv per vedere i suggerimenti di oggi");
         card.setLeftButtonText("Free");
         card.setRightButtonText("Pay-tv");
@@ -113,20 +81,19 @@ public class ProposalFragment extends BaseFragment {
 
         card.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
-            public void onButtonPressedListener(TextView t) {
+            public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
                 if (!first) emptyList(proposal_material_list_view,card);
                 movieList = new ArrayList<Movie>();
                 first=false;
                 new JsonRequest().execute(skyurl);
-
             }
         });
 
         card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
             @Override
-            public void onButtonPressedListener(TextView t) {
+            public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
                 if (!first) emptyList(proposal_material_list_view,card);
@@ -149,25 +116,28 @@ public class ProposalFragment extends BaseFragment {
     private void drawResult() {
         //System.out.println("Size is: "+ movieList.size());
         for (int i = 0; i < movieList.size(); i++) {
-            final BasicImageButtonsCard currentcard = new BasicImageButtonsCard();
+            final ProposalCard currentcard = new ProposalCard(context);
             Movie currentmovie = movieList.get(i);
 
             String title = currentmovie.getTitle();
-
-
+            
             if (!currentmovie.getOriginalTitle().equals("null"))
                 currentcard.setDescription("Titolo originale: " + currentmovie.getOriginalTitle() + "\n" + currentmovie.getTime() + "\n" + currentmovie.getChannel());
             else
                 currentcard.setDescription(currentmovie.getTime() + "\n" + currentmovie.getChannel());
-
+            
+            currentcard.setMovieInfoText("Channel: " + currentmovie.getChannel() + " Time: " + currentmovie.getTime());
+            
             currentcard.setTitle(title);
-            currentcard.setBitmap(context,R.drawable.ic_launcher);
+            currentcard.setDrawable(R.drawable.ic_launcher);
+            currentcard.setFullWidthDivider(true);
+            currentcard.setDividerVisible(true);
             currentcard.setLeftButtonText("Detail");
             currentcard.setRightButtonText("I'll watch it");
             currentcard.setDismissible(false);
             currentcard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
-                public void onButtonPressedListener(TextView t) {
+                public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You have pressed " + currentcard.getTitle(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -175,7 +145,7 @@ public class ProposalFragment extends BaseFragment {
 
             currentcard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
-                public void onButtonPressedListener(TextView t) {
+                public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You have pressed the left button", Toast.LENGTH_SHORT).show();
 
                 }

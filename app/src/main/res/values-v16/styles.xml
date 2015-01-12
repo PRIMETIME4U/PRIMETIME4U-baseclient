@@ -17,9 +17,6 @@
 
     <style name="PrimeTimeTheme" parent="PrimeTimeTheme.Base">
 
-
-        <item name="android:fontFamily">sans-serif-light</item>
-
     </style>
 
 

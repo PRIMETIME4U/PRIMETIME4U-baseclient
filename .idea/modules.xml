@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PRIMETIME4U-baseclient.iml" filepath="$PROJECT_DIR$/PRIMETIME4U-baseclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PRIMETIME4U.iml" filepath="$PROJECT_DIR$/PRIMETIME4U.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/materialList/materialList.iml" filepath="$PROJECT_DIR$/materialList/materialList.iml" />
     </modules>
   </component>
 </project>
