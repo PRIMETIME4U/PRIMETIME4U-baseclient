@@ -84,7 +84,7 @@ public class StartActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setto l'intent filter per chiudere questa activity dalla main
+        //setto l'intent filter per chiudere questa activity dalla mainactivity
         IntentFilter filter = new IntentFilter(ACTION_CLOSE);
         closeReceiver = new CloseReceiver();
         registerReceiver(closeReceiver, filter);
