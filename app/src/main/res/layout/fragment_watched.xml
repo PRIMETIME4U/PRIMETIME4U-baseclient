@@ -1,7 +1,15 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="it.scripto.primetime4u.WatchedFragment">
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    tools:context="it.scripto.primetime4u.WatchedFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <com.dexafree.materialList.view.MaterialListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/watched_material_list_view"
+        android:paddingBottom="@dimen/small_padding"
+        android:clipToPadding="false" />
 
 </FrameLayout>
