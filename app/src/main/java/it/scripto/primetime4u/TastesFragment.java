@@ -40,6 +40,29 @@ public class TastesFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+
+        /** in order to add tastes (movies or actors):
+         *
+         * route('/api/tastes/<user_id>/<type>', methods=['GET', 'POST'])
+
+        Endpoint that allow to list all tastes by type or add new one.
+        :param user_id: email of the user
+        :type user_id: string
+        :param type: string
+        :type type: string
+        :return: list of tastes
+        {"code": 0, "data": {"tastes": [{"id_IMDB": id,"original_title": original_title, "poster": poster_url}],
+        "type": type, "user_id": user_id}
+        :rtype: JSON
+        :raise MethodNotAllowed: if method is neither POST neither GET
+        :raise InternalServerError: if user is not subscribed
+        :raise BadRequest: if type is neither artist neither movie
+        :raise InternalServerError: if there is an error from MYAPIFILMS
+        """
+         *
+         */
+
+
         MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
         
         final TasteCard movieCard = new TasteCard(context);

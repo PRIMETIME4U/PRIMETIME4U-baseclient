@@ -15,7 +15,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.dexafree.materialList.cards.model.Card;
+import com.dexafree.materialList.cards.model.WelcomeCard;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.IMaterialView;
 import com.dexafree.materialList.view.MaterialListView;
@@ -34,8 +34,8 @@ public class StartFragment extends BaseFragment {
 
 
     private MaterialListView start_material_list_view;
+    private WelcomeCard welcome;
 
-    private boolean launchmain;
 
     public StartFragment() {
         // Required empty public constructor
@@ -58,8 +58,8 @@ public class StartFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         super.onCreateView(inflater, container, savedInstanceState);
-        launchmain=false;
 
+        //leggo l'email dall'activity sottostante al fragment
         StartActivity base = (StartActivity) this.getActivity();
         final String username=base.getAccount();
 
@@ -67,37 +67,32 @@ public class StartFragment extends BaseFragment {
         start_material_list_view = (MaterialListView) view.findViewById(R.id.start_material_list_view);
         //start_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
-        WelcomeCard welcome = new WelcomeCard(context);
+        welcome = new WelcomeCard(context);
         welcome.setTitle("Dear "+username);
-        welcome.setDescription("Welcome to PRIMETIME4U\n Please, sign-in in order to use our app\n In futuro quest'operazione sara' automatica");
-        welcome.setLeftButtonText("No, thanks");
-        welcome.setRightButtonText("Okay");
+        welcome.setDescription("Welcome to PRIMETIME4U\n\n");
+        /*welcome.setLeftButtonText("No, thanks");
+        welcome.setRightButtonText("Okay");*/
         welcome.setDismissible(false);
-        welcome.setOnRightButtonPressedListener(new OnButtonPressListener() {
+        /*welcome.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(View view, Card card) {
                 //ho l'email, devo registrarlo al server
-                /**
-                 * REGISTRATION JSON:
-                 * {"user_id":"username", "user_name":null, "user_birth_year":null, "user_gender":null}
-                 */
 
-                new JsonPost().execute(username);
+
+
 
             }
         });
         welcome.setOnLeftButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(View view, Card card) {
-                System.out.println("You should sign in");
+                Toast.makeText(context,"Invece dovresti",Toast.LENGTH_LONG).show();
             }
-        });
-        Toast.makeText(context,"Accesso in corso....",Toast.LENGTH_LONG).show();
+        });*/
+
 
         start_material_list_view.add(welcome);
-
-
-
+        new JsonPost().execute(username);
         return view;
     }
 
@@ -107,10 +102,10 @@ public class StartFragment extends BaseFragment {
 
         @Override
         protected Void doInBackground(String... params) {
-            String email = params[0];
+            final String email = params[0];
             JSONObject obj= new JSONObject();
             String subscribeUrl = "http://hale-kite-786.appspot.com/api/subscribe/";
-            /**TODO:
+            /**
              * ATTENZIONE, IL JSON VA MANDATO COMPLETO PER REGISTRARSI CORRETTAMENTE
              * in caso di errori o utente gia' registrato il server risponde con un altro json
              */
@@ -122,7 +117,7 @@ public class StartFragment extends BaseFragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            System.out.println(obj);
+
             /**
              * Creates a new request.
              * @param method the HTTP method to use
@@ -139,9 +134,26 @@ public class StartFragment extends BaseFragment {
                         public void onResponse(JSONObject response) {
                             // response
                             Log.d("Response", response.toString());
+                            //gestione risultato subscribe
+                            try{
+                                code = response.getInt("code");
+                                if (code==1){
+                                    //utente già iscritto, no tutorial
+                                    Toast.makeText(context, "Bentornato "+email,Toast.LENGTH_LONG).show();
+                                }
+                                if (code==0){
+                                    //nuovo utente, si tutorial
+                                    //TODO: qui è il punto in cui si dovrà far partire l'activity del tutorial
+                                    Toast.makeText(context,"Benvenuto nuovo utente",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            catch (JSONException e){
 
-                            //TODO: gestire la risposta, fare parsing della risposta e se correttamente iscritto, lanciare la main
+                            }
+
+                            //chiamo la mainactivity e passo l'email
                             Intent i = new Intent(context,MainActivity.class);
+                            i.putExtra("email",email);
                             startActivity(i);
 
                         }
@@ -164,7 +176,7 @@ public class StartFragment extends BaseFragment {
         }
 
         protected void onPostExecute(Void v){
-            launchmain=true;
+
         }
 
     }

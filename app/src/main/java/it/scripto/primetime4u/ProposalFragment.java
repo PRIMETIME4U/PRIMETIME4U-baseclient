@@ -92,12 +92,15 @@ public class ProposalFragment extends BaseFragment {
 
         movieList = new ArrayList<Movie>();
 
+        MainActivity base = (MainActivity) this.getActivity();
+        String account = base.getAccount();
+
         //welcome card scorso film, compare solo alla prima esecuzione
         if (firstExec) {
             card2 = new WelcomeCard(context);
             card2.setFullWidthDivider(true);
             card2.setDividerVisible(true);
-            card2.setTitle(getResources().getString(R.string.welcome_text));
+            card2.setTitle(getResources().getString(R.string.welcome_text)+" "+account );
             card2.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
             card2.setLeftButtonText(getString(R.string.no_text));
             card2.setRightButtonText(getString(R.string.yes_text));
@@ -138,7 +141,7 @@ public class ProposalFragment extends BaseFragment {
             public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
-                if (!first) emptyList(proposal_material_list_view,card);
+                if (!first) emptyList(proposal_material_list_view,card,card2,firstExec);
                 movieList = new ArrayList<Movie>();
                 first=false;
                 lastChoosen="sky";
@@ -151,7 +154,7 @@ public class ProposalFragment extends BaseFragment {
             public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
-                if (!first) emptyList(proposal_material_list_view,card);
+                if (!first) emptyList(proposal_material_list_view,card,card2,firstExec);
                 movieList = new ArrayList<Movie>();
                 first=false;
                 lastChoosen="free";
@@ -169,11 +172,15 @@ public class ProposalFragment extends BaseFragment {
         }
         return view;
     }
-    private void emptyList(MaterialListView list, Card starting){
-
+    private void emptyList(MaterialListView list, Card starting1, Card starting2, boolean b){
+        //se non abbiamo ancora risposto al "ti è piaciuto il film di ieri", non dobbiamo togliere la card
         list.removeAllViewsInLayout();
         list.getAdapter().clear();
-        list.add(starting);
+        if (b) {
+            list.add(starting2);
+            list.add(starting1);
+        }
+        else list.add(starting1);
 
     }
 

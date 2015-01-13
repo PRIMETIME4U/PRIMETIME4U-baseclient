@@ -14,6 +14,8 @@ import com.astuetz.PagerSlidingTabStrip;
 
 public class MainActivity extends BaseActivity {
 
+    private String account;
+
     @Override
     protected String getTagLog() {
         return "MainActivity";
@@ -27,9 +29,13 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //i close the login activity
+        //I close the login activity
         Intent myIntent = new Intent(StartActivity.ACTION_CLOSE);
         sendBroadcast(myIntent);
+
+        //ricavo l'email passata dalla startActivity
+        account = getIntent().getExtras().getString("email");
+
         // Get and set toolbar as action bar
         Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(main_activity_toolbar);
@@ -41,6 +47,12 @@ public class MainActivity extends BaseActivity {
         // Bind the tabs to the ViewPager
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.main_activity_pager_sliding_tab_strip);
         tabs.setViewPager(pager);
+    }
+
+    public String getAccount(){
+        if (account!=null)
+            return account;
+        else return "";
     }
 
     @Override
