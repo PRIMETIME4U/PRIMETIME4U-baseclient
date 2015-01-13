@@ -13,4 +13,6 @@
     <string name="poster_content_description">Poster</string>
     <string name="no_text">No</string>
     <string name="yes_text">Sì</string>
+    <string name="add_taste_content_description">Aggiungi ai tuoi gusti</string>
+    <string name="remove_taste_content_description">Togli dai tuoi gusti</string>
 </resources>

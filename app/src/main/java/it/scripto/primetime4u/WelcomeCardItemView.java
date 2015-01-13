@@ -3,7 +3,7 @@ package it.scripto.primetime4u;
 import android.content.Context;
 import android.util.AttributeSet;
 
-public class WelcomeCardItemView extends MyBaseButtonsCardItemView {
+public class WelcomeCardItemView extends BaseButtonsCardItemView {
 
     public WelcomeCardItemView(Context context) {
         super(context);

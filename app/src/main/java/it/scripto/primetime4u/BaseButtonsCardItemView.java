@@ -12,19 +12,19 @@ import com.dexafree.materialList.R;
 import com.dexafree.materialList.cards.model.ExtendedCard;
 import com.dexafree.materialList.cards.view.BaseTextCardItemView;
 
-public abstract class MyBaseButtonsCardItemView<T extends ExtendedCard> extends BaseTextCardItemView<T> {
+public abstract class BaseButtonsCardItemView<T extends ExtendedCard> extends BaseTextCardItemView<T> {
     private final static int DIVIDER_MARGIN_DP = 16;
 
-    public MyBaseButtonsCardItemView(Context context) {
+    public BaseButtonsCardItemView(Context context) {
         super(context);
     }
 
-    public MyBaseButtonsCardItemView(Context context, AttributeSet attrs) {
+    public BaseButtonsCardItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public MyBaseButtonsCardItemView(Context context, AttributeSet attrs, int defStyle) {
+    public BaseButtonsCardItemView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
