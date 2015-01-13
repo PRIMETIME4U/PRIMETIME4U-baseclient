@@ -47,9 +47,8 @@ public class TastesFragment extends BaseFragment {
 
         Endpoint that allow to list all tastes by type or add new one.
         :param user_id: email of the user
-        :type user_id: string
-        :param type: string
-        :type type: string
+        :type user_id: string, "movie" or "artist"
+
         :return: list of tastes
         {"code": 0, "data": {"tastes": [{"id_IMDB": id,"original_title": original_title, "poster": poster_url}],
         "type": type, "user_id": user_id}
