@@ -6,12 +6,10 @@ import com.dexafree.materialList.cards.model.ExtendedCard;
 import com.dexafree.materialList.events.BusProvider;
 
 public class ProposalCard extends ExtendedCard {
-
-    private String mMovieInfo;
-
+    protected String mMovieInfo;
+   
     public ProposalCard(Context context) {
         super(context);
-
     }
 
     @Override

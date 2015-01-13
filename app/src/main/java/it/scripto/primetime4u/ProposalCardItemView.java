@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-
 public class ProposalCardItemView<T extends ProposalCard> extends MyBaseButtonsCardItemView<T> {
     
     public ProposalCardItemView(Context context) {

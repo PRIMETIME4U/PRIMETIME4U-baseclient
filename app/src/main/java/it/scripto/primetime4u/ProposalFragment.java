@@ -72,11 +72,13 @@ public class ProposalFragment extends BaseFragment {
         proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         movieList = new ArrayList<Movie>();
 
-        final ProposalCard card = new ProposalCard(context);
-        card.setTitle("PRIMETIME4U");
-        card.setDescription("Scegli tra free tv e pay-tv per vedere i suggerimenti di oggi");
-        card.setLeftButtonText("Free");
-        card.setRightButtonText("Pay-tv");
+        final WelcomeCard card = new WelcomeCard(context);
+        card.setFullWidthDivider(true);
+        card.setDividerVisible(true);
+        card.setTitle(getResources().getString(R.string.welcome_text));
+        card.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
+        card.setLeftButtonText(getString(R.string.no_text));
+        card.setRightButtonText(getString(R.string.yes_text));
         card.setDismissible(false);
 
         card.setOnRightButtonPressedListener(new OnButtonPressListener() {

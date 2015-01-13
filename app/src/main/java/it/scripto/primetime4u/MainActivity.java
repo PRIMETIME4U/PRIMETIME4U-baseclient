@@ -11,7 +11,6 @@ import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
 
-
 public class MainActivity extends BaseActivity {
 
     @Override
