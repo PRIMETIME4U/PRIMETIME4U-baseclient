@@ -15,7 +15,10 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
+import com.dexafree.materialList.view.IMaterialView;
 import com.dexafree.materialList.view.MaterialListView;
+
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +29,8 @@ import java.util.List;
 
 import primetime4u.app.AppController;
 import primetime4u.model.Movie;
+
+
 
 public class ProposalFragment extends BaseFragment {
 
@@ -70,16 +75,51 @@ public class ProposalFragment extends BaseFragment {
 
         //setting up the materiallistview and movie array
         proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
+        /**
+         * PER ORA NIENTE ANIMAZIONI DI CARD, PROBLEMI NELLE LIBRERIE
+         * proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
+         */
+
+
         movieList = new ArrayList<Movie>();
 
+        //welcome card scorso film
+        final WelcomeCard card2 = new WelcomeCard(context);
+        card2.setFullWidthDivider(true);
+        card2.setDividerVisible(true);
+        card2.setTitle(getResources().getString(R.string.welcome_text));
+        card2.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
+        card2.setLeftButtonText(getString(R.string.no_text));
+        card2.setRightButtonText(getString(R.string.yes_text));
+        card2.setDismissible(false);
+        card2.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+            @Override
+            public void onButtonPressedListener(View view, Card card) {
+                Toast.makeText(context,"You pressed No",Toast.LENGTH_SHORT).show();
+                //non è piaciuto il film scorso
+                card2.setDismissible(true);
+                card2.dismiss();
+            }
+        });
+        card2.setOnRightButtonPressedListener(new OnButtonPressListener() {
+            @Override
+            public void onButtonPressedListener(View view, Card card) {
+                Toast.makeText(context,"You pressed Yes",Toast.LENGTH_SHORT).show();
+                //è piaciuto il film scorso
+                card2.setDismissible(true);
+                card2.dismiss();
+            }
+        });
+
+        //card scelta proposte
+
         final WelcomeCard card = new WelcomeCard(context);
+        card.setDescription("Scegli tra i canali free o pay-tv");
         card.setFullWidthDivider(true);
         card.setDividerVisible(true);
-        card.setTitle(getResources().getString(R.string.welcome_text));
-        card.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
-        card.setLeftButtonText(getString(R.string.no_text));
-        card.setRightButtonText(getString(R.string.yes_text));
-        card.setDismissible(false);
+        card.setLeftButtonText("Free");
+        card.setRightButtonText("Pay-tv");
+
 
         card.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
@@ -105,6 +145,7 @@ public class ProposalFragment extends BaseFragment {
             }
         });
 
+        proposal_material_list_view.add(card2);
         proposal_material_list_view.add(card);
 
         return view;
@@ -212,6 +253,7 @@ public class ProposalFragment extends BaseFragment {
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Toast.makeText(context,"Impossibile caricare la lista al momento, riprova tra poco",Toast.LENGTH_LONG).show();
 
                             }
                         }
