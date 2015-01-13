@@ -2,7 +2,10 @@ package it.scripto.primetime4u;
 
 import android.accounts.AccountManager;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -25,10 +28,23 @@ public class StartActivity extends BaseActivity {
     /**
      * Launcher activity, retrieves users' email in order to subscribe to primetime4u service
      */
+    public static final String ACTION_CLOSE = "it.scripto.primetime4u.ACTION_CLOSE";
+
+    private CloseReceiver closeReceiver;
 
     private static final int REQUEST_CODE_EMAIL = 1;
 
     private String account;
+
+    class CloseReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ACTION_CLOSE)) {
+                StartActivity.this.finish();
+            }
+        }
+    }
 
     @Override
     protected String getTagLog() {
@@ -68,6 +84,10 @@ public class StartActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setto l'intent filter per chiudere questa activity dalla main
+        IntentFilter filter = new IntentFilter(ACTION_CLOSE);
+        closeReceiver = new CloseReceiver();
+        registerReceiver(closeReceiver, filter);
 
         System.out.println("i'm here, in onCreate");
 

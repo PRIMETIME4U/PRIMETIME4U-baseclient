@@ -1,5 +1,6 @@
 package it.scripto.primetime4u;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,7 +27,9 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //i close the login activity
+        Intent myIntent = new Intent(StartActivity.ACTION_CLOSE);
+        sendBroadcast(myIntent);
         // Get and set toolbar as action bar
         Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(main_activity_toolbar);
