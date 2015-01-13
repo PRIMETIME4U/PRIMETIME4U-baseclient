@@ -44,7 +44,8 @@ public class TastesFragment extends BaseFragment {
         
         final TasteCard movieCard = new TasteCard(context);
         movieCard.setTitle("Dead Poets Society");
-        movieCard.setDescription("Film");
+        movieCard.setDismissible(false);
+        movieCard.setType(TasteCard.MOVIE_TYPE);
         movieCard.setDrawable(R.drawable.ic_launcher);
         movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
             @Override
@@ -54,8 +55,21 @@ public class TastesFragment extends BaseFragment {
             }
         });
         
+        final TasteCard artistCard = new TasteCard(context);
+        artistCard.setTitle("Robin Williams");
+        artistCard.setDismissible(false);
+        artistCard.setType(TasteCard.ARTIST_TYPE);
+        artistCard.setDrawable(R.drawable.ic_launcher);
+        artistCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+            @Override
+            public void onButtonPressedListener(View view, Card card) {
+                String toastText = artistCard.getTaste() ? "Me gusta" : "Me disgusta";
+                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();               
+            }
+        });
         
         tastes_material_list_view.add(movieCard);
+        tastes_material_list_view.add(artistCard);
 
         return view;
     }

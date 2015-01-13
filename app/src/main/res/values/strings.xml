@@ -16,5 +16,7 @@
     <string name="no_text">No</string>
     <string name="add_taste_content_description">Add to your tastes</string>
     <string name="remove_taste_content_description">Remove from your tastes</string>
+    <string name="movie">Movie</string>
+    <string name="artist">Artist</string>
 
 </resources>

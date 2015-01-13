@@ -5,6 +5,8 @@
     <com.dexafree.materialList.view.MaterialListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/proposal_material_list_view"/>
+        android:id="@+id/proposal_material_list_view"
+        android:paddingBottom="@dimen/small_padding"
+        android:clipToPadding="false" />
 
 </FrameLayout>

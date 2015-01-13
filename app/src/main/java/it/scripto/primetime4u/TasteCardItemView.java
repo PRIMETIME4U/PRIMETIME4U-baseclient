@@ -1,9 +1,13 @@
 package it.scripto.primetime4u;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView<T> {
     public TasteCardItemView(Context context) {
@@ -39,5 +43,18 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
             tasteImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_add_taste));
         }
         
+        // Set description
+        TextView mDescription = (TextView) findViewById(R.id.descriptionTextView);
+        mDescription.setText(card.getType() == 0 ? getResources().getString(R.string.movie) : getResources().getString(R.string.artist));
+        
+        // Set width
+        DisplayMetrics dm = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        CardView cardView = (CardView) findViewById(R.id.cardView);
+        
+        if (card.getType() == 1) {
+            cardView.getLayoutParams().width = width / 2 - 8;
+        }
     }
 }
