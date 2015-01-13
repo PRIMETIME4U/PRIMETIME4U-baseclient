@@ -15,4 +15,6 @@
     <string name="yes_text">Sì</string>
     <string name="add_taste_content_description">Aggiungi ai tuoi gusti</string>
     <string name="remove_taste_content_description">Togli dai tuoi gusti</string>
+    <string name="artist">Artista</string>
+    <string name="movie">Film</string>
 </resources>

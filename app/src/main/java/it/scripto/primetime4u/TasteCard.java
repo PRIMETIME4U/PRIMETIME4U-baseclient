@@ -8,9 +8,12 @@ import com.dexafree.materialList.events.BusProvider;
 
 public class TasteCard extends BigImageCard {
 
+    public static final int MOVIE_TYPE = 0;
+    public static final int ARTIST_TYPE = 1;
+    
     protected OnButtonPressListener onTasteButtonPressedListener;
     protected boolean taste = false;
-
+    protected int type = MOVIE_TYPE;
 
     public TasteCard(Context context) {
         super(context);
@@ -36,5 +39,13 @@ public class TasteCard extends BigImageCard {
     public void setTaste(boolean taste) {
         this.taste = taste;
         BusProvider.dataSetChanged();
+    }
+    
+    public void setType(int type) {
+        this.type = type;
+    } 
+    
+    public int getType() {
+        return this.type;
     }
 }
