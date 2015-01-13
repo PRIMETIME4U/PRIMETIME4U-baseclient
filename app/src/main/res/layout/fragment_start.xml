@@ -1,0 +1,10 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="it.scripto.primetime4u.StartFragment">
+
+    <com.dexafree.materialList.view.MaterialListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/start_material_list_view"/>
+
+</FrameLayout>
