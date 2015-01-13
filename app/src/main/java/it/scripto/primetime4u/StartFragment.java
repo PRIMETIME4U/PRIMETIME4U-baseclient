@@ -72,6 +72,7 @@ public class StartFragment extends BaseFragment {
         welcome.setDescription("Welcome to PRIMETIME4U\n Please, sign-in in order to use our app\n In futuro quest'operazione sara' automatica");
         welcome.setLeftButtonText("No, thanks");
         welcome.setRightButtonText("Okay");
+        welcome.setDismissible(false);
         welcome.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(View view, Card card) {

@@ -42,7 +42,16 @@ public class ProposalFragment extends BaseFragment {
     //list of movies
     private List<Movie> movieList;
     private MaterialListView proposal_material_list_view;
-    boolean first=true;
+    boolean first=true;  //mi serve per controllare se la lista film è stata riempita già prima
+
+    private WelcomeCard card = null;
+    private WelcomeCard card2 = null;
+
+    //mi serve per ricordare l'ultima scelt fatta dall'utente, se free o sky
+    private String lastChoosen = "";
+
+    private boolean firstExec = true; //mi serve per controllare se è il primo accesso al fragment da parte dell'utente
+
 
     /**
      * Use this factory method to create a new instance of
@@ -83,43 +92,46 @@ public class ProposalFragment extends BaseFragment {
 
         movieList = new ArrayList<Movie>();
 
-        //welcome card scorso film
-        final WelcomeCard card2 = new WelcomeCard(context);
-        card2.setFullWidthDivider(true);
-        card2.setDividerVisible(true);
-        card2.setTitle(getResources().getString(R.string.welcome_text));
-        card2.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
-        card2.setLeftButtonText(getString(R.string.no_text));
-        card2.setRightButtonText(getString(R.string.yes_text));
-        card2.setDismissible(false);
-        card2.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context,"You pressed No",Toast.LENGTH_SHORT).show();
-                //non è piaciuto il film scorso
-                card2.setDismissible(true);
-                card2.dismiss();
-            }
-        });
-        card2.setOnRightButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context,"You pressed Yes",Toast.LENGTH_SHORT).show();
-                //è piaciuto il film scorso
-                card2.setDismissible(true);
-                card2.dismiss();
-            }
-        });
+        //welcome card scorso film, compare solo alla prima esecuzione
+        if (firstExec) {
+            card2 = new WelcomeCard(context);
+            card2.setFullWidthDivider(true);
+            card2.setDividerVisible(true);
+            card2.setTitle(getResources().getString(R.string.welcome_text));
+            card2.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
+            card2.setLeftButtonText(getString(R.string.no_text));
+            card2.setRightButtonText(getString(R.string.yes_text));
+            card2.setDismissible(false);
+            card2.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
+                    //non è piaciuto il film scorso
+                    card2.setDismissible(true);
+                    card2.dismiss();
+                    firstExec=false;
+                }
+            });
+            card2.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
+                    //è piaciuto il film scorso
+                    card2.setDismissible(true);
+                    card2.dismiss();
+                    firstExec=false;
+                }
+            });
+        }
+        //card scelta proposte, rimane sempre
 
-        //card scelta proposte
-
-        final WelcomeCard card = new WelcomeCard(context);
+        card = new WelcomeCard(context);
         card.setDescription("Scegli tra i canali free o pay-tv");
         card.setFullWidthDivider(true);
         card.setDividerVisible(true);
         card.setLeftButtonText("Free");
         card.setRightButtonText("Pay-tv");
-
+        card.setDismissible(false);
 
         card.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
@@ -129,6 +141,7 @@ public class ProposalFragment extends BaseFragment {
                 if (!first) emptyList(proposal_material_list_view,card);
                 movieList = new ArrayList<Movie>();
                 first=false;
+                lastChoosen="sky";
                 new JsonRequest().execute(skyurl);
             }
         });
@@ -141,13 +154,19 @@ public class ProposalFragment extends BaseFragment {
                 if (!first) emptyList(proposal_material_list_view,card);
                 movieList = new ArrayList<Movie>();
                 first=false;
+                lastChoosen="free";
                 new JsonRequest().execute(freeurl);
             }
         });
 
-        proposal_material_list_view.add(card2);
+        if (firstExec) proposal_material_list_view.add(card2);
         proposal_material_list_view.add(card);
-
+        if (!first){
+            //se avevo una lista prima, devo rimetterla
+            Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+            if (lastChoosen.equals("free")) new JsonRequest().execute(freeurl);
+            if (lastChoosen.equals("sky")) new JsonRequest().execute(skyurl);
+        }
         return view;
     }
     private void emptyList(MaterialListView list, Card starting){
@@ -155,14 +174,16 @@ public class ProposalFragment extends BaseFragment {
         list.removeAllViewsInLayout();
         list.getAdapter().clear();
         list.add(starting);
+
     }
+
     private void drawResult() {
         //System.out.println("Size is: "+ movieList.size());
         for (int i = 0; i < movieList.size(); i++) {
-            final ProposalCard currentcard = new ProposalCard(context);
+            ProposalCard currentcard = new ProposalCard(context);
             Movie currentmovie = movieList.get(i);
 
-            String title = currentmovie.getTitle();
+            final String title = currentmovie.getTitle();
             
             if (!currentmovie.getOriginalTitle().equals("null"))
                 currentcard.setDescription("Titolo originale: " + currentmovie.getOriginalTitle() + "\n" + currentmovie.getTime() + "\n" + currentmovie.getChannel());
@@ -181,7 +202,7 @@ public class ProposalFragment extends BaseFragment {
             currentcard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You have pressed " + currentcard.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "You have pressed " + title, Toast.LENGTH_SHORT).show();
 
                 }
             });
