@@ -48,9 +48,9 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
         mDescription.setText(card.getType() == 0 ? getResources().getString(R.string.movie) : getResources().getString(R.string.artist));
         
         // Set width
-        DisplayMetrics dm = new DisplayMetrics();
-        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int width = dm.widthPixels;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
         CardView cardView = (CardView) findViewById(R.id.cardView);
         
         if (card.getType() == 1) {

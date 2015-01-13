@@ -18,7 +18,7 @@
     <string name="remove_taste_content_description">Remove from your tastes</string>
     <string name="movie">Movie</string>
     <string name="artist">Artist</string>
-
+    <string name="watched_text">Watched on %1$s</string>
 
 
 </resources>

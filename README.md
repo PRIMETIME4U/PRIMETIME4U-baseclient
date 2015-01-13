@@ -1,6 +1,9 @@
 ## PRIMETIME4U
 
-The only app that allows you to plop down to the couch and simply enjoy a movie.
+*The only app that allows you to plop down to the couch and simply enjoy a movie.*
+
+### What is it?
+PRIMETIME4U is an app that simply help you in the daily choose your movie for your evening. It collects your tastes and it finds for you the best movie in the evening.
 
 [PRIMETIME4U Site](http://hale-kite-786.appspot.com/)
 
