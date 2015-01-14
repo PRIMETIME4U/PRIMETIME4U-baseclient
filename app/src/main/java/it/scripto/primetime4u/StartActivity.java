@@ -89,7 +89,7 @@ public class StartActivity extends BaseActivity {
         closeReceiver = new CloseReceiver();
         registerReceiver(closeReceiver, filter);
 
-        System.out.println("i'm here, in onCreate");
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.start_activity_toolbar);
         setSupportActionBar(toolbar);

@@ -1,5 +1,6 @@
 package it.scripto.primetime4u;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,7 +51,8 @@ public class ProposalFragment extends BaseFragment {
     //mi serve per ricordare l'ultima scelt fatta dall'utente, se free o sky
     private String lastChoosen = "";
 
-    private boolean firstExec = true; //mi serve per controllare se è il primo accesso al fragment da parte dell'utente
+    //mi serve per controllare se è il primo accesso al fragment da parte dell'utente
+    private boolean firstExec = true;
 
 
     /**
@@ -164,11 +166,14 @@ public class ProposalFragment extends BaseFragment {
 
         if (firstExec) proposal_material_list_view.add(card2);
         proposal_material_list_view.add(card);
-        if (!first){
+        if (!first && movieList.isEmpty()){
             //se avevo una lista prima, devo rimetterla
             Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
             if (lastChoosen.equals("free")) new JsonRequest().execute(freeurl);
             if (lastChoosen.equals("sky")) new JsonRequest().execute(skyurl);
+        }
+        if (!first && !movieList.isEmpty()){
+            drawResult();
         }
         return view;
     }
@@ -210,15 +215,17 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You have pressed " + title, Toast.LENGTH_SHORT).show();
-
+                    //TODO: Scelto film da mostrare
                 }
             });
 
             currentcard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You have pressed the left button", Toast.LENGTH_SHORT).show();
-
+                    //Toast.makeText(context, "You have pressed the left button", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(context,DetailsActivity.class);
+                    i.putExtra("film",title);
+                    startActivity(i);
                 }
             });
             proposal_material_list_view.add(currentcard);
