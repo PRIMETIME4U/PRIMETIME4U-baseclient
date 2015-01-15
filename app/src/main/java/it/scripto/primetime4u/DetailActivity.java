@@ -25,7 +25,7 @@ public class DetailActivity extends BaseActivity {
     
     public final static String EXTRA_ID_IMDB = "ID_IMDB";
     public final static String EXTRA_ORIGINAL_TITLE = "ORIGINAL_TITLE";
-    
+    //
     @Override
     protected String getTagLog() {
         return "DetailActivity";
