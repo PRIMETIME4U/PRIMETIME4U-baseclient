@@ -30,6 +30,9 @@ import primetime4u.util.Utils;
 public class WatchedFragment extends BaseFragment {
 
     private MaterialListView watched_material_list_view;
+    private List<Movie> watchedList = new ArrayList<>();
+    private List<String> dateList = new ArrayList<>();
+    private String account;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,58 +62,51 @@ public class WatchedFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        // Setting up material list
         watched_material_list_view = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
 
+        // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
-        String account = base.getAccount();
+        account = base.getAccount();
 
+        // Generate URL
         String url = Utils.SERVER_API + "watched/" + account;
 
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-
-                    List<Movie> watchedList = new ArrayList<>();
-                    List<String> dateList = new ArrayList<>();
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
-                        try {
-                            JSONObject data = response.getJSONObject("data");
-                            JSONArray watcheds = data.getJSONArray("watched");
-
-                            for (int i = 0; i < watcheds.length(); i++) {
-                                JSONObject watchedJSON = watcheds.getJSONObject(i);
-
-                                Movie watched = new Movie();
-                                watched.setOriginalTitle(watchedJSON.getString("original_title"));
-                                watched.setIdIMDB(watchedJSON.getString("id_IMDB"));
-                                watched.setPoster(watchedJSON.getString("poster"));
-                                
-                                watchedList.add(watched);
-                                dateList.add(watchedJSON.getString("date"));
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-
-                        drawResult(watchedList, dateList);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        });
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+        // Get watcheds
+        get(url);
+        
         return view;
     }
 
-    private void drawResult(List<Movie> watchedList, List<String> dateList) {
+    /**
+     *
+     */
+    private void parseResponse(JSONObject response) {
+        try {
+            JSONObject data = response.getJSONObject("data");
+            JSONArray watcheds = data.getJSONArray("watched");
+
+            for (int i = 0; i < watcheds.length(); i++) {
+                JSONObject watchedJSON = watcheds.getJSONObject(i);
+
+                Movie watched = new Movie();
+                watched.setOriginalTitle(watchedJSON.getString("original_title"));
+                watched.setIdIMDB(watchedJSON.getString("id_IMDB"));
+                watched.setPoster(watchedJSON.getString("poster"));
+
+                watchedList.add(watched);
+                dateList.add(watchedJSON.getString("date"));
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     *
+     */
+    private void drawResult() {
         for (int i = 0; i < watchedList.size(); i++) {
             final Movie watched = watchedList.get(i);
 
@@ -130,5 +126,43 @@ public class WatchedFragment extends BaseFragment {
             watched_material_list_view.add(watchedCard);
         }
     }
+    
+    /**
+     *
+     */
+    private void get(String url) {
+        JsonObjectRequest proposalRequest = new JsonObjectRequest(
+                Request.Method.GET, 
+                url, 
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
 
+                        watchedList.clear();
+                        dateList.clear();
+
+                        parseResponse(response);
+
+                        drawResult();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
+                 }
+        );
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(proposalRequest);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle toSave) {
+        super.onSaveInstanceState(toSave);
+        // TODO: save watchedsList in order to reuse after
+    }
 }

@@ -30,6 +30,8 @@ import primetime4u.util.Utils;
 public class TastesFragment extends BaseFragment {
 
     private MaterialListView tastes_material_list_view;
+    private List<Movie> tastesList = new ArrayList<>();
+    private String account;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,56 +61,50 @@ public class TastesFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        // Setting up material list
         tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
-
-        MainActivity base = (MainActivity) this.getActivity();
-        String account = base.getAccount();
         
+        // Get user_id
+        MainActivity base = (MainActivity) this.getActivity();
+        account = base.getAccount();
+        
+        // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
-
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-
-                    List<Movie> tastesList = new ArrayList<>();
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
-                        try {
-                            JSONObject data = response.getJSONObject("data");
-                            JSONArray tastes = data.getJSONArray("tastes");
-
-                            for (int i = 0; i < tastes.length(); i++) {
-                                JSONObject tasteJSON = tastes.getJSONObject(i);
-
-                                Movie proposal = new Movie();
-                                proposal.setOriginalTitle(tasteJSON.getString("original_title"));
-                                proposal.setIdIMDB(tasteJSON.getString("id_IMDB"));
-                                proposal.setPoster(tasteJSON.getString("poster"));
-
-                                tastesList.add(proposal);
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-
-                        drawResult(tastesList);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        });
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+        
+        // Get tastes
+        get(url);
+        
         return view;
     }
+    
+    /**
+     *
+     */
+    private void parseResponse(JSONObject response) {
+        try {
+            JSONObject data = response.getJSONObject("data");
+            JSONArray tastes = data.getJSONArray("tastes");
 
-    private void drawResult(List<Movie> tastesList) {
+            for (int i = 0; i < tastes.length(); i++) {
+                JSONObject tasteJSON = tastes.getJSONObject(i);
+
+                Movie proposal = new Movie();
+                proposal.setOriginalTitle(tasteJSON.getString("original_title"));
+                proposal.setIdIMDB(tasteJSON.getString("id_IMDB"));
+                proposal.setPoster(tasteJSON.getString("poster"));
+
+                tastesList.add(proposal);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    /**
+     *
+     */
+    private void drawResult() {
         for (int i = 0; i < tastesList.size(); i++) {
             final Movie taste = tastesList.get(i);
 
@@ -125,28 +121,8 @@ public class TastesFragment extends BaseFragment {
 
 
                     } else {
-                        String url = Utils.SERVER_API + "tastes/" + "pastorini.claudio@gmail.com" + "/movie/" + taste.getIdIMDB();
-
-                        JsonObjectRequest tasteDelete = new JsonObjectRequest(
-                                Request.Method.DELETE,
-                                url,
-                                null,
-                                new Response.Listener<JSONObject>() {
-
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        Log.i(TAG, String.valueOf(response));
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                                    }
-                                });
-
-                        // Adding request to request queue
-                        AppController.getInstance().addToRequestQueue(tasteDelete);
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
+                        deleteTaste(url);
                     }
                 }
             });
@@ -155,10 +131,74 @@ public class TastesFragment extends BaseFragment {
         }
     }
 
+    /**
+     *
+     */
+    private void get(String url) {
+        JsonObjectRequest proposalRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        tastesList.clear();
+
+                        parseResponse(response);
+
+                        drawResult();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+                    }
+                }
+        );
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(proposalRequest);
+    }
+
+    /**
+     *
+     */
+    private void deleteTaste(String url) {
+        JsonObjectRequest tasteDelete = new JsonObjectRequest(
+                Request.Method.DELETE,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        tastesList.clear();
+
+                        parseResponse(response);
+
+                        drawResult();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
+                }
+        );
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(tasteDelete);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-
+        // TODO: save tastesList in order to reuse after
     }
-
 }

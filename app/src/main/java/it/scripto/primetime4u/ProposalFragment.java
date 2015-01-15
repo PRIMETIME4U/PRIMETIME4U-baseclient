@@ -32,6 +32,8 @@ import primetime4u.util.Utils;
 public class ProposalFragment extends BaseFragment {
 
     private MaterialListView proposal_material_list_view;
+    private List<Movie> proposalList = new ArrayList<>();
+    private String account;
 
     /**
      * Use this factory method to create a new instance of
@@ -57,31 +59,31 @@ public class ProposalFragment extends BaseFragment {
         return R.layout.fragment_proposal;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        //setting up the materiallistview and movie array
+        // Setting up material list
         proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
-        /**
-         * PER ORA NIENTE ANIMAZIONI DI CARD, PROBLEMI NELLE LIBRERIE
-         * proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
-         */
+        // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
+        // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
-        String account = base.getAccount();
+        account = base.getAccount();
 
-        //welcome card scorso film, compare solo alla prima esecuzione
+        // WelcomeCard visible only if yesterday user saw a movie
+        // TODO: check if user saw a movie yesterday
         final WelcomeCard welcomeCard = new WelcomeCard(context);
         welcomeCard.setFullWidthDivider(true);
         welcomeCard.setDividerVisible(true);
-        //togliete il " + account" dal titolo, l'ho messo per provare le shared preferences
+
+        // TODO: remove account string
         welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + account);
         welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
         welcomeCard.setLeftButtonText(getString(R.string.no_text));
         welcomeCard.setRightButtonText(getString(R.string.yes_text));
         welcomeCard.setDismissible(false);
+        
         welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(View view, Card card) {
@@ -91,6 +93,7 @@ public class ProposalFragment extends BaseFragment {
                 welcomeCard.dismiss();
             }
         });
+        
         welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
             @Override
             public void onButtonPressedListener(View view, Card card) {
@@ -102,59 +105,44 @@ public class ProposalFragment extends BaseFragment {
         });
         
         proposal_material_list_view.add(welcomeCard);
-
+        
+        // Generate URL
         String url = Utils.SERVER_API + "proposal/" + account;
         
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    
-                    List<Movie> proposalList = new ArrayList<>();
-                    
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
-                        try {
-                            JSONObject data = response.getJSONObject("data");
-                            JSONArray proposals = data.getJSONArray("proposal");
-
-                            for (int i = 0; i < proposals.length(); i++) {
-                                JSONObject proposalJSON = proposals.getJSONObject(i);
-
-                                Movie proposal = new Movie();
-                                proposal.setOriginalTitle(proposalJSON.getString("original_title"));
-                                proposal.setChannel(proposalJSON.getString(("channel")));
-                                proposal.setTime(proposalJSON.getString("time"));
-                                proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
-                                proposal.setPoster(proposalJSON.getString("poster"));
-                                proposal.setSimplePlot(proposalJSON.getString("simple_plot"));
-
-                                proposalList.add(proposal);
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-                        
-                        drawResult(proposalList);
-                    }
-                }, 
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                    }
-        });
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+        // Get proposals
+        get(url);
+        
         return view;
     }
+    
+    private void parseResponse(JSONObject response) {
+        try {
+            JSONObject data = response.getJSONObject("data");
+            JSONArray proposals = data.getJSONArray("proposal");
 
-    private void drawResult(List<Movie> proposalList) {
+            for (int i = 0; i < proposals.length(); i++) {
+                JSONObject proposalJSON = proposals.getJSONObject(i);
+
+                Movie proposal = new Movie();
+                proposal.setOriginalTitle(proposalJSON.getString("original_title"));
+                proposal.setChannel(proposalJSON.getString(("channel")));
+                proposal.setTime(proposalJSON.getString("time"));
+                proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
+                proposal.setPoster(proposalJSON.getString("poster"));
+                proposal.setSimplePlot(proposalJSON.getString("simple_plot"));
+
+                proposalList.add(proposal);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     *
+     */
+    private void drawResult() {
         for (int i = 0; i < proposalList.size(); i++) {
             ProposalCard card = new ProposalCard(context);
             final Movie proposal = proposalList.get(i);
@@ -177,7 +165,7 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You have pressed " + originalTitle, Toast.LENGTH_SHORT).show();
-                    //TODO: Scelto film da mostrare
+                    //TODO: Manage "I'll watch it"
                 }
             });
 
@@ -192,14 +180,46 @@ public class ProposalFragment extends BaseFragment {
                     startActivity(intent);
                 }
             });
-            
+
             proposal_material_list_view.add(card);
         }
+    }
+
+    /**
+     *
+     */
+    private void get(String url) {
+        JsonObjectRequest proposalRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        proposalList.clear();
+
+                        parseResponse(response);
+
+                        drawResult();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
+                }
+        );
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(proposalRequest);
     }
 
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-
+        // TODO: save poposalList in order to reuse after
     }
 }

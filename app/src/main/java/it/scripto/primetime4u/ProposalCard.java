@@ -39,31 +39,27 @@ public class ProposalCard extends ExtendedCard {
         BusProvider.dataSetChanged();
     }
 
-    public void setPoster(String imgurl){
-        new DownloadImageTask().execute(imgurl);
+    public void setPoster(String imageUrl){
+        new DownloadImageTask().execute(imageUrl);
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-
         protected Bitmap doInBackground(String... urls) {
 
-            String urldisplay = urls[0];
-            Bitmap _bitmap = null;
+            Bitmap bitmap = null;
 
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                _bitmap = BitmapFactory.decodeStream(in);
+                InputStream in = new java.net.URL(urls[0]).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                Log.e("Errore", e.getMessage());
-                e.printStackTrace();
+                Log.e("ProposalCard", e.getMessage());
             }
 
-            return _bitmap;
+            return bitmap;
         }
 
         protected void onPostExecute(Bitmap result) {
-
             poster = result;
             draw();
         }
@@ -71,7 +67,7 @@ public class ProposalCard extends ExtendedCard {
     }
 
     private void draw(){
-        Drawable d = new BitmapDrawable(this.getResources(),poster);
-        this.setDrawable(d);
+        Drawable drawable = new BitmapDrawable(this.getResources(), poster);
+        this.setDrawable(drawable);
     }
 }
