@@ -61,41 +61,12 @@ public class TastesFragment extends BaseFragment {
 
         tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
 
-        final TasteCard movieCard = new TasteCard(context);
-        movieCard.setTitle("Dead Poets Society");
-        movieCard.setDismissible(false);
-        movieCard.setType(TasteCard.MOVIE_TYPE);
-        movieCard.setDrawable(R.drawable.ic_launcher);
-        movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                String toastText = movieCard.getTaste() ? "Me gusta" : "Me disgusta";
-                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        final TasteCard artistCard = new TasteCard(context);
-        artistCard.setTitle("Robin Williams");
-        artistCard.setDismissible(false);
-        artistCard.setType(TasteCard.ARTIST_TYPE);
-        artistCard.setDrawable(R.drawable.ic_launcher);
-        artistCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                String toastText = artistCard.getTaste() ? "Me gusta" : "Me disgusta";
-                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        tastes_material_list_view.add(movieCard);
-        tastes_material_list_view.add(artistCard);
-
         String url = Utils.SERVER_API + "tastes/" + "pastorini.claudio@gmail.com" + "/movie";
 
         JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
 
-                    List<Movie> proposalList = new ArrayList<>();
+                    List<Movie> tastesList = new ArrayList<>();
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -103,27 +74,24 @@ public class TastesFragment extends BaseFragment {
 
                         try {
                             JSONObject data = response.getJSONObject("data");
-                            JSONArray proposals = data.getJSONArray("proposal");
+                            JSONArray tastes = data.getJSONArray("tastes");
 
-                            for (int i = 0; i < proposals.length(); i++) {
-                                JSONObject proposalJSON = proposals.getJSONObject(i);
+                            for (int i = 0; i < tastes.length(); i++) {
+                                JSONObject proposalJSON = tastes.getJSONObject(i);
 
                                 Movie proposal = new Movie();
                                 proposal.setOriginalTitle(proposalJSON.getString("original_title"));
-                                proposal.setChannel(proposalJSON.getString(("channel")));
-                                proposal.setTime(proposalJSON.getString("time"));
                                 proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
                                 proposal.setPoster(proposalJSON.getString("poster"));
-                                proposal.setSimplePlot(proposalJSON.getString("simple_plot"));
 
-                                proposalList.add(proposal);
+                                tastesList.add(proposal);
                             }
                         } catch (JSONException e) {
                             Log.e(TAG, e.toString());
                             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
                         }
 
-                        drawResult(proposalList);
+                        drawResult(tastesList);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -145,6 +113,7 @@ public class TastesFragment extends BaseFragment {
 
             final TasteCard movieCard = new TasteCard(context);
             movieCard.setTitle(originalTitle);
+            movieCard.setTaste(true);
             movieCard.setDismissible(false);
             movieCard.setType(TasteCard.MOVIE_TYPE);
             movieCard.setDrawable(R.drawable.ic_launcher);
