@@ -29,6 +29,7 @@ import primetime4u.model.Movie;
 import primetime4u.util.Utils;
 
 
+
 public class ProposalFragment extends BaseFragment {
 
     private MaterialListView proposal_material_list_view;
@@ -132,7 +133,7 @@ public class ProposalFragment extends BaseFragment {
                             }
                         } catch (JSONException e) {
                             Log.e(TAG, e.toString());
-                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Impossibile caricare la lista al momento, riprova tra poco", Toast.LENGTH_LONG).show();
                         }
                         
                         drawResult(proposalList);
@@ -152,14 +153,14 @@ public class ProposalFragment extends BaseFragment {
     private void drawResult(List<Movie> proposalList) {
         for (int i = 0; i < proposalList.size(); i++) {
             ProposalCard card = new ProposalCard(context);
-            final Movie proposal = proposalList.get(i);
+            Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
 
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
             card.setDescription(proposal.getSimplePlot());
-            card.setDrawable(R.drawable.ic_launcher);
+            card.setPoster(proposal.getPoster());
 
             card.setFullWidthDivider(true);
             card.setDividerVisible(true);
@@ -180,8 +181,7 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     Intent intent = new Intent(context, DetailActivity.class);
-                    intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
-                    intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, proposal.getOriginalTitle());
+                    intent.putExtra("film", originalTitle);
                     startActivity(intent);
                 }
             });
