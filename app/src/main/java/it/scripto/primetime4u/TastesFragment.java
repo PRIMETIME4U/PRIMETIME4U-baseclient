@@ -63,7 +63,7 @@ public class TastesFragment extends BaseFragment {
 
 
         MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
-        
+
         final TasteCard movieCard = new TasteCard(context);
         movieCard.setTitle("Dead Poets Society");
         movieCard.setDismissible(false);
@@ -76,7 +76,7 @@ public class TastesFragment extends BaseFragment {
                 Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         final TasteCard artistCard = new TasteCard(context);
         artistCard.setTitle("Robin Williams");
         artistCard.setDismissible(false);
@@ -86,10 +86,10 @@ public class TastesFragment extends BaseFragment {
             @Override
             public void onButtonPressedListener(View view, Card card) {
                 String toastText = artistCard.getTaste() ? "Me gusta" : "Me disgusta";
-                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();               
+                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         tastes_material_list_view.add(movieCard);
         tastes_material_list_view.add(artistCard);
 
