@@ -18,4 +18,5 @@
     <string name="artist">Artista</string>
     <string name="movie">Film</string>
     <string name="watched_text">Guardato il %1$s</string>
+    <string name="title_activity_detail">DetailActivity</string>
 </resources>
