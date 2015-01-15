@@ -45,6 +45,8 @@ public class DetailsFragment extends BaseFragment{
 
     private final String detailsurl="http://hale-kite-786.appspot.com/api/detail/movie/tt0240890";
 
+    private String id;
+
     private MaterialListView details_material_list_view;
 
     private Bitmap poster;
@@ -73,6 +75,11 @@ public class DetailsFragment extends BaseFragment{
         super.onCreateView(inflater, container, savedInstanceState);
         DetailsActivity base;
         base = (DetailsActivity) this.getActivity();
+        id = "";
+        //da "base" ricaverò l'id del film che andrò a cercare nei dettagli
+        //id = base.getMovieId()
+        //detailsurl = detailsurl + id;
+
         film = new HashMap<String,String>();
 
         details_material_list_view = (MaterialListView) view.findViewById(R.id.details_material_list_view);
@@ -213,7 +220,8 @@ public class DetailsFragment extends BaseFragment{
         card.setTitle(film.get("title"));
         Drawable d = new BitmapDrawable(this.getResources(),poster);
         card.setDrawable(d);
-        card.setDescription(film.get("plot"));
+        card.setDismissible(false);
+        card.setDescription("Titolo originale: "+film.get("original_title")+"\n"+film.get("plot"));
         card.setLeftButtonText("Left");
         card.setRightButtonText("Right");
         card.setOnLeftButtonPressedListener(new OnButtonPressListener() {

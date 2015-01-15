@@ -40,13 +40,14 @@ public class ProposalFragment extends BaseFragment {
     //URL for free and paytv channels suggestions
     private static final String freeurl = "http://hale-kite-786.appspot.com/api/schedule/free/today";
     private static final String skyurl = "http://hale-kite-786.appspot.com/api/schedule/sky/today";
+    private static String proposalurl = "http://hale-kite-786.appspot.com/api/proposal/";
     //list of movies
     private List<Movie> movieList;
     private MaterialListView proposal_material_list_view;
     boolean first=true;  //mi serve per controllare se la lista film è stata riempita già prima
 
     private WelcomeCard card = null;
-    private WelcomeCard card2 = null;
+    private WelcomeCard cardLastMovie = null;
 
     //mi serve per ricordare l'ultima scelt fatta dall'utente, se free o sky
     private String lastChoosen = "";
@@ -96,42 +97,47 @@ public class ProposalFragment extends BaseFragment {
 
         MainActivity base = (MainActivity) this.getActivity();
         String account = base.getAccount();
+        proposalurl = proposalurl + account;
 
         //welcome card scorso film, compare solo alla prima esecuzione
         if (firstExec) {
-            card2 = new WelcomeCard(context);
-            card2.setFullWidthDivider(true);
-            card2.setDividerVisible(true);
-            card2.setTitle(getResources().getString(R.string.welcome_text)+" "+account );
-            card2.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
-            card2.setLeftButtonText(getString(R.string.no_text));
-            card2.setRightButtonText(getString(R.string.yes_text));
-            card2.setDismissible(false);
-            card2.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+            cardLastMovie = new WelcomeCard(context);
+            cardLastMovie.setFullWidthDivider(true);
+            cardLastMovie.setDividerVisible(true);
+            cardLastMovie.setTitle(getResources().getString(R.string.welcome_text)+" "+account );
+            cardLastMovie.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
+            cardLastMovie.setLeftButtonText(getString(R.string.no_text));
+            cardLastMovie.setRightButtonText(getString(R.string.yes_text));
+            cardLastMovie.setDismissible(false);
+            cardLastMovie.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
                     //non è piaciuto il film scorso
-                    card2.setDismissible(true);
-                    card2.dismiss();
+                    cardLastMovie.setDismissible(true);
+                    cardLastMovie.dismiss();
                     firstExec=false;
                 }
             });
-            card2.setOnRightButtonPressedListener(new OnButtonPressListener() {
+            cardLastMovie.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
                     //è piaciuto il film scorso
-                    card2.setDismissible(true);
-                    card2.dismiss();
+                    cardLastMovie.setDismissible(true);
+                    cardLastMovie.dismiss();
                     firstExec=false;
                 }
             });
         }
-        //card scelta proposte, rimane sempre
+
+        //TODO: asyncTask come in DetailsFragment, ottengo info film in una ProposalCard, e lancio DetailsActivity se premo su tasto dettagli
+        //dopo i suggerimenti, metto la card per proporre altri film!
+
+
 
         card = new WelcomeCard(context);
-        card.setDescription("Scegli tra i canali free o pay-tv");
+        card.setDescription("Per vedere gli altri film in programmazione, clicca su Free o Pay-tv");
         card.setFullWidthDivider(true);
         card.setDividerVisible(true);
         card.setLeftButtonText("Free");
@@ -143,7 +149,7 @@ public class ProposalFragment extends BaseFragment {
             public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
-                if (!first) emptyList(proposal_material_list_view,card,card2,firstExec);
+                if (!first) emptyList(proposal_material_list_view,card,cardLastMovie,firstExec);
                 movieList = new ArrayList<Movie>();
                 first=false;
                 lastChoosen="sky";
@@ -156,7 +162,7 @@ public class ProposalFragment extends BaseFragment {
             public void onButtonPressedListener(View view, Card card) {
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
-                if (!first) emptyList(proposal_material_list_view,card,card2,firstExec);
+                if (!first) emptyList(proposal_material_list_view,card,cardLastMovie,firstExec);
                 movieList = new ArrayList<Movie>();
                 first=false;
                 lastChoosen="free";
@@ -164,8 +170,10 @@ public class ProposalFragment extends BaseFragment {
             }
         });
 
-        if (firstExec) proposal_material_list_view.add(card2);
+        if (firstExec) proposal_material_list_view.add(cardLastMovie);
         proposal_material_list_view.add(card);
+
+
         if (!first && movieList.isEmpty()){
             //se avevo una lista prima, devo rimetterla
             Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
@@ -175,6 +183,8 @@ public class ProposalFragment extends BaseFragment {
         if (!first && !movieList.isEmpty()){
             drawResult();
         }
+
+
         return view;
     }
     private void emptyList(MaterialListView list, Card starting1, Card starting2, boolean b){
@@ -269,7 +279,7 @@ public class ProposalFragment extends BaseFragment {
                                 }
 
                                 movieList = movieList2;
-
+                                //TODO:mettere drawresult nel onpostexecute
                                 drawResult();
                                 //movie.setRating(((Number) obj.get("rating"))
                                 //        .doubleValue());
@@ -310,5 +320,54 @@ public class ProposalFragment extends BaseFragment {
 
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle toSave) {
+        super.onSaveInstanceState(toSave);
+
+    }
+
+    class ProposalTask extends AsyncTask<String,Void,Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            /**RISPOSTA JSON
+             * {
+             "code": 0,
+             "data": {
+             "proposal": [
+             {
+             "channel": "Rai Movie",
+             "id_IMDB": "tt0240890",
+             "original_title": "Serendipity",
+             "poster": "http://ia.media-imdb.com/images/M/MV5BMTkzMjEzOTQ3Nl5BMl5BanBnXkFtZTYwMjI1NzU5._V1_SY317_CR4,0,214,317_AL_.jpg",
+             "simple_plot": "A couple reunite years after the night they first met, fell in love, and separated, convinced that one day they'd end up together.",
+             "time": "21:15"
+             },
+             {
+             "channel": "Iris",
+             "id_IMDB": "tt0146309",
+             "original_title": "Thirteen Days",
+             "poster": "http://ia.media-imdb.com/images/M/MV5BMTkwMTkxNTYyM15BMl5BanBnXkFtZTYwOTc5NTk2._V1_SY317_CR1,0,214,317_AL_.jpg",
+             "simple_plot": "A dramatization of President Kennedy's administration's struggle to contain the Cuban Missile Crisis in October of 1962.",
+             "time": "21:00"
+             },
+             {
+             "channel": "Rai Movie",
+             "id_IMDB": "tt0240890",
+             "original_title": "Serendipity",
+             "poster": "http://ia.media-imdb.com/images/M/MV5BMTkzMjEzOTQ3Nl5BMl5BanBnXkFtZTYwMjI1NzU5._V1_SY317_CR4,0,214,317_AL_.jpg",
+             "simple_plot": "A couple reunite years after the night they first met, fell in love, and separated, convinced that one day they'd end up together.",
+             "time": "21:15"
+             }
+             ],
+             "user_id": "gc240790@gmail.com"
+             }
+             }
+             */
+            return null;
+        }
     }
 }
