@@ -5,6 +5,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -25,7 +26,9 @@ public class DetailActivity extends BaseActivity {
     
     public final static String EXTRA_ID_IMDB = "ID_IMDB";
     public final static String EXTRA_ORIGINAL_TITLE = "ORIGINAL_TITLE";
-    
+    public final static String EXTRA_CHANNEL = "CHANNEL";
+    public final static String EXTRA_TIME = "TIME";
+
     @Override
     protected String getTagLog() {
         return "DetailActivity";
@@ -48,11 +51,15 @@ public class DetailActivity extends BaseActivity {
 
         String idIMDB = null;
         String originalTitle = null;
+        String channel = null;
+        String time = null;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             idIMDB = extras.getString(EXTRA_ID_IMDB);
             originalTitle = extras.getString(EXTRA_ORIGINAL_TITLE);
+            channel = extras.getString(EXTRA_CHANNEL);
+            time = extras.getString(EXTRA_TIME);
         }
 
         if (originalTitle != null) {
@@ -61,6 +68,8 @@ public class DetailActivity extends BaseActivity {
 
         String url = Utils.SERVER_API + "detail/movie/" + idIMDB;
 
+        final String finalTime = time;
+        final String finalChannel = channel;
         JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
 
@@ -68,11 +77,14 @@ public class DetailActivity extends BaseActivity {
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
+                        Movie movie = new Movie();
+                        movie.setChannel(finalChannel);
+                        movie.setTime(finalTime);
+
                         try {
                             JSONObject data = response.getJSONObject("data");
                             JSONObject detail = data.getJSONObject("detail");
 
-                            Movie movie = new Movie();
                             movie.setOriginalTitle(detail.getString("original_title"));
                             movie.setPlot(detail.getString("plot"));
                             movie.setPoster(detail.getString("poster"));
@@ -86,6 +98,8 @@ public class DetailActivity extends BaseActivity {
                             Log.e(TAG, e.toString());
                             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                         }
+                        
+                        drawResult(movie);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -98,6 +112,24 @@ public class DetailActivity extends BaseActivity {
         AppController.getInstance().addToRequestQueue(proposalRequest);
     }
 
+    private void drawResult(Movie movie) {
+        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
+        TextView movieInfoTextView = (TextView) findViewById(R.id.movie_info_text_view);
+        TextView timeGenreTextView = (TextView) findViewById(R.id.time_genre_text_view);
+        TextView directorsTextView = (TextView) findViewById(R.id.directors_value_text_view);
+        TextView writersTextView = (TextView) findViewById(R.id.writers_value_text_view);
+        TextView actorsTextView = (TextView) findViewById(R.id.actors_value_text_view);
+        TextView plotTextView = (TextView) findViewById(R.id.plot_value_text_view);
+        
+        titleTextView.setText(movie.getOriginalTitle());
+        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), movie.getChannel(), movie.getTime()));
+        timeGenreTextView.setText(movie.getRunTimes());
+        directorsTextView.setText("Claudio Pastorini");
+        writersTextView.setText("Giovanni Colonna");
+        actorsTextView.setText("Dorel Coman, Marius Ionita");
+        plotTextView.setText(movie.getPlot());
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

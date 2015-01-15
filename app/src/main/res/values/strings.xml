@@ -20,5 +20,9 @@
     <string name="artist">Artist</string>
     <string name="watched_text">Watched on %1$s</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="directors">Directors:</string>
+    <string name="writers">Writers:</string>
+    <string name="actors">Actors:</string>
+    <string name="plot">Plot:</string>
 
 </resources>

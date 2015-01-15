@@ -27,10 +27,182 @@
         android:layout_marginLeft="@dimen/small_padding"
         card_view:cardCornerRadius="@dimen/card_corner_radius">
 
-        <TextView
-            android:id="@+id/info_text"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/title_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:paddingLeft="@dimen/big_padding"
+                style="@style/PrimeTime.Display1"
+                android:textColor="@color/black_button"
+                tools:text="Title"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:id="@+id/movie_info_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/caption_text"
+                android:textStyle="bold"
+                tools:text="Movie info"
+                android:layout_below="@+id/title_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:id="@+id/time_genre_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/big_padding"
+                android:paddingBottom="@dimen/big_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/primary_material_light"
+                android:textSize="@dimen/subhead_text"
+                tools:text="Time - Genre | Genre"
+                android:textStyle="bold"
+                android:layout_below="@+id/movie_info_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:id="@+id/directors_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/body1_text"
+                android:textStyle="bold"
+                android:text="@string/directors"
+                android:layout_below="@+id/time_genre_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                tools:text="@string/writers"
+                android:id="@+id/writers_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/body1_text"
+                android:textStyle="bold"
+                android:layout_below="@+id/directors_value_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/writers" />
+
+            <TextView
+                tools:text="@string/actors"
+                android:id="@+id/actors_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/body1_text"
+                android:textStyle="bold"
+                android:layout_below="@+id/writers_value_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/actors" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/directors"
+                android:id="@+id/directors_value_text_view"
+                android:textColor="@color/grey_title"
+                android:textStyle="bold"
+                android:layout_below="@+id/directors_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/writers_value_text_view"
+                android:textColor="@color/grey_title" 
+                tools:text="@string/writers"
+                android:textStyle="bold"
+                android:layout_below="@+id/writers_text_view"
+                android:layout_alignLeft="@+id/directors_value_text_view"
+                android:layout_alignStart="@+id/directors_value_text_view"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/big_padding"
+                android:id="@+id/actors_value_text_view"
+                android:textColor="@color/grey_title"
+                android:textStyle="bold"
+                tools:text="@string/actors"
+                android:layout_below="@+id/actors_text_view"
+                android:layout_alignLeft="@+id/writers_value_text_view"
+                android:layout_alignStart="@+id/writers_value_text_view"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:text="@string/plot"
+                android:id="@+id/plot_text_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/small_padding"
+                android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/body1_text"
+                android:textStyle="bold"
+                android:layout_below="@+id/actors_value_text_view"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollView"
+                android:layout_below="@+id/plot_text_view"
+                android:layout_alignLeft="@+id/actors_value_text_view"
+                android:layout_alignStart="@+id/actors_value_text_view"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true" >
+
+                <TextView
+                    tools:text="@string/plot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/big_padding"
+                    android:id="@+id/plot_value_text_view"
+                    android:textColor="@color/grey_title"
+                    android:textStyle="bold" />
+            </ScrollView>
+
+        </RelativeLayout>
     </android.support.v7.widget.CardView>
     
 </LinearLayout>

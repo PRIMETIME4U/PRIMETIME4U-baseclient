@@ -19,4 +19,8 @@
     <string name="movie">Film</string>
     <string name="watched_text">Guardato il %1$s</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="writers">Scrittori:</string>
+    <string name="directors">Registi:</string>
+    <string name="actors">Attori:</string>
+    <string name="plot">Trama:</string>
 </resources>

@@ -182,6 +182,8 @@ public class ProposalFragment extends BaseFragment {
                     Intent intent = new Intent(context, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
                     intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, proposal.getOriginalTitle());
+                    intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
+                    intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
                     startActivity(intent);
                 }
             });

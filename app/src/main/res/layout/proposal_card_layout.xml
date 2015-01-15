@@ -57,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:paddingTop="@dimen/small_padding"
                 android:paddingLeft="@dimen/big_padding"
+                android:paddingRight="@dimen/big_padding"
                 android:layout_below="@+id/imageView"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
