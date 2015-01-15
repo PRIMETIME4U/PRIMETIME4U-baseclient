@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import primetime4u.app.AppController;
-import primetime4u.model.Proposal;
+import primetime4u.model.Movie;
 
 
 public class ProposalFragment extends BaseFragment {
@@ -106,7 +106,7 @@ public class ProposalFragment extends BaseFragment {
         JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     
-                    List<Proposal> proposalList = new ArrayList<>();
+                    List<Movie> proposalList = new ArrayList<>();
                     
                     @Override
                     public void onResponse(JSONObject response) {
@@ -119,7 +119,7 @@ public class ProposalFragment extends BaseFragment {
                             for (int i = 0; i < proposals.length(); i++) {
                                 JSONObject proposalJSON = proposals.getJSONObject(i);
 
-                                Proposal proposal = new Proposal();
+                                Movie proposal = new Movie();
                                 proposal.setOriginalTitle(proposalJSON.getString("original_title"));
                                 proposal.setChannel(proposalJSON.getString(("channel")));
                                 proposal.setTime(proposalJSON.getString("time"));
@@ -131,7 +131,7 @@ public class ProposalFragment extends BaseFragment {
                             }
                         } catch (JSONException e) {
                             Log.e(TAG, e.toString());
-                            Toast.makeText(context, "Impossibile caricare la lista al momento, riprova tra poco", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
                         }
                         
                         drawResult(proposalList);
@@ -148,10 +148,10 @@ public class ProposalFragment extends BaseFragment {
         return view;
     }
 
-    private void drawResult(List<Proposal> proposalList) {
+    private void drawResult(List<Movie> proposalList) {
         for (int i = 0; i < proposalList.size(); i++) {
             ProposalCard card = new ProposalCard(context);
-            Proposal proposal = proposalList.get(i);
+            final Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
 
@@ -178,8 +178,9 @@ public class ProposalFragment extends BaseFragment {
             card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Intent intent = new Intent(context, DetailsActivity.class);
-                    intent.putExtra("film", originalTitle);
+                    Intent intent = new Intent(context, DetailActivity.class);
+                    intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
+                    intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, proposal.getOriginalTitle());
                     startActivity(intent);
                 }
             });

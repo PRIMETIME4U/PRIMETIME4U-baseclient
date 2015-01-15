@@ -80,7 +80,9 @@
                 android:textColor="@color/grey_title"
                 android:textSize="@dimen/body1_text"
                 android:textStyle="bold"
-                tools:text="Description" />
+                tools:text="Description"
+                android:maxLines="3"
+                android:ellipsize="end" />
 
             <View
                 android:id="@+id/cardDivider"
