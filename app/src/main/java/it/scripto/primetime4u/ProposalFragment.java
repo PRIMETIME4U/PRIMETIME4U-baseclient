@@ -105,7 +105,10 @@ public class ProposalFragment extends BaseFragment {
 
         String url = Utils.SERVER_API + "proposal/" + account;
         
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+        JsonObjectRequest proposalRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
                 new Response.Listener<JSONObject>() {
                     
                     List<Movie> proposalList = new ArrayList<>();
@@ -138,11 +141,12 @@ public class ProposalFragment extends BaseFragment {
                         
                         drawResult(proposalList);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
+                }, 
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
         });
 
         // Adding request to request queue

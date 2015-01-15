@@ -61,7 +61,10 @@ public class TastesFragment extends BaseFragment {
 
         tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
 
-        String url = Utils.SERVER_API + "tastes/" + "pastorini.claudio@gmail.com" + "/movie";
+        MainActivity base = (MainActivity) this.getActivity();
+        String account = base.getAccount();
+        
+        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
 
         JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -77,12 +80,12 @@ public class TastesFragment extends BaseFragment {
                             JSONArray tastes = data.getJSONArray("tastes");
 
                             for (int i = 0; i < tastes.length(); i++) {
-                                JSONObject proposalJSON = tastes.getJSONObject(i);
+                                JSONObject tasteJSON = tastes.getJSONObject(i);
 
                                 Movie proposal = new Movie();
-                                proposal.setOriginalTitle(proposalJSON.getString("original_title"));
-                                proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
-                                proposal.setPoster(proposalJSON.getString("poster"));
+                                proposal.setOriginalTitle(tasteJSON.getString("original_title"));
+                                proposal.setIdIMDB(tasteJSON.getString("id_IMDB"));
+                                proposal.setPoster(tasteJSON.getString("poster"));
 
                                 tastesList.add(proposal);
                             }
@@ -105,14 +108,12 @@ public class TastesFragment extends BaseFragment {
         return view;
     }
 
-    private void drawResult(List<Movie> proposalList) {
-        for (int i = 0; i < proposalList.size(); i++) {
-            Movie proposal = proposalList.get(i);
-
-            String originalTitle = proposal.getOriginalTitle();
+    private void drawResult(List<Movie> tastesList) {
+        for (int i = 0; i < tastesList.size(); i++) {
+            final Movie taste = tastesList.get(i);
 
             final TasteCard movieCard = new TasteCard(context);
-            movieCard.setTitle(originalTitle);
+            movieCard.setTitle(taste.getOriginalTitle());
             movieCard.setTaste(true);
             movieCard.setDismissible(false);
             movieCard.setType(TasteCard.MOVIE_TYPE);
@@ -120,8 +121,33 @@ public class TastesFragment extends BaseFragment {
             movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    String toastText = movieCard.getTaste() ? "Me gusta" : "Me disgusta";
-                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+                    if (movieCard.getTaste()) {
+
+
+                    } else {
+                        String url = Utils.SERVER_API + "tastes/" + "pastorini.claudio@gmail.com" + "/movie/" + taste.getIdIMDB();
+
+                        JsonObjectRequest tasteDelete = new JsonObjectRequest(
+                                Request.Method.DELETE,
+                                url,
+                                null,
+                                new Response.Listener<JSONObject>() {
+
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        Log.i(TAG, String.valueOf(response));
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                                    }
+                                });
+
+                        // Adding request to request queue
+                        AppController.getInstance().addToRequestQueue(tasteDelete);
+                    }
                 }
             });
             
