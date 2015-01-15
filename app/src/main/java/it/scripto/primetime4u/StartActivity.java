@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -28,6 +29,10 @@ public class StartActivity extends BaseActivity {
     /**
      * Launcher activity, retrieves users' email in order to subscribe to primetime4u service
      */
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
+
     public static final String ACTION_CLOSE = "it.scripto.primetime4u.ACTION_CLOSE";
 
     private CloseReceiver closeReceiver;
@@ -71,6 +76,10 @@ public class StartActivity extends BaseActivity {
         if (requestCode == REQUEST_CODE_EMAIL && resultCode == RESULT_OK) {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             account=accountName;
+            preferences = getPreferences(Context.MODE_PRIVATE);
+            editor = preferences.edit();
+            editor.putString("ACCOUNT",account);
+            editor.commit();
             createFrag();
 
         }
@@ -91,20 +100,32 @@ public class StartActivity extends BaseActivity {
 
 
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.start_activity_toolbar);
         setSupportActionBar(toolbar);
 
+        //controllo se l'utente e' nuovo
+        preferences = getPreferences(Context.MODE_PRIVATE);
 
-        //ricavo l'email associata al dispositivo
-        try {
-            Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                    new String[] { GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE }, false, null, null, null, null);
-            System.out.println("i just passed account picker");
-            startActivityForResult(intent, REQUEST_CODE_EMAIL);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+        if (preferences.contains("ACCOUNT")){
+            //utente vecchio
+            createFrag();
+            account = preferences.getString("ACCOUNT","");
+            account = account + "OLD";
         }
 
+        else
+        {
+            //ricavo l'email associata al dispositivo
+            try {
+                Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                        new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
+
+                startActivityForResult(intent, REQUEST_CODE_EMAIL);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+            }
+        }
 
 
     }

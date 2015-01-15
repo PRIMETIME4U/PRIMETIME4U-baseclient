@@ -76,7 +76,8 @@ public class ProposalFragment extends BaseFragment {
         final WelcomeCard welcomeCard = new WelcomeCard(context);
         welcomeCard.setFullWidthDivider(true);
         welcomeCard.setDividerVisible(true);
-        welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
+        //togliete il " + account" dal titolo, l'ho messo per provare le shared preferences
+        welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + account);
         welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
         welcomeCard.setLeftButtonText(getString(R.string.no_text));
         welcomeCard.setRightButtonText(getString(R.string.yes_text));
@@ -159,7 +160,7 @@ public class ProposalFragment extends BaseFragment {
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
             card.setDescription(proposal.getSimplePlot());
-            card.setDrawable(R.drawable.ic_launcher);
+            card.setPoster(proposal.getPoster());
 
             card.setFullWidthDivider(true);
             card.setDividerVisible(true);

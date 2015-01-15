@@ -1,6 +1,10 @@
 package primetime4u.model;
-
 import java.util.ArrayList;
+
+/**
+ * Created by Giovanni on 06/12/2014.
+ */
+
 
 public class Movie {
     private String title;

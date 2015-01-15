@@ -61,7 +61,7 @@ public class StartFragment extends BaseFragment {
 
         //leggo l'email dall'activity sottostante al fragment
         StartActivity base = (StartActivity) this.getActivity();
-        final String username=base.getAccount();
+        String username=base.getAccount();
 
 
         start_material_list_view = (MaterialListView) view.findViewById(R.id.start_material_list_view);
@@ -92,7 +92,16 @@ public class StartFragment extends BaseFragment {
 
 
         start_material_list_view.add(welcome);
-        new JsonPost().execute(username);
+        if (username.charAt(username.length()-1)=='D' && username.charAt(username.length()-2)=='L' && username.charAt(username.length()-3)=='O'){
+            //se è vecchio
+            int end = username.length()-3;
+            username = username.substring(0,end);
+            Intent i = new Intent(context,MainActivity.class);
+            i.putExtra("email",username);
+            startActivity(i);
+
+        }
+        else new JsonPost().execute(username);
         return view;
     }
 

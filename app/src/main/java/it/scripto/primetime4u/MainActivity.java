@@ -1,6 +1,8 @@
 package it.scripto.primetime4u;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,10 @@ import com.astuetz.PagerSlidingTabStrip;
 public class MainActivity extends BaseActivity {
 
     private String account;
+
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
 
     @Override
     protected String getTagLog() {
@@ -33,9 +39,18 @@ public class MainActivity extends BaseActivity {
         Intent myIntent = new Intent(StartActivity.ACTION_CLOSE);
         sendBroadcast(myIntent);
 
-        //ricavo l'email passata dalla startActivity
-        account = getIntent().getExtras().getString("email");
+        preferences = getPreferences(Context.MODE_PRIVATE);
 
+        //ricavo l'email passata dalla startActivity
+        if (!preferences.contains("ACCOUNT")){
+            account = getIntent().getExtras().getString("email");
+            editor = preferences.edit();
+            editor.putString("ACCOUNT",account);
+            editor.commit();
+        }
+        else {
+            account = preferences.getString("ACCOUNT","");
+        }
         // Get and set toolbar as action bar
         Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(main_activity_toolbar);
