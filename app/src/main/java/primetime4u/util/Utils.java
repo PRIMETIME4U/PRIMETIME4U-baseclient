@@ -1,4 +1,4 @@
-package it.scripto.primetime4u;
+package primetime4u.util;
 
 public class Utils {
     

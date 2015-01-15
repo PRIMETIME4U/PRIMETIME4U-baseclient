@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import primetime4u.app.AppController;
 import primetime4u.model.Movie;
+import primetime4u.util.Utils;
 
 
 public class DetailActivity extends BaseActivity {
@@ -95,7 +96,6 @@ public class DetailActivity extends BaseActivity {
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(proposalRequest);
-        
     }
 
     @Override

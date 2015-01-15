@@ -26,6 +26,7 @@ import java.util.List;
 
 import primetime4u.app.AppController;
 import primetime4u.model.Movie;
+import primetime4u.util.Utils;
 
 
 public class ProposalFragment extends BaseFragment {

@@ -19,9 +19,13 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
         android:layout_gravity="center"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        card_view:cardCornerRadius="4dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/content_top_padding"
+        android:layout_marginBottom="@dimen/small_padding"
+        android:layout_marginRight="@dimen/small_padding"
+        android:layout_marginLeft="@dimen/small_padding"
+        card_view:cardCornerRadius="@dimen/card_corner_radius">
 
         <TextView
             android:id="@+id/info_text"

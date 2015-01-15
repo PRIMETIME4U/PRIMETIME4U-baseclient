@@ -1,16 +1,35 @@
 package it.scripto.primetime4u;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import primetime4u.app.AppController;
+import primetime4u.model.Movie;
+import primetime4u.util.Utils;
+
 public class TastesFragment extends BaseFragment {
+
+    private MaterialListView tastes_material_list_view;
 
     /**
      * Use this factory method to create a new instance of
@@ -40,29 +59,7 @@ public class TastesFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-
-        /** in order to add tastes (movies or actors):
-         *
-         * route('/api/tastes/<user_id>/<type>', methods=['GET', 'POST'])
-
-        Endpoint that allow to list all tastes by type or add new one.
-        :param user_id: email of the user
-        :type user_id: string, "movie" or "artist"
-
-        :return: list of tastes
-        {"code": 0, "data": {"tastes": [{"id_IMDB": id,"original_title": original_title, "poster": poster_url}],
-        "type": type, "user_id": user_id}
-        :rtype: JSON
-        :raise MethodNotAllowed: if method is neither POST neither GET
-        :raise InternalServerError: if user is not subscribed
-        :raise BadRequest: if type is neither artist neither movie
-        :raise InternalServerError: if there is an error from MYAPIFILMS
-        """
-         *
-         */
-
-
-        MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
 
         final TasteCard movieCard = new TasteCard(context);
         movieCard.setTitle("Dead Poets Society");
@@ -93,7 +90,80 @@ public class TastesFragment extends BaseFragment {
         tastes_material_list_view.add(movieCard);
         tastes_material_list_view.add(artistCard);
 
+        String url = Utils.SERVER_API + "tastes/" + "pastorini.claudio@gmail.com" + "/movie";
+
+        JsonObjectRequest proposalRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+
+                    List<Movie> proposalList = new ArrayList<>();
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+                            JSONObject data = response.getJSONObject("data");
+                            JSONArray proposals = data.getJSONArray("proposal");
+
+                            for (int i = 0; i < proposals.length(); i++) {
+                                JSONObject proposalJSON = proposals.getJSONObject(i);
+
+                                Movie proposal = new Movie();
+                                proposal.setOriginalTitle(proposalJSON.getString("original_title"));
+                                proposal.setChannel(proposalJSON.getString(("channel")));
+                                proposal.setTime(proposalJSON.getString("time"));
+                                proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
+                                proposal.setPoster(proposalJSON.getString("poster"));
+                                proposal.setSimplePlot(proposalJSON.getString("simple_plot"));
+
+                                proposalList.add(proposal);
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+                        }
+
+                        drawResult(proposalList);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+            }
+        });
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(proposalRequest);
         return view;
+    }
+
+    private void drawResult(List<Movie> proposalList) {
+        for (int i = 0; i < proposalList.size(); i++) {
+            Movie proposal = proposalList.get(i);
+
+            String originalTitle = proposal.getOriginalTitle();
+
+            final TasteCard movieCard = new TasteCard(context);
+            movieCard.setTitle(originalTitle);
+            movieCard.setDismissible(false);
+            movieCard.setType(TasteCard.MOVIE_TYPE);
+            movieCard.setDrawable(R.drawable.ic_launcher);
+            movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    String toastText = movieCard.getTaste() ? "Me gusta" : "Me disgusta";
+                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+                }
+            });
+            
+            tastes_material_list_view.add(movieCard);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle toSave) {
+        super.onSaveInstanceState(toSave);
+
     }
 
 }
