@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import primetime4u.app.AppController;
@@ -32,6 +33,7 @@ public class WatchedFragment extends BaseFragment {
     private MaterialListView watched_material_list_view;
     private List<Movie> watchedList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
+    private List<Integer> tasteList = new ArrayList<>();
     private String account;
 
     /**
@@ -96,6 +98,7 @@ public class WatchedFragment extends BaseFragment {
 
                 watchedList.add(watched);
                 dateList.add(watchedJSON.getString("date"));
+                tasteList.add(watchedJSON.getInt("tasted"));
             }
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
@@ -113,13 +116,20 @@ public class WatchedFragment extends BaseFragment {
             final WatchedCard watchedCard = new WatchedCard(context);
             watchedCard.setTitle(watched.getOriginalTitle());
             watchedCard.setDate(dateList.get(i));
+            watchedCard.setTaste(tasteList.get(i) == 1);
             watchedCard.setDismissible(false);
             watchedCard.setPoster(watched.getPoster());
             watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    String toastText = watchedCard.getTaste() ? "Me gusta" : "Me disgusta";
-                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+                    if (watchedCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+                        Log.i(TAG, url);
+                        addTaste(url, watched.getOriginalTitle());
+                    } else {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + watched.getIdIMDB();
+                        deleteTaste(url);
+                    }
                 }
             });
 
@@ -142,6 +152,7 @@ public class WatchedFragment extends BaseFragment {
 
                         watchedList.clear();
                         dateList.clear();
+                        tasteList.clear();
 
                         parseResponse(response);
 
@@ -159,7 +170,63 @@ public class WatchedFragment extends BaseFragment {
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(proposalRequest);
     }
+    /**
+     *
+     */
+    private void addTaste(String url, final String movieTitle) {
+        
+        HashMap<String, String> params = new HashMap<>();
+        params.put("movie_title", movieTitle);
+        
+        JsonObjectRequest tasteAdd = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                        // TODO: manage response (update tastesFragment)
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
+                }
+        );
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(tasteAdd);
+    }
 
+    /**
+     *
+     */
+    private void deleteTaste(String url) {
+        JsonObjectRequest tasteDelete = new JsonObjectRequest(
+                Request.Method.DELETE,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                        // TODO: manage response (update tastesFragment)
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.e(TAG, "Error: " + error.getMessage());
+                    }
+                }
+        );
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(tasteDelete);
+    }
+    
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);

@@ -6,7 +6,7 @@ public class Movie {
     private String originalTitle;
     private String simplePlot;
     private String plot;
-    private ArrayList<String> genres;
+    private String genres;
     private String year;
     private String runTimes;
     private String rated;
@@ -56,11 +56,11 @@ public class Movie {
         this.plot = plot;
     }
 
-    public ArrayList<String> getGenres() {
+    public String getGenres() {
         return genres;
     }
 
-    public void setGenres(ArrayList<String> genres) {
+    public void setGenres(String genres) {
         this.genres = genres;
     }
 

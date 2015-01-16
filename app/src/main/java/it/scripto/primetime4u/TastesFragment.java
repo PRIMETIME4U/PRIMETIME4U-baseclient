@@ -126,7 +126,7 @@ public class TastesFragment extends BaseFragment {
                     }
                 }
             });
-            
+
             tastes_material_list_view.add(movieCard);
         }
     }

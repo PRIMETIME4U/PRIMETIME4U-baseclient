@@ -28,7 +28,6 @@ import primetime4u.app.AppController;
 import primetime4u.model.Movie;
 import primetime4u.util.Utils;
 
-
 public class ProposalFragment extends BaseFragment {
 
     private MaterialListView proposal_material_list_view;
@@ -72,13 +71,13 @@ public class ProposalFragment extends BaseFragment {
         account = base.getAccount();
 
         // WelcomeCard visible only if yesterday user saw a movie
-        // TODO: check if user saw a movie yesterday
+        // TODO: check if user saw a movie yesterday and manage it
         final WelcomeCard welcomeCard = new WelcomeCard(context);
         welcomeCard.setFullWidthDivider(true);
         welcomeCard.setDividerVisible(true);
 
         // TODO: remove account string
-        welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + account);
+        welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + "\n" + account);
         welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
         welcomeCard.setLeftButtonText(getString(R.string.no_text));
         welcomeCard.setRightButtonText(getString(R.string.yes_text));
@@ -115,6 +114,9 @@ public class ProposalFragment extends BaseFragment {
         return view;
     }
     
+    /**
+     *
+     */
     private void parseResponse(JSONObject response) {
         try {
             JSONObject data = response.getJSONObject("data");
