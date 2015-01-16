@@ -1,5 +1,6 @@
 package it.scripto.primetime4u;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,7 +38,6 @@ public class ProposalFragment extends BaseFragment {
     private String account;
 
     private SharedPreferences preferences;
-
     private SharedPreferences.Editor editor;
 
     /**
@@ -78,7 +78,7 @@ public class ProposalFragment extends BaseFragment {
         String account = base.getAccount();
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        //welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
+        // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
         if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE")) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
 
@@ -161,6 +161,7 @@ public class ProposalFragment extends BaseFragment {
             final Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
+            final String idIMDB = proposal.getIdIMDB();
 
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
@@ -183,15 +184,15 @@ public class ProposalFragment extends BaseFragment {
                     editor = preferences.edit();
 
                     if (!preferences.contains("PENDING_MOVIE")){
-                        editor.putString("PENDING_MOVIE",idIMDB);
-                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.putString("PENDING_MOVIE", idIMDB);
+                        editor.putString("PENDING_TITLE", originalTitle);
                         editor.commit();
                     }
                     else{
                         editor.remove("PENDING_MOVIE");
                         editor.remove("PENDING_TITLE");
                         //NB: dobbiamo però averlo già preso per mostrarlo nella prima scheda
-                        editor.putString("PENDING_MOVIE",idIMDB);
+                        editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE",originalTitle);
                         editor.commit();
                     }
