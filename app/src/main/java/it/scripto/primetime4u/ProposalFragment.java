@@ -1,6 +1,7 @@
 package it.scripto.primetime4u;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,11 +29,16 @@ import primetime4u.app.AppController;
 import primetime4u.model.Movie;
 import primetime4u.util.Utils;
 
+
 public class ProposalFragment extends BaseFragment {
 
     private MaterialListView proposal_material_list_view;
     private List<Movie> proposalList = new ArrayList<>();
     private String account;
+
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
 
     /**
      * Use this factory method to create a new instance of
@@ -69,43 +75,48 @@ public class ProposalFragment extends BaseFragment {
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
+        String account = base.getAccount();
+        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        // WelcomeCard visible only if yesterday user saw a movie
-        // TODO: check if user saw a movie yesterday and manage it
-        final WelcomeCard welcomeCard = new WelcomeCard(context);
-        welcomeCard.setFullWidthDivider(true);
-        welcomeCard.setDividerVisible(true);
+        //welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE")) {
+            final WelcomeCard welcomeCard = new WelcomeCard(context);
 
-        // TODO: remove account string
-        welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + "\n" + account);
-        welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
-        welcomeCard.setLeftButtonText(getString(R.string.no_text));
-        welcomeCard.setRightButtonText(getString(R.string.yes_text));
-        welcomeCard.setDismissible(false);
-        
-        welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
-                //non è piaciuto il film scorso
-                welcomeCard.setDismissible(true);
-                welcomeCard.dismiss();
-            }
-        });
-        
-        welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
-                //è piaciuto il film scorso
-                welcomeCard.setDismissible(true);
-                welcomeCard.dismiss();
-            }
-        });
-        
-        proposal_material_list_view.add(welcomeCard);
-        
-        // Generate URL
+            welcomeCard.setFullWidthDivider(true);
+            welcomeCard.setDividerVisible(true);
+            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE","")));
+            welcomeCard.setLeftButtonText(getString(R.string.no_text));
+            welcomeCard.setRightButtonText(getString(R.string.yes_text));
+            welcomeCard.setDismissible(false);
+            welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
+                    //TODO: non è piaciuto
+                    welcomeCard.setDismissible(true);
+                    welcomeCard.dismiss();
+                }
+            });
+            welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "Ti è piaciuto", Toast.LENGTH_SHORT).show();
+                    //TODO: è piaciuto, aggiungo in gusti
+                    /**
+                     * Cosa fare: ricordo l'idIMDB e il titolo
+                     */
+                    String lastMovieId = preferences.getString("PENDING_MOVIE","");
+                    /**
+                     * faccio add di questo ID ai tastes dell'utente con HTTP POST
+                     */
+                    welcomeCard.setDismissible(true);
+                    welcomeCard.dismiss();
+                }
+            });
+
+            proposal_material_list_view.add(welcomeCard);
+        }
         String url = Utils.SERVER_API + "proposal/" + account;
         
         // Get proposals
@@ -166,8 +177,25 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You have pressed " + originalTitle, Toast.LENGTH_SHORT).show();
-                    //TODO: Manage "I'll watch it"
+                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
+
+                    preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    editor = preferences.edit();
+
+                    if (!preferences.contains("PENDING_MOVIE")){
+                        editor.putString("PENDING_MOVIE",idIMDB);
+                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.commit();
+                    }
+                    else{
+                        editor.remove("PENDING_MOVIE");
+                        editor.remove("PENDING_TITLE");
+                        //NB: dobbiamo però averlo già preso per mostrarlo nella prima scheda
+                        editor.putString("PENDING_MOVIE",idIMDB);
+                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.commit();
+                    }
+
                 }
             });
 
@@ -182,7 +210,7 @@ public class ProposalFragment extends BaseFragment {
                     startActivity(intent);
                 }
             });
-
+            
             proposal_material_list_view.add(card);
         }
     }
