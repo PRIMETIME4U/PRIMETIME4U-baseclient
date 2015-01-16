@@ -119,10 +119,10 @@ public class StartFragment extends BaseFragment {
              * in caso di errori o utente gia' registrato il server risponde con un altro json
              */
             try {
-                obj.put("user_id", email);
-                obj.put("user_name", "giovanni");
-                obj.put("user_birth_year", "1990");
-                obj.put("user_gender", "m");
+                obj.put("userId", email);
+                obj.put("userName", "giovanni");
+                obj.put("userBirthYear", "1990");
+                obj.put("userGender", "m");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -173,6 +173,7 @@ public class StartFragment extends BaseFragment {
                         public void onErrorResponse(VolleyError error) {
                             // error
                             System.out.println("Error.Response");
+                            System.out.println(error.toString());
                         }
                     }
             );

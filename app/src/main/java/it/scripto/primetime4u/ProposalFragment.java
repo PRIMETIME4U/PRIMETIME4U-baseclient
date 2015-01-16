@@ -37,6 +37,7 @@ public class ProposalFragment extends BaseFragment {
     private List<Movie> proposalList = new ArrayList<>();
     private String account;
 
+
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
 
@@ -75,13 +76,13 @@ public class ProposalFragment extends BaseFragment {
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
-        String account = base.getAccount();
+        final String account = base.getAccount();
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
-        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE")) {
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED")) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
-
+            editor = preferences.edit();
             welcomeCard.setFullWidthDivider(true);
             welcomeCard.setDividerVisible(true);
             welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
@@ -96,22 +97,36 @@ public class ProposalFragment extends BaseFragment {
                     //TODO: non è piaciuto
                     welcomeCard.setDismissible(true);
                     welcomeCard.dismiss();
+                    editor.remove("TOBEANSWERED");
+                    editor.commit();
                 }
             });
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Ti è piaciuto", Toast.LENGTH_SHORT).show();
-                    //TODO: è piaciuto, aggiungo in gusti
+                    Toast.makeText(context, "L'hai guardato", Toast.LENGTH_SHORT).show();
+
                     /**
                      * Cosa fare: ricordo l'idIMDB e il titolo
+                     *
+                     *  http://hale-kite-786.appspot.com/api/watched/<id>
+
+                     mettendo il json
+                     {
+
+                     "idIMDB":"id"
+                     }
                      */
                     String lastMovieId = preferences.getString("PENDING_MOVIE","");
                     /**
-                     * faccio add di questo ID ai tastes dell'utente con HTTP POST
+                     * faccio add di questo ID ai watched dell'utente con HTTP POST
                      */
                     welcomeCard.setDismissible(true);
                     welcomeCard.dismiss();
+                    editor.remove("TOBEANSWERED");
+                    editor.commit();
+                    String s = Utils.SERVER_API + "watched/" + account;
+                    addWatched(s,lastMovieId);
                 }
             });
 
@@ -124,10 +139,7 @@ public class ProposalFragment extends BaseFragment {
         
         return view;
     }
-    
-    /**
-     *
-     */
+
     private void parseResponse(JSONObject response) {
         try {
             JSONObject data = response.getJSONObject("data");
@@ -137,12 +149,12 @@ public class ProposalFragment extends BaseFragment {
                 JSONObject proposalJSON = proposals.getJSONObject(i);
 
                 Movie proposal = new Movie();
-                proposal.setOriginalTitle(proposalJSON.getString("original_title"));
+                proposal.setOriginalTitle(proposalJSON.getString("originalTitle"));
                 proposal.setChannel(proposalJSON.getString(("channel")));
                 proposal.setTime(proposalJSON.getString("time"));
-                proposal.setIdIMDB(proposalJSON.getString("id_IMDB"));
+                proposal.setIdIMDB(proposalJSON.getString("idIMDB"));
                 proposal.setPoster(proposalJSON.getString("poster"));
-                proposal.setSimplePlot(proposalJSON.getString("simple_plot"));
+                proposal.setSimplePlot(proposalJSON.getString("simplePlot"));
 
                 proposalList.add(proposal);
             }
@@ -186,14 +198,16 @@ public class ProposalFragment extends BaseFragment {
                     if (!preferences.contains("PENDING_MOVIE")){
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE", originalTitle);
+                        editor.putString("TOBEANSWERED","true");
                         editor.commit();
                     }
                     else{
                         editor.remove("PENDING_MOVIE");
                         editor.remove("PENDING_TITLE");
-                        //NB: dobbiamo però averlo già preso per mostrarlo nella prima scheda
+
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE",originalTitle);
+                        editor.putString("TOBEANSWERED","true");
                         editor.commit();
                     }
 
@@ -248,6 +262,48 @@ public class ProposalFragment extends BaseFragment {
         AppController.getInstance().addToRequestQueue(proposalRequest);
     }
 
+    private void addWatched(String url,String id){
+        /**
+         * Creates a new request.
+         * @param method the HTTP method to use
+         * @param url URL to fetch the JSON from
+         * @param jsonRequest A {@link org.json.JSONObject} to post with the request. Null is allowed and
+         *   indicates no parameters will be posted along with request.
+         * @param listener Listener to receive the JSON response
+         * @param errorListener Error listener, or null to ignore errors.
+         */
+        JSONObject toBePosted = new JSONObject();
+        try{
+            toBePosted.put("idIMDB",id);
+        }
+        catch (JSONException e){
+            Log.e(TAG, e.toString());
+            Toast.makeText(context, "JSON Exception in post request", Toast.LENGTH_LONG).show();
+        }
+
+        JsonObjectRequest postRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                toBePosted,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Toast.makeText(context,"Film correttamente aggiunto",Toast.LENGTH_LONG).show();
+
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(context,"Errore nell'aggiunta del film",Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+
+        AppController.getInstance().addToRequestQueue(postRequest);
+    }
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);

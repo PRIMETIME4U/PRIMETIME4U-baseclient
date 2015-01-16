@@ -92,8 +92,8 @@ public class WatchedFragment extends BaseFragment {
                 JSONObject watchedJSON = watcheds.getJSONObject(i);
 
                 Movie watched = new Movie();
-                watched.setOriginalTitle(watchedJSON.getString("original_title"));
-                watched.setIdIMDB(watchedJSON.getString("id_IMDB"));
+                watched.setOriginalTitle(watchedJSON.getString("originalTitle"));
+                watched.setIdIMDB(watchedJSON.getString("idIMDB"));
                 watched.setPoster(watchedJSON.getString("poster"));
 
                 watchedList.add(watched);
