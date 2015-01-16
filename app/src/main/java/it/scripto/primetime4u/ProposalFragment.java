@@ -1,6 +1,8 @@
 package it.scripto.primetime4u;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,10 @@ import primetime4u.util.Utils;
 public class ProposalFragment extends BaseFragment {
 
     private MaterialListView proposal_material_list_view;
+
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
 
     /**
      * Use this factory method to create a new instance of
@@ -71,38 +77,41 @@ public class ProposalFragment extends BaseFragment {
 
         MainActivity base = (MainActivity) this.getActivity();
         String account = base.getAccount();
+        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        //welcome card scorso film, compare solo alla prima esecuzione
-        final WelcomeCard welcomeCard = new WelcomeCard(context);
-        welcomeCard.setFullWidthDivider(true);
-        welcomeCard.setDividerVisible(true);
-        //togliete il " + account" dal titolo, l'ho messo per provare le shared preferences
-        welcomeCard.setTitle(getResources().getString(R.string.welcome_text) + account);
-        welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), "The Blues Brothers"));
-        welcomeCard.setLeftButtonText(getString(R.string.no_text));
-        welcomeCard.setRightButtonText(getString(R.string.yes_text));
-        welcomeCard.setDismissible(false);
-        welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
-                //non è piaciuto il film scorso
-                welcomeCard.setDismissible(true);
-                welcomeCard.dismiss();
-            }
-        });
-        welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
-            @Override
-            public void onButtonPressedListener(View view, Card card) {
-                Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
-                //è piaciuto il film scorso
-                welcomeCard.setDismissible(true);
-                welcomeCard.dismiss();
-            }
-        });
-        
-        proposal_material_list_view.add(welcomeCard);
+        //welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE")) {
+            final WelcomeCard welcomeCard = new WelcomeCard(context);
 
+            welcomeCard.setFullWidthDivider(true);
+            welcomeCard.setDividerVisible(true);
+            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE","")));
+            welcomeCard.setLeftButtonText(getString(R.string.no_text));
+            welcomeCard.setRightButtonText(getString(R.string.yes_text));
+            welcomeCard.setDismissible(false);
+            welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
+                    //non è piaciuto il film scorso
+                    welcomeCard.setDismissible(true);
+                    welcomeCard.dismiss();
+                }
+            });
+            welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
+                    //TODO: è piaciuto, aggiungo in gusti
+
+                    welcomeCard.setDismissible(true);
+                    welcomeCard.dismiss();
+                }
+            });
+
+            proposal_material_list_view.add(welcomeCard);
+        }
         String url = Utils.SERVER_API + "proposal/" + account;
         
         JsonObjectRequest proposalRequest = new JsonObjectRequest(
@@ -161,6 +170,8 @@ public class ProposalFragment extends BaseFragment {
 
             final String originalTitle = proposal.getOriginalTitle();
 
+            final String idIMDB = proposal.getIdIMDB();
+
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
             card.setDescription(proposal.getSimplePlot());
@@ -176,8 +187,25 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You have pressed " + originalTitle, Toast.LENGTH_SHORT).show();
-                    //TODO: Scelto film da mostrare
+                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
+
+                    preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    editor = preferences.edit();
+
+                    if (!preferences.contains("PENDING_MOVIE")){
+                        editor.putString("PENDING_MOVIE",idIMDB);
+                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.commit();
+                    }
+                    else{
+                        editor.remove("PENDING_MOVIE");
+                        editor.remove("PENDING_TITLE");
+                        //NB: dobbiamo però averlo già preso per mostrarlo nella prima scheda
+                        editor.putString("PENDING_MOVIE",idIMDB);
+                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.commit();
+                    }
+
                 }
             });
 
