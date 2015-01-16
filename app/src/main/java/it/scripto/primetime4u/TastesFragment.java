@@ -113,7 +113,7 @@ public class TastesFragment extends BaseFragment {
             movieCard.setTaste(true);
             movieCard.setDismissible(false);
             movieCard.setType(TasteCard.MOVIE_TYPE);
-            movieCard.setDrawable(R.drawable.ic_launcher);
+            movieCard.setPoster(taste.getPoster());
             movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {

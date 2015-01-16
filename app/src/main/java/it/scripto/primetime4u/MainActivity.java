@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
 
         preferences = getPreferences(Context.MODE_PRIVATE);
 
-        //ricavo l'email passata dalla startActivity
+        //ricavo l'email passata dalla startActivity e la salvo in maniera permanente
         if (!preferences.contains("ACCOUNT")){
             account = getIntent().getExtras().getString("email");
             editor = preferences.edit();

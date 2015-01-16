@@ -114,7 +114,7 @@ public class WatchedFragment extends BaseFragment {
             watchedCard.setTitle(watched.getOriginalTitle());
             watchedCard.setDate(dateList.get(i));
             watchedCard.setDismissible(false);
-            watchedCard.setDrawable(R.drawable.ic_launcher);
+            watchedCard.setPoster(watched.getPoster());
             watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
