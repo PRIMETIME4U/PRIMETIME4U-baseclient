@@ -125,7 +125,7 @@ public class WatchedFragment extends BaseFragment {
                     if (watchedCard.getTaste()) {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
                         Log.i(TAG, url);
-                        addTaste(url, watched.getOriginalTitle());
+                        addTaste(url, watched.getIdIMDB());
                     } else {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + watched.getIdIMDB();
                         deleteTaste(url);
@@ -173,10 +173,10 @@ public class WatchedFragment extends BaseFragment {
     /**
      *
      */
-    private void addTaste(String url, final String movieTitle) {
+    private void addTaste(String url, final String id) {
         
         HashMap<String, String> params = new HashMap<>();
-        params.put("movie_title", movieTitle);
+        params.put("idIMDB", id);
         
         JsonObjectRequest tasteAdd = new JsonObjectRequest(
                 Request.Method.POST,
