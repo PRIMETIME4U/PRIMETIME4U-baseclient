@@ -93,8 +93,8 @@ public class ProposalFragment extends BaseFragment {
             welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You pressed No", Toast.LENGTH_SHORT).show();
-                    //non è piaciuto il film scorso
+                    Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
+                    //TODO: non è piaciuto
                     welcomeCard.setDismissible(true);
                     welcomeCard.dismiss();
                 }
@@ -102,9 +102,15 @@ public class ProposalFragment extends BaseFragment {
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "You pressed Yes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Ti è piaciuto", Toast.LENGTH_SHORT).show();
                     //TODO: è piaciuto, aggiungo in gusti
-
+                    /**
+                     * Cosa fare: ricordo l'idIMDB e il titolo
+                     */
+                    String lastMovieId = preferences.getString("PENDING_MOVIE","");
+                    /**
+                     * faccio add di questo ID ai tastes dell'utente con HTTP POST
+                     */
                     welcomeCard.setDismissible(true);
                     welcomeCard.dismiss();
                 }
