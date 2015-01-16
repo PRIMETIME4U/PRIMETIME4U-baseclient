@@ -1,10 +1,18 @@
 package it.scripto.primetime4u;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import com.dexafree.materialList.cards.model.BigImageCard;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.events.BusProvider;
+
+import java.io.InputStream;
 
 public class TasteCard extends BigImageCard {
 
@@ -14,6 +22,8 @@ public class TasteCard extends BigImageCard {
     protected OnButtonPressListener onTasteButtonPressedListener;
     protected boolean taste = false;
     protected int type = MOVIE_TYPE;
+
+    private Bitmap poster;
 
     public TasteCard(Context context) {
         super(context);
@@ -47,5 +57,41 @@ public class TasteCard extends BigImageCard {
     
     public int getType() {
         return this.type;
+    }
+
+    public void setPoster(String imgurl){
+        new DownloadImageTask().execute(imgurl);
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+
+
+        protected Bitmap doInBackground(String... urls) {
+
+            String urldisplay = urls[0];
+            Bitmap _bitmap = null;
+
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                _bitmap = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Errore", e.getMessage());
+                e.printStackTrace();
+            }
+
+            return _bitmap;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+
+            poster = result;
+            draw();
+        }
+
+    }
+
+    private void draw(){
+        Drawable d = new BitmapDrawable(this.getResources(),poster);
+        this.setDrawable(d);
     }
 }
