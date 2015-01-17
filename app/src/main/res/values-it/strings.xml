@@ -3,9 +3,9 @@
     <string name="app_name">PRIMETIME4U</string>
     <string name="action_settings">Impostazioni</string>
     <string name="watched_tab">Guardati</string>
-    <string name="tastes_tab">Gusti</string>
+    <string name="tastes_tab">Preferiti</string>
     <string name="proposal_tab">Proposte</string>
-    <string name="detail_text">Dettaglio</string>
+    <string name="detail_text">Dettagli</string>
     <string name="watch_text">Lo guarderò</string>
     <string name="welcome_text">Bentornato!</string>
     <string name="movie_info_text">Canale: %1$s - Orario: %2$s</string>

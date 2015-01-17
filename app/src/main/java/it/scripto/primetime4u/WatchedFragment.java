@@ -82,34 +82,9 @@ public class WatchedFragment extends BaseFragment {
         return view;
     }
 
-    /**
-     * parses watched response
-     */
-    private void parseResponse(JSONObject response) {
-        try {
-            JSONObject data = response.getJSONObject("data");
-            JSONArray watcheds = data.getJSONArray("watched");
-
-            for (int i = 0; i < watcheds.length(); i++) {
-                JSONObject watchedJSON = watcheds.getJSONObject(i);
-
-                Movie watched = new Movie();
-                watched.setOriginalTitle(watchedJSON.getString("originalTitle"));
-                watched.setIdIMDB(watchedJSON.getString("idIMDB"));
-                watched.setPoster(watchedJSON.getString("poster"));
-
-                watchedList.add(watched);
-                dateList.add(watchedJSON.getString("date"));
-                tasteList.add(watchedJSON.getInt("tasted"));
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-        }
-    }
 
     /**
-     *
+     * draws cards of watched list
      */
     private void drawResult() {
 
@@ -142,7 +117,7 @@ public class WatchedFragment extends BaseFragment {
     }
     
     /**
-     * gets "watched" list
+     * gets "watched" list and parses the response
      */
     private void get(String url) {
         JsonObjectRequest proposalRequest = new JsonObjectRequest(
@@ -194,7 +169,7 @@ public class WatchedFragment extends BaseFragment {
         AppController.getInstance().addToRequestQueue(proposalRequest);
     }
     /**
-     *
+     * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
         
@@ -232,7 +207,7 @@ public class WatchedFragment extends BaseFragment {
     }
 
     /**
-     *
+     * deletes from user's taste list
      */
     private void deleteTaste(String url) {
         JsonObjectRequest tasteDelete = new JsonObjectRequest(
