@@ -6,6 +6,7 @@
     tools:context="it.scripto.primetime4u.WatchedFragment">
 
     <com.dexafree.materialList.view.MaterialListView
+        android:listSelector="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/watched_material_list_view"
