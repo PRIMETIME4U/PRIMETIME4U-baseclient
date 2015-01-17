@@ -33,6 +33,10 @@ public class TastesFragment extends BaseFragment {
     private List<Movie> tastesList = new ArrayList<>();
     private String account;
 
+    private LayoutInflater inflater;
+    private ViewGroup container;
+    private Bundle savedInstanceState;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment.
@@ -60,14 +64,17 @@ public class TastesFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-
+        //i need to save these info
+        inflater=inflater;
+        container = container;
+        savedInstanceState = savedInstanceState;
         // Setting up material list
         tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
         
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
-        
+
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
         
@@ -89,8 +96,8 @@ public class TastesFragment extends BaseFragment {
                 JSONObject tasteJSON = tastes.getJSONObject(i);
 
                 Movie proposal = new Movie();
-                proposal.setOriginalTitle(tasteJSON.getString("original_title"));
-                proposal.setIdIMDB(tasteJSON.getString("id_IMDB"));
+                proposal.setOriginalTitle(tasteJSON.getString("originalTitle"));
+                proposal.setIdIMDB(tasteJSON.getString("idIMDB"));
                 proposal.setPoster(tasteJSON.getString("poster"));
 
                 tastesList.add(proposal);
@@ -99,15 +106,17 @@ public class TastesFragment extends BaseFragment {
             Log.e(TAG, e.toString());
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
         }
+
+        drawResult();
     }
     
     /**
      *
      */
     private void drawResult() {
+
         for (int i = 0; i < tastesList.size(); i++) {
             final Movie taste = tastesList.get(i);
-
             final TasteCard movieCard = new TasteCard(context);
             movieCard.setTitle(taste.getOriginalTitle());
             movieCard.setTaste(true);
@@ -123,6 +132,8 @@ public class TastesFragment extends BaseFragment {
                     } else {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
+                        movieCard.setDismissible(true);
+                        movieCard.dismiss();
                     }
                 }
             });
@@ -135,6 +146,8 @@ public class TastesFragment extends BaseFragment {
      *
      */
     private void get(String url) {
+
+
         JsonObjectRequest proposalRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 url,
@@ -149,7 +162,6 @@ public class TastesFragment extends BaseFragment {
 
                         parseResponse(response);
 
-                        drawResult();
                     }
                 },
                 new Response.ErrorListener() {
@@ -179,9 +191,6 @@ public class TastesFragment extends BaseFragment {
 
                         tastesList.clear();
 
-                        parseResponse(response);
-
-                        drawResult();
                     }
                 },
                 new Response.ErrorListener() {
@@ -194,6 +203,10 @@ public class TastesFragment extends BaseFragment {
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(tasteDelete);
+        //alert of refreshing is now active
+        MainActivity base = (MainActivity)this.getActivity();
+        base.shouldIRefresh = true;
+
     }
 
     @Override

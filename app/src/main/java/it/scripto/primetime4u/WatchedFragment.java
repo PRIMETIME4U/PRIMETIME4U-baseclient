@@ -74,6 +74,8 @@ public class WatchedFragment extends BaseFragment {
         // Generate URL
         String url = Utils.SERVER_API + "watched/" + account;
 
+
+
         // Get watcheds
         get(url);
         
@@ -81,7 +83,7 @@ public class WatchedFragment extends BaseFragment {
     }
 
     /**
-     *
+     * parses watched response
      */
     private void parseResponse(JSONObject response) {
         try {
@@ -110,10 +112,12 @@ public class WatchedFragment extends BaseFragment {
      *
      */
     private void drawResult() {
+
         for (int i = 0; i < watchedList.size(); i++) {
             final Movie watched = watchedList.get(i);
 
             final WatchedCard watchedCard = new WatchedCard(context);
+            final String id = watched.getIdIMDB();
             watchedCard.setTitle(watched.getOriginalTitle());
             watchedCard.setDate(dateList.get(i));
             watchedCard.setTaste(tasteList.get(i) == 1);
@@ -125,9 +129,9 @@ public class WatchedFragment extends BaseFragment {
                     if (watchedCard.getTaste()) {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
                         Log.i(TAG, url);
-                        addTaste(url, watched.getIdIMDB());
+                        addTaste(url, id);
                     } else {
-                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + watched.getIdIMDB();
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
                         deleteTaste(url);
                     }
                 }
@@ -138,7 +142,7 @@ public class WatchedFragment extends BaseFragment {
     }
     
     /**
-     *
+     * gets "watched" list
      */
     private void get(String url) {
         JsonObjectRequest proposalRequest = new JsonObjectRequest(
@@ -154,7 +158,26 @@ public class WatchedFragment extends BaseFragment {
                         dateList.clear();
                         tasteList.clear();
 
-                        parseResponse(response);
+                        try {
+                            JSONObject data = response.getJSONObject("data");
+                            JSONArray watcheds = data.getJSONArray("watched");
+
+                            for (int i = 0; i < watcheds.length(); i++) {
+                                JSONObject watchedJSON = watcheds.getJSONObject(i);
+
+                                Movie watched = new Movie();
+                                watched.setOriginalTitle(watchedJSON.getString("originalTitle"));
+                                watched.setIdIMDB(watchedJSON.getString("idIMDB"));
+                                watched.setPoster(watchedJSON.getString("poster"));
+
+                                watchedList.add(watched);
+                                dateList.add(watchedJSON.getString("date"));
+                                tasteList.add(watchedJSON.getInt("tasted"));
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+                        }
 
                         drawResult();
                     }
@@ -175,18 +198,23 @@ public class WatchedFragment extends BaseFragment {
      */
     private void addTaste(String url, final String id) {
         
-        HashMap<String, String> params = new HashMap<>();
-        params.put("idIMDB", id);
+        JSONObject toBePosted = new JSONObject();
+        try {
+            toBePosted.put("idIMDB", id);
+        }
+        catch (JSONException e){
+            Log.d(TAG,e.toString());
+        }
         
         JsonObjectRequest tasteAdd = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                new JSONObject(params),
+                toBePosted,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
-                        // TODO: manage response (update tastesFragment)
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -198,6 +226,9 @@ public class WatchedFragment extends BaseFragment {
         );
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(tasteAdd);
+        //alert of refreshing is now active
+        MainActivity base = (MainActivity) this.getActivity();
+        base.shouldIRefresh = true;
     }
 
     /**
@@ -212,7 +243,7 @@ public class WatchedFragment extends BaseFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
-                        // TODO: manage response (update tastesFragment)
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -225,6 +256,9 @@ public class WatchedFragment extends BaseFragment {
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(tasteDelete);
+        //alert of refreshing is now active
+        MainActivity base = (MainActivity) this.getActivity();
+        base.shouldIRefresh = true;
     }
     
     @Override

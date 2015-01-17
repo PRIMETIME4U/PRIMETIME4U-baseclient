@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 
@@ -21,6 +22,15 @@ public class MainActivity extends BaseActivity {
     private SharedPreferences preferences;
 
     private SharedPreferences.Editor editor;
+
+    public MainAdapter adapter;
+
+    private ViewPager pager;
+
+    private PagerSlidingTabStrip tabs;
+
+    //boolean which acts like a refresh alert
+    public boolean shouldIRefresh;
 
     @Override
     protected String getTagLog() {
@@ -38,6 +48,7 @@ public class MainActivity extends BaseActivity {
         //I close the login activity
         Intent myIntent = new Intent(StartActivity.ACTION_CLOSE);
         sendBroadcast(myIntent);
+        shouldIRefresh = false;
 
         preferences = getPreferences(Context.MODE_PRIVATE);
 
@@ -56,12 +67,43 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(main_activity_toolbar);
  
         // Initialize the ViewPager and set an adapter
-        ViewPager pager = (ViewPager) findViewById(R.id.main_activity_view_pager);
-        pager.setAdapter(new MainAdapter(getSupportFragmentManager()));
+        pager = (ViewPager) findViewById(R.id.main_activity_view_pager);
+        adapter = new MainAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
 
         // Bind the tabs to the ViewPager
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.main_activity_pager_sliding_tab_strip);
+        tabs = (PagerSlidingTabStrip) findViewById(R.id.main_activity_pager_sliding_tab_strip);
         tabs.setViewPager(pager);
+
+        tabs.setOnPageChangeListener( new ViewPager.OnPageChangeListener() {
+            private int current;
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                current = position;
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == pager.SCROLL_STATE_IDLE){
+                    if (shouldIRefresh){
+                        //if alert of refreshing has been activated, i reload fragments
+                        refreshTastes();
+                        shouldIRefresh = false;
+                    }
+                }
+            }
+        });
+
+
+
+    }
+    public void refreshTastes(){
+       adapter.notifyDataSetChanged();
     }
 
     public String getAccount(){
@@ -117,16 +159,25 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
+
                     return ProposalFragment.newInstance();
                 case 1:
+
                     return TastesFragment.newInstance();
                 case 2:
+
                     return WatchedFragment.newInstance();
                 default:
                     break;
             }
             return null;
         }
+
+        @Override
+        public int getItemPosition(Object object){
+            return POSITION_NONE;
+        }
+
     }
     
 }

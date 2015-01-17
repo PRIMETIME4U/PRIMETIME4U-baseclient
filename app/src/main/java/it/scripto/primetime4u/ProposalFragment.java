@@ -95,8 +95,8 @@ public class ProposalFragment extends BaseFragment {
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
                     //TODO: non è piaciuto
-                    welcomeCard.setDismissible(true);
-                    welcomeCard.dismiss();
+                    card.setDismissible(true);
+                    card.dismiss();
                     editor.remove("TOBEANSWERED");
                     editor.commit();
                 }
@@ -121,8 +121,8 @@ public class ProposalFragment extends BaseFragment {
                     /**
                      * faccio add di questo ID ai watched dell'utente con HTTP POST
                      */
-                    welcomeCard.setDismissible(true);
-                    welcomeCard.dismiss();
+                    card.setDismissible(true);
+                    card.dismiss();
                     editor.remove("TOBEANSWERED");
                     editor.commit();
                     String s = Utils.SERVER_API + "watched/" + account;
@@ -289,7 +289,7 @@ public class ProposalFragment extends BaseFragment {
 
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        Toast.makeText(context,"Film correttamente aggiunto",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context,"Film aggiunto nella lista dei guardati",Toast.LENGTH_LONG).show();
 
                     }
                 },
