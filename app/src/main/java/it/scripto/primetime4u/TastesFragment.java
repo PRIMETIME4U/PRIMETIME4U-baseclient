@@ -130,10 +130,10 @@ public class TastesFragment extends BaseFragment {
 
 
                     } else {
+                        Toast.makeText(context,"L'elemento verrà rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
-                        movieCard.setDismissible(true);
-                        movieCard.dismiss();
+
                     }
                 }
             });
