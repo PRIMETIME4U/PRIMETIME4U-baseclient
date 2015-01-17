@@ -334,6 +334,6 @@ public class ProposalFragment extends BaseFragment {
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-        // TODO: save poposalList in order to reuse after
+        // TODO: save proposalList in order to reuse after
     }
 }
