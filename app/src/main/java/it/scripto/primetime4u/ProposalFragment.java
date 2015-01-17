@@ -81,23 +81,21 @@ public class ProposalFragment extends BaseFragment {
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
-        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED")) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
             editor = preferences.edit();
             welcomeCard.setFullWidthDivider(true);
             welcomeCard.setDividerVisible(true);
             welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
-            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE", "")));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE","")));
             welcomeCard.setLeftButtonText(getString(R.string.no_text));
             welcomeCard.setRightButtonText(getString(R.string.yes_text));
             welcomeCard.setDismissible(false);
             welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-
-                    /**
-                     * FILM NON GUARDATO
-                     */
+                    Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
+                    //TODO: non è piaciuto
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
@@ -107,17 +105,29 @@ public class ProposalFragment extends BaseFragment {
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    /**
-                     * FILM GUARDATO
-                     */
+                    Toast.makeText(context, "L'hai guardato", Toast.LENGTH_SHORT).show();
 
-                    String lastMovieId = preferences.getString("PENDING_MOVIE", "");
+                    /**
+                     * Cosa fare: ricordo l'idIMDB e il titolo
+                     *
+                     *  http://hale-kite-786.appspot.com/api/watched/<id>
+
+                     mettendo il json
+                     {
+
+                     "idIMDB":"id"
+                     }
+                     */
+                    String lastMovieId = preferences.getString("PENDING_MOVIE","");
+                    /**
+                     * faccio add di questo ID ai watched dell'utente con HTTP POST
+                     */
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
                     editor.commit();
                     String s = Utils.SERVER_API + "watched/" + account;
-                    addWatched(s, lastMovieId);
+                    addWatched(s,lastMovieId);
                 }
             });
 
@@ -181,7 +191,7 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Hai scelto " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
 
 
                     preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -213,9 +223,7 @@ public class ProposalFragment extends BaseFragment {
 
                         editor.commit();
                     }
-                    /**
-                     * TODO: some code here to change the card status into a "selected" movie
-                     */
+
                 }
             });
 
@@ -326,6 +334,6 @@ public class ProposalFragment extends BaseFragment {
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-        // TODO: save proposalList in order to reuse after
+        // TODO: save poposalList in order to reuse after
     }
 }
