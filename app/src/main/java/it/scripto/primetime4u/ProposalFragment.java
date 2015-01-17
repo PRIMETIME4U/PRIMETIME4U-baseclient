@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import primetime4u.app.AppController;
@@ -80,21 +81,23 @@ public class ProposalFragment extends BaseFragment {
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
-        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED")) {
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
             editor = preferences.edit();
             welcomeCard.setFullWidthDivider(true);
             welcomeCard.setDividerVisible(true);
             welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
-            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE","")));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE", "")));
             welcomeCard.setLeftButtonText(getString(R.string.no_text));
             welcomeCard.setRightButtonText(getString(R.string.yes_text));
             welcomeCard.setDismissible(false);
             welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
-                    //TODO: non è piaciuto
+
+                    /**
+                     * FILM NON GUARDATO
+                     */
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
@@ -104,29 +107,17 @@ public class ProposalFragment extends BaseFragment {
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "L'hai guardato", Toast.LENGTH_SHORT).show();
-
                     /**
-                     * Cosa fare: ricordo l'idIMDB e il titolo
-                     *
-                     *  http://hale-kite-786.appspot.com/api/watched/<id>
-
-                     mettendo il json
-                     {
-
-                     "idIMDB":"id"
-                     }
+                     * FILM GUARDATO
                      */
-                    String lastMovieId = preferences.getString("PENDING_MOVIE","");
-                    /**
-                     * faccio add di questo ID ai watched dell'utente con HTTP POST
-                     */
+
+                    String lastMovieId = preferences.getString("PENDING_MOVIE", "");
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
                     editor.commit();
                     String s = Utils.SERVER_API + "watched/" + account;
-                    addWatched(s,lastMovieId);
+                    addWatched(s, lastMovieId);
                 }
             });
 
@@ -190,7 +181,7 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Hai scelto " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
 
                     preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
                     editor = preferences.edit();
@@ -199,18 +190,31 @@ public class ProposalFragment extends BaseFragment {
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE", originalTitle);
                         editor.putString("TOBEANSWERED","true");
+                        //inizializzo il timer
+                        Calendar c = Calendar.getInstance();
+                        long day = c.getTimeInMillis();
+                        editor.putLong("PENDING_TIME",day);
+
                         editor.commit();
                     }
                     else{
                         editor.remove("PENDING_MOVIE");
                         editor.remove("PENDING_TITLE");
+                        editor.remove("PENDING_TIME");
 
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE",originalTitle);
                         editor.putString("TOBEANSWERED","true");
+                        //inizializzo il timer
+                        Calendar c = Calendar.getInstance();
+                        long day = c.getTimeInMillis();
+                        editor.putLong("PENDING_TIME",day);
+
                         editor.commit();
                     }
-
+                    /**
+                     * TODO: some code here to change the card status into a "selected" movie
+                     */
                 }
             });
 
@@ -304,9 +308,23 @@ public class ProposalFragment extends BaseFragment {
 
         AppController.getInstance().addToRequestQueue(postRequest);
     }
+
+    private boolean aDayIsPassed(){
+        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        //inizializzo il timer
+        Calendar c = Calendar.getInstance();
+        long now = c.getTimeInMillis();
+        long yday = preferences.getLong("PENDING_TIME",0);
+        long diff = now - yday;
+        //possiamo far comparire la card anche dopo sola mezza giornata: 43 200 000
+        //TEST: uso 10 minuti, 600 000, test OK
+        if (diff > 43200000) return true;
+        else return false;
+
+    }
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-        // TODO: save poposalList in order to reuse after
+        // TODO: save proposalList in order to reuse after
     }
 }
