@@ -1,13 +1,19 @@
 package it.scripto.primetime4u;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,10 +33,15 @@ public class MainActivity extends BaseActivity {
 
     private ViewPager pager;
 
+    private Toolbar main_activity_toolbar;
+
     private PagerSlidingTabStrip tabs;
 
     //boolean which acts like a refresh alert
     public boolean shouldIRefresh;
+
+    //boolean which says if i'm in the Tastes tab
+    public boolean tasteTab;
 
     @Override
     protected String getTagLog() {
@@ -63,7 +74,7 @@ public class MainActivity extends BaseActivity {
             account = preferences.getString("ACCOUNT","");
         }
         // Get and set toolbar as action bar
-        Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
+        main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(main_activity_toolbar);
  
         // Initialize the ViewPager and set an adapter
@@ -84,7 +95,15 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-
+                if (position==1) {
+                    //change toolbar style
+                    tasteTab = true;
+                    invalidateOptionsMenu();
+                }
+                else{
+                    tasteTab = false;
+                    invalidateOptionsMenu();
+                }
             }
 
             @Override
@@ -98,6 +117,8 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
+
+
 
 
 
@@ -115,10 +136,42 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_nosearch, menu);
+
         return true;
     }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        //questo metodo viene chiamato per cambiare dinamicamente il menu
+        if (tasteTab){
+            getMenuInflater().inflate(R.menu.menu_main,menu);
+            MenuItem searchItem = menu.findItem(R.id.searchButton);
+            if (searchItem!=null){
+                SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+                searchView.setQueryHint("Search movie/artist, es: Matrix, Di Caprio"); //suggerimento
+                //TODO: i listener sulle ricerche vanno settati su questa searchView
+                MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        //espande la barra di ricerca
+                        Toast.makeText(getBaseContext(),"Search has been expanded",Toast.LENGTH_LONG).show();
+                        return true;
+                    }
 
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        //collassa action view
+                        return true;
+                    }
+                });
+            }
+
+        }
+        else {
+            getMenuInflater().inflate(R.menu.menu_main_nosearch,menu);
+        }
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -129,10 +182,17 @@ public class MainActivity extends BaseActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+            //gestione del tasto impostazioni, modificare impostazioni su notifiche
+        }
+        if (id == R.id.searchButton){
+
+            //gestione in onPrepareOptionMenu
+
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private class MainAdapter extends FragmentPagerAdapter {
 
@@ -177,6 +237,7 @@ public class MainActivity extends BaseActivity {
         public int getItemPosition(Object object){
             return POSITION_NONE;
         }
+
 
     }
     

@@ -24,5 +24,6 @@
     <string name="writers">Writers:</string>
     <string name="actors">Actors:</string>
     <string name="plot">Plot:</string>
+    <string name="action_search">Taste Search</string>
 
 </resources>

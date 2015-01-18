@@ -3,7 +3,7 @@
     <string name="app_name">PRIMETIME4U</string>
     <string name="action_settings">Impostazioni</string>
     <string name="watched_tab">Guardati</string>
-    <string name="tastes_tab">Preferiti</string>
+    <string name="tastes_tab">Gusti</string>
     <string name="proposal_tab">Proposte</string>
     <string name="detail_text">Dettagli</string>
     <string name="watch_text">Lo guarderò</string>
@@ -23,4 +23,5 @@
     <string name="directors">Registi:</string>
     <string name="actors">Attori:</string>
     <string name="plot">Trama:</string>
+    <string name="action_search">Ricerca gusti</string>
 </resources>
