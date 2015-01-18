@@ -81,7 +81,7 @@ public class ProposalFragment extends BaseFragment {
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
-        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED")) {
+        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
             editor = preferences.edit();
             welcomeCard.setFullWidthDivider(true);
