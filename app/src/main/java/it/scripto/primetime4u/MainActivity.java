@@ -148,13 +148,13 @@ public class MainActivity extends BaseActivity {
             MenuItem searchItem = menu.findItem(R.id.searchButton);
             if (searchItem!=null){
                 SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-                searchView.setQueryHint("Search movie/artist, es: Matrix, Di Caprio"); //suggerimento
+                searchView.setQueryHint("Movie/artist, es: Matrix, Di Caprio"); //suggerimento ricerca
                 //TODO: i listener sulle ricerche vanno settati su questa searchView
                 MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
                         //espande la barra di ricerca
-                        Toast.makeText(getBaseContext(),"Search has been expanded",Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getBaseContext(),"Search has been expanded",Toast.LENGTH_LONG).show();
                         return true;
                     }
 
