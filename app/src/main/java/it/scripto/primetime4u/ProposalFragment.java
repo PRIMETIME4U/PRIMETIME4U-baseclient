@@ -80,6 +80,8 @@ public class ProposalFragment extends BaseFragment {
         final String account = base.getAccount();
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
+
+
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
         if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
@@ -99,6 +101,10 @@ public class ProposalFragment extends BaseFragment {
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
+                    editor.remove("PENDING_MOVIE");
+                    editor.remove("PENDING_TITLE");
+                    editor.remove("PENDING_TIME");
+                    editor.remove("TIME_HOUR");
                     editor.commit();
                 }
             });
@@ -125,6 +131,10 @@ public class ProposalFragment extends BaseFragment {
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");
+                    editor.remove("PENDING_MOVIE");
+                    editor.remove("PENDING_TITLE");
+                    editor.remove("PENDING_TIME");
+                    editor.remove("TIME_HOUR");
                     editor.commit();
                     String s = Utils.SERVER_API + "watched/" + account;
                     addWatched(s,lastMovieId);
@@ -176,8 +186,11 @@ public class ProposalFragment extends BaseFragment {
             final String originalTitle = proposal.getOriginalTitle();
             final String idIMDB = proposal.getIdIMDB();
 
+
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
+
+            final String info = card.getMovieInfoText();
             card.setDescription(proposal.getSimplePlot());
             card.setPoster(proposal.getPoster());
 
@@ -200,6 +213,7 @@ public class ProposalFragment extends BaseFragment {
                     if (!preferences.contains("PENDING_MOVIE")){
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE", originalTitle);
+                        editor.putString("TIME_HOUR",info);
                         editor.putString("TOBEANSWERED","true");
                         //inizializzo il timer
                         Calendar c = Calendar.getInstance();
@@ -212,10 +226,12 @@ public class ProposalFragment extends BaseFragment {
                         editor.remove("PENDING_MOVIE");
                         editor.remove("PENDING_TITLE");
                         editor.remove("PENDING_TIME");
+                        editor.remove("TIME_HOUR");
 
                         editor.putString("PENDING_MOVIE", idIMDB);
                         editor.putString("PENDING_TITLE",originalTitle);
                         editor.putString("TOBEANSWERED","true");
+                        editor.putString("TIME_HOUR",info);
                         //inizializzo il timer
                         Calendar c = Calendar.getInstance();
                         long day = c.getTimeInMillis();
@@ -302,7 +318,7 @@ public class ProposalFragment extends BaseFragment {
 
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        Toast.makeText(context,"Film aggiunto nella lista dei guardati",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context,"Film aggiunto nella lista dei film visti",Toast.LENGTH_LONG).show();
 
                     }
                 },

@@ -5,12 +5,14 @@
     android:layout_height="match_parent" 
     tools:context="it.scripto.primetime4u.TastesFragment">
 
-    <com.dexafree.materialList.view.MaterialListView
+    <com.dexafree.materialList.view.MaterialStaggeredGridView
         android:listSelector="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/tastes_material_list_view"
+        android:id="@+id/tastes_material_grid_view"
         android:paddingBottom="@dimen/small_padding"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        tools:column_count_portrait="2"
+        tools:column_count_land="3"/>/>
 
 </FrameLayout>

@@ -15,6 +15,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.dexafree.materialList.view.MaterialStaggeredGridView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +31,7 @@ import primetime4u.model.Artist;
 
 public class TastesFragment extends BaseFragment {
 
-    private MaterialListView tastes_material_list_view;
+    private MaterialStaggeredGridView tastes_material_list_view;
     private List<Movie> tastesList = new ArrayList<>();
     private List<Artist> tastesListArtist = new ArrayList<>();
     private String account;
@@ -71,7 +72,7 @@ public class TastesFragment extends BaseFragment {
         container = container;
         savedInstanceState = savedInstanceState;
         // Setting up material list
-        tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        tastes_material_list_view = (MaterialStaggeredGridView) view.findViewById(R.id.tastes_material_grid_view);
         
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
