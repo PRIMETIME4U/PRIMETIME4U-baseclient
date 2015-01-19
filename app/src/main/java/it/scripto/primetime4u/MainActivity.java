@@ -43,6 +43,9 @@ public class MainActivity extends BaseActivity {
     //boolean which says if i'm in the Tastes tab
     public boolean tasteTab;
 
+    //boolean to avoid double inflations
+    public boolean inflate;
+
     private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&q=";
 
     @Override
@@ -61,8 +64,8 @@ public class MainActivity extends BaseActivity {
         //I close the login activity
         Intent myIntent = new Intent(StartActivity.ACTION_CLOSE);
         sendBroadcast(myIntent);
+        inflate = true;
         shouldIRefresh = false;
-
         preferences = getPreferences(Context.MODE_PRIVATE);
 
         //ricavo l'email passata dalla startActivity e la salvo in maniera permanente
@@ -138,15 +141,18 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_nosearch, menu);
-
+        if (!tasteTab) getMenuInflater().inflate(R.menu.menu_main_nosearch, menu);
         return true;
     }
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
         //questo metodo viene chiamato per cambiare dinamicamente il menu
+
         if (tasteTab){
-            getMenuInflater().inflate(R.menu.menu_main,menu);
+            if (inflate) {
+                getMenuInflater().inflate(R.menu.menu_main, menu);
+                inflate = false;
+            }
             MenuItem searchItem = menu.findItem(R.id.searchButton);
             if (searchItem!=null){
                 SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -189,9 +195,7 @@ public class MainActivity extends BaseActivity {
             }
 
         }
-        else {
-            getMenuInflater().inflate(R.menu.menu_main_nosearch,menu);
-        }
+        else inflate = true;
         return true;
     }
     @Override
@@ -203,7 +207,7 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            System.out.println("chiamato on options item selected");
             //gestione del tasto impostazioni, modificare impostazioni su notifiche
         }
         if (id == R.id.searchButton){

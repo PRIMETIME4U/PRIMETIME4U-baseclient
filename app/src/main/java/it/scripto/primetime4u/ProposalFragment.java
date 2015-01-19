@@ -327,7 +327,7 @@ public class ProposalFragment extends BaseFragment {
         long diff = now - yday;
         //possiamo far comparire la card dopo la giornata: 86 400 000
         //TEST: uso 10 minuti, 600 000, test OK
-        if (diff > 86400000) return true;
+        if (diff > 72000000) return true;
         else return false;
 
     }
