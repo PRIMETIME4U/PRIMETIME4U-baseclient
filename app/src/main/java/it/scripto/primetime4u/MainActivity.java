@@ -43,6 +43,8 @@ public class MainActivity extends BaseActivity {
     //boolean which says if i'm in the Tastes tab
     public boolean tasteTab;
 
+    private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&q=";
+
     @Override
     protected String getTagLog() {
         return "MainActivity";
@@ -149,7 +151,27 @@ public class MainActivity extends BaseActivity {
             if (searchItem!=null){
                 SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
                 searchView.setQueryHint("Movie/artist, es: Matrix, Di Caprio"); //suggerimento ricerca
-                //TODO: i listener sulle ricerche vanno settati su questa searchView
+
+                searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        if (s==null || s.isEmpty() || s.length()==0){
+                            Toast.makeText(getBaseContext(),"Non hai cercato nulla",Toast.LENGTH_LONG).show();
+                        }
+                        String rebuilt = s.replace(" ","+"); //sostituisco spazi con +
+                        String url = IMDB_SEARCH_LINK + rebuilt;
+
+                        //TODO: json parsing di "url" dei suggerimenti e aggiunta a lista gusti
+                        Toast.makeText(getBaseContext(),url,Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
+
                 MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {

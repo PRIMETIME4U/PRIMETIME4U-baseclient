@@ -102,10 +102,12 @@ public class WatchedFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (watchedCard.getTaste()) {
+                        Toast.makeText(context,"Film aggiunto alla tua lista gusti",Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
                         Log.i(TAG, url);
                         addTaste(url, id);
                     } else {
+                        Toast.makeText(context,"Film rimosso dalla tua lista gusti",Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
                         deleteTaste(url);
                     }

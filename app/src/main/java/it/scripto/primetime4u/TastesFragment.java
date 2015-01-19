@@ -129,8 +129,11 @@ public class TastesFragment extends BaseFragment {
                     if (movieCard.getTaste()) {
 
 
+
                     } else {
-                        Toast.makeText(context,"L'elemento verrà rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+
+                        card.dismiss();
+                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -206,7 +209,7 @@ public class TastesFragment extends BaseFragment {
         //alert of refreshing is now active
         MainActivity base = (MainActivity)this.getActivity();
         base.shouldIRefresh = true;
-
+        base.refreshTastes();
     }
 
     @Override
