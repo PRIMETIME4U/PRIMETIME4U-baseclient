@@ -241,9 +241,6 @@ public class MainActivity extends BaseActivity {
          * }
          *
          */
-
-
-
         JsonObjectRequest imdbReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url,
@@ -295,8 +292,8 @@ public class MainActivity extends BaseActivity {
 
     private void addToServer(String idimdb,String type){
         /**
-         * Formato POST su nostro server:
-         * /api/tastes/<user_id>/<type>  POST dove type: artist , movie  genre
+         * POST su nostro server:
+         * /api/tastes/<user_id>/<type>  POST dove type: artist , movie o genre
          * {
          *     "idIMDB" = id
          * }

@@ -76,7 +76,7 @@ public class WatchedFragment extends BaseFragment {
 
 
 
-        // Get watcheds
+        // Get watched
         get(url);
         
         return view;
