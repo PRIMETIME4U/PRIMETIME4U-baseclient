@@ -17,9 +17,24 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.astuetz.PagerSlidingTabStrip;
+import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import primetime4u.app.AppController;
+import primetime4u.util.Utils;
 
 public class MainActivity extends BaseActivity {
 
@@ -155,7 +170,7 @@ public class MainActivity extends BaseActivity {
             }
             MenuItem searchItem = menu.findItem(R.id.searchButton);
             if (searchItem!=null){
-                SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+                final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
                 searchView.setQueryHint("Movie/artist, es: Matrix, Di Caprio"); //suggerimento ricerca
 
                 searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
@@ -167,8 +182,11 @@ public class MainActivity extends BaseActivity {
                         String rebuilt = s.replace(" ","+"); //sostituisco spazi con +
                         String url = IMDB_SEARCH_LINK + rebuilt;
 
-                        //TODO: json parsing di "url" dei suggerimenti e aggiunta a lista gusti
-                        Toast.makeText(getBaseContext(),url,Toast.LENGTH_LONG).show();
+                        addTaste(url);
+
+                        //Toast.makeText(getBaseContext(),url,Toast.LENGTH_LONG).show();
+                        System.out.println("cerco su "+url);
+                        searchView.clearFocus();
                         return true;
                     }
 
@@ -178,20 +196,7 @@ public class MainActivity extends BaseActivity {
                     }
                 });
 
-                MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-                    @Override
-                    public boolean onMenuItemActionExpand(MenuItem item) {
-                        //espande la barra di ricerca
-                        //Toast.makeText(getBaseContext(),"Search has been expanded",Toast.LENGTH_LONG).show();
-                        return true;
-                    }
 
-                    @Override
-                    public boolean onMenuItemActionCollapse(MenuItem item) {
-                        //collassa action view
-                        return true;
-                    }
-                });
             }
 
         }
@@ -207,7 +212,7 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            System.out.println("chiamato on options item selected");
+
             //gestione del tasto impostazioni, modificare impostazioni su notifiche
         }
         if (id == R.id.searchButton){
@@ -219,7 +224,119 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void addTaste(String url){
+        //metodo che legge da imdb il json dell'url e aggiunge l'attore/film cercato ai gusti
+        /**
+         * Formato risposta da IMDB, se artista:
+         * {
+         *   "name_popular" : [ { "id":nm010101, ... } ]
+         *   "name_approx" : [ { .... } ]
+         * }
+         *
+         * se film:
+         *
+         * {
+         *    "title_popular" : [ { "id":tt9191919, .. } ]
+         *
+         * }
+         *
+         */
 
+
+
+        JsonObjectRequest imdbReq = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //tenere conto caso film/artista
+                        if (response.has("title_popular")){
+                            //film
+                            try {
+                                Toast.makeText(getBaseContext(),"Il film verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
+                                JSONArray popArray= response.getJSONArray("title_popular");
+                                JSONObject movie = popArray.getJSONObject(0);
+                                String id = movie.getString("id");
+                                addToServer(id, "movie");
+                            }
+                            catch (JSONException e){
+                                Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                        if (response.has("name_popular")){
+                            //artista
+                            try {
+                                Toast.makeText(getBaseContext(),"L'attore verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
+                                JSONArray popArray= response.getJSONArray("name_popular");
+                                JSONObject movie = popArray.getJSONObject(0);
+                                String id = movie.getString("id");
+                                addToServer(id,"artist");
+                            }
+                            catch (JSONException e){
+                                Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        else Toast.makeText(getBaseContext(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener(){
+
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        VolleyLog.d(TAG,"Error: "+volleyError.getMessage());
+                    }
+                }
+        );
+        AppController.getInstance().addToRequestQueue(imdbReq);
+    }
+
+    private void addToServer(String idimdb,String type){
+        /**
+         * Formato POST su nostro server:
+         * /api/tastes/<user_id>/<type>  POST dove type: artist , movie  genre
+         * {
+         *     "idIMDB" = id
+         * }
+         */
+
+        String url = Utils.SERVER_API + "tastes/" + account + "/" + type;
+        JSONObject toBePosted = new JSONObject();
+        try{
+            toBePosted.put("idIMDB",idimdb);
+        }
+        catch (JSONException e ){
+            Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+        }
+
+        JsonObjectRequest postRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                toBePosted,
+                new Response.Listener<JSONObject>() {
+
+                        @Override
+                            public void onResponse(JSONObject jsonObject) {
+
+                                refreshTastes();
+
+                            }
+                },
+                new Response.ErrorListener() {
+
+                        @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                                refreshTastes();
+                            }
+                }
+        );
+        AppController.getInstance().addToRequestQueue(postRequest);
+
+
+    }
     private class MainAdapter extends FragmentPagerAdapter {
 
         private final String[] TITLES = {

@@ -26,11 +26,13 @@ import java.util.List;
 import primetime4u.app.AppController;
 import primetime4u.model.Movie;
 import primetime4u.util.Utils;
+import primetime4u.model.Artist;
 
 public class TastesFragment extends BaseFragment {
 
     private MaterialListView tastes_material_list_view;
     private List<Movie> tastesList = new ArrayList<>();
+    private List<Artist> tastesListArtist = new ArrayList<>();
     private String account;
 
     private LayoutInflater inflater;
@@ -76,7 +78,7 @@ public class TastesFragment extends BaseFragment {
         account = base.getAccount();
 
         // Generate URL
-        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+        String url = Utils.SERVER_API + "tastes/" + account + "/all";
         
         // Get tastes
         get(url);
@@ -89,11 +91,12 @@ public class TastesFragment extends BaseFragment {
      */
     private void parseResponse(JSONObject response) {
         try {
+            //il get lo faccio sempre da ALL
             JSONObject data = response.getJSONObject("data");
-            JSONArray tastes = data.getJSONArray("tastes");
-
-            for (int i = 0; i < tastes.length(); i++) {
-                JSONObject tasteJSON = tastes.getJSONObject(i);
+            JSONObject tastes = data.getJSONObject("tastes");
+            JSONArray movies = tastes.getJSONArray("movies");
+            for (int i = 0; i < movies.length(); i++) {
+                JSONObject tasteJSON = movies.getJSONObject(i);
 
                 Movie proposal = new Movie();
                 proposal.setOriginalTitle(tasteJSON.getString("originalTitle"));
@@ -102,6 +105,19 @@ public class TastesFragment extends BaseFragment {
 
                 tastesList.add(proposal);
             }
+            //fare il for per artists e creare una tasteslist per movies
+            JSONArray artists = tastes.getJSONArray("artists");
+            for (int i=0;i < artists.length();i++){
+                JSONObject tasteJSON = artists.getJSONObject(i);
+
+                Artist proposal = new Artist();
+                proposal.setName(tasteJSON.getString("name"));
+                proposal.setIdIMDB(tasteJSON.getString("idIMDB"));
+                proposal.setPoster(tasteJSON.getString("photo"));
+
+                tastesListArtist.add(proposal);
+            }
+
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
@@ -114,7 +130,7 @@ public class TastesFragment extends BaseFragment {
      *
      */
     private void drawResult() {
-
+        //draw movies
         for (int i = 0; i < tastesList.size(); i++) {
             final Movie taste = tastesList.get(i);
             final TasteCard movieCard = new TasteCard(context);
@@ -143,6 +159,36 @@ public class TastesFragment extends BaseFragment {
 
             tastes_material_list_view.add(movieCard);
         }
+        //draw artists
+        for (int i = 0; i < tastesListArtist.size(); i++) {
+            final Artist taste = tastesListArtist.get(i);
+            final TasteCard artistCard = new TasteCard(context);
+            artistCard.setTitle(taste.getName());
+            artistCard.setTaste(true);
+            artistCard.setDismissible(false);
+            artistCard.setType(TasteCard.ARTIST_TYPE);
+            artistCard.setPoster(taste.getPoster());
+            artistCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    if (artistCard.getTaste()) {
+
+
+
+                    } else {
+
+                        card.dismiss();
+                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+                        String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
+                        deleteTaste(url);
+
+                    }
+                }
+            });
+
+            tastes_material_list_view.add(artistCard);
+        }
+
     }
 
     /**
@@ -162,6 +208,7 @@ public class TastesFragment extends BaseFragment {
                         Log.d(TAG, response.toString());
 
                         tastesList.clear();
+                        tastesListArtist.clear();
 
                         parseResponse(response);
 
@@ -191,7 +238,7 @@ public class TastesFragment extends BaseFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
-
+                        tastesListArtist.clear();
                         tastesList.clear();
 
                     }
