@@ -117,7 +117,6 @@ public class WatchedFragment extends BaseFragment {
             watched_material_list_view.add(watchedCard);
         }
     }
-    
     /**
      * gets "watched" list and parses the response
      */
