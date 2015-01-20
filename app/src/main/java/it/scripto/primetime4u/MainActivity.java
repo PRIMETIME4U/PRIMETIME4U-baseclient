@@ -27,7 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.astuetz.PagerSlidingTabStrip;
-import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -241,6 +241,7 @@ public class MainActivity extends BaseActivity {
          * }
          *
          */
+        System.out.println("Add taste invocato");
         JsonObjectRequest imdbReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url,
@@ -263,7 +264,7 @@ public class MainActivity extends BaseActivity {
                             }
 
                         }
-                        if (response.has("name_popular")){
+                        else if (response.has("name_popular")){
                             //artista
                             try {
                                 Toast.makeText(getBaseContext(),"L'attore verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
