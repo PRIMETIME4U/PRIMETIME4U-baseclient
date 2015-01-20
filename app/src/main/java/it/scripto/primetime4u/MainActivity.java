@@ -1,12 +1,10 @@
 package it.scripto.primetime4u;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,8 +15,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
+
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -63,6 +60,8 @@ public class MainActivity extends BaseActivity {
 
     private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&q=";
 
+
+
     @Override
     protected String getTagLog() {
         return "MainActivity";
@@ -82,6 +81,7 @@ public class MainActivity extends BaseActivity {
         inflate = true;
         shouldIRefresh = false;
         preferences = getPreferences(Context.MODE_PRIVATE);
+
 
         //ricavo l'email passata dalla startActivity e la salvo in maniera permanente
         if (!preferences.contains("ACCOUNT")){
@@ -163,6 +163,7 @@ public class MainActivity extends BaseActivity {
     public boolean onPrepareOptionsMenu(Menu menu){
         //questo metodo viene chiamato per cambiare dinamicamente il menu
 
+
         if (tasteTab){
             if (inflate) {
                 getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -185,6 +186,7 @@ public class MainActivity extends BaseActivity {
                         addTaste(url);
 
                         //Toast.makeText(getBaseContext(),url,Toast.LENGTH_LONG).show();
+
                         System.out.println("cerco su "+url);
                         searchView.clearFocus();
                         return true;
@@ -224,7 +226,11 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     private void addTaste(String url){
+
+
         //metodo che legge da imdb il json dell'url e aggiunge l'attore/film cercato ai gusti
         /**
          * Formato risposta da IMDB, se artista:
@@ -241,7 +247,9 @@ public class MainActivity extends BaseActivity {
          * }
          *
          */
-        System.out.println("Add taste invocato");
+        final String[] id = new String[1];
+        final String[] type = new String[1];
+
         JsonObjectRequest imdbReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url,
@@ -256,11 +264,14 @@ public class MainActivity extends BaseActivity {
                                 Toast.makeText(getBaseContext(),"Il film verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
                                 JSONArray popArray= response.getJSONArray("title_popular");
                                 JSONObject movie = popArray.getJSONObject(0);
-                                String id = movie.getString("id");
-                                addToServer(id, "movie");
+                                id[0] = movie.getString("id");
+                                type[0] = "movie";
+
+
                             }
                             catch (JSONException e){
                                 Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                return;
                             }
 
                         }
@@ -270,14 +281,23 @@ public class MainActivity extends BaseActivity {
                                 Toast.makeText(getBaseContext(),"L'attore verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
                                 JSONArray popArray= response.getJSONArray("name_popular");
                                 JSONObject movie = popArray.getJSONObject(0);
-                                String id = movie.getString("id");
-                                addToServer(id,"artist");
+                                id[0] = movie.getString("id");
+                                type[0] = "artist";
+
+
+
                             }
                             catch (JSONException e){
                                 Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                return;
                             }
                         }
-                        else Toast.makeText(getBaseContext(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
+                        else {
+                            Toast.makeText(getBaseContext(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        addToServer(id[0],type[0]);
                     }
                 },
                 new Response.ErrorListener(){
@@ -285,21 +305,27 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         VolleyLog.d(TAG,"Error: "+volleyError.getMessage());
+
                     }
                 }
         );
         AppController.getInstance().addToRequestQueue(imdbReq);
+
+
+
+
     }
 
     private void addToServer(String idimdb,String type){
         /**
          * POST su nostro server:
+         * ATTENZIONE, FA IL POST DUE VOLTE DI SEGUITO
          * /api/tastes/<user_id>/<type>  POST dove type: artist , movie o genre
          * {
          *     "idIMDB" = id
          * }
          */
-
+        System.out.println("Sto facendo HTTP post sul server");
         String url = Utils.SERVER_API + "tastes/" + account + "/" + type;
         JSONObject toBePosted = new JSONObject();
         try{
