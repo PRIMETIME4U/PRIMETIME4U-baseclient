@@ -25,5 +25,7 @@
     <string name="actors">Actors:</string>
     <string name="plot">Plot:</string>
     <string name="action_search">Taste Search</string>
+    <string name="title_activity_tutorial">TutorialActivity</string>
+    <string name="skip_button">SKIP</string>
 
 </resources>

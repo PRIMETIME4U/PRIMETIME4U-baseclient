@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<it.scripto.primetime4u.ProposalCardItemView 
+<it.scripto.primetime4u.cards.ProposalCardItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingTop="@dimen/content_top_padding"
@@ -128,4 +128,4 @@
 
     </android.support.v7.widget.CardView>
 
-</it.scripto.primetime4u.ProposalCardItemView>
+</it.scripto.primetime4u.cards.ProposalCardItemView>

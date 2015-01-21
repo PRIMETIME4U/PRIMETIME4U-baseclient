@@ -1,4 +1,4 @@
-package primetime4u.model;
+package it.scripto.primetime4u.model;
 
 /**
  * Created by Giovanni on 19/01/2015.

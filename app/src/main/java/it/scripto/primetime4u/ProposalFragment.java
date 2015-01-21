@@ -10,34 +10,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import primetime4u.app.AppController;
-import primetime4u.model.Movie;
-import primetime4u.util.Utils;
+import it.scripto.primetime4u.cards.MaterialProposalCardListAdapter;
+import it.scripto.primetime4u.cards.ProposalCard;
+import it.scripto.primetime4u.cards.WelcomeCard;
+import it.scripto.primetime4u.model.Movie;
+import it.scripto.primetime4u.model.Proposal;
+import it.scripto.primetime4u.model.ServerResponse;
+import it.scripto.primetime4u.utils.BaseFragment;
+import it.scripto.primetime4u.utils.Utils;
 
 
 public class ProposalFragment extends BaseFragment {
 
-    private MaterialListView proposal_material_list_view;
     private List<Movie> proposalList = new ArrayList<>();
-    private String account;
-
+    private ArrayList<ProposalCard> cardList = new ArrayList<>();
+    private MaterialProposalCardListAdapter materialListViewAdapter;
 
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -71,12 +70,11 @@ public class ProposalFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Setting up material list
-        proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
+        MaterialListView proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
-        account = base.getAccount();
         final String account = base.getAccount();
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -136,49 +134,57 @@ public class ProposalFragment extends BaseFragment {
                     editor.remove("PENDING_TIME");
                     editor.remove("TIME_HOUR");
                     editor.commit();
-                    String s = Utils.SERVER_API + "watched/" + account;
-                    addWatched(s,lastMovieId);
+                    
+                    // Generate URL
+                    String url = Utils.SERVER_API + "watched/" + account;
+                    
+                    // Add watched movie
+                    addWatched(url, lastMovieId);
                 }
             });
 
             proposal_material_list_view.add(welcomeCard);
         }
+        
+        // Generate URL
         String url = Utils.SERVER_API + "proposal/" + account;
         
         // Get proposals
         get(url);
+
+        // Create and set adapter
+        materialListViewAdapter = new MaterialProposalCardListAdapter(getActivity());
+        proposal_material_list_view.setAdapter(materialListViewAdapter);
         
         return view;
     }
+    
+    //
+    private void parseResponse(ServerResponse.ProposalData response) {
+        List<Proposal> proposals = response.proposal;
+        
+        Log.i(TAG, String.valueOf(proposals));
 
-    private void parseResponse(JSONObject response) {
-        try {
-            JSONObject data = response.getJSONObject("data");
-            JSONArray proposals = data.getJSONArray("proposal");
+        for (Proposal proposal : proposals) {
 
-            for (int i = 0; i < proposals.length(); i++) {
-                JSONObject proposalJSON = proposals.getJSONObject(i);
+            Movie movie = new Movie();
+            movie.setOriginalTitle(proposal.getOriginalTitle());
+            movie.setChannel(proposal.getChannel());
+            movie.setTime(proposal.getTime());
+            movie.setIdIMDB(proposal.getIdIMDB());
+            movie.setPoster(proposal.getPoster());
+            movie.setSimplePlot(proposal.getSimplePlot());
 
-                Movie proposal = new Movie();
-                proposal.setOriginalTitle(proposalJSON.getString("originalTitle"));
-                proposal.setChannel(proposalJSON.getString(("channel")));
-                proposal.setTime(proposalJSON.getString("time"));
-                proposal.setIdIMDB(proposalJSON.getString("idIMDB"));
-                proposal.setPoster(proposalJSON.getString("poster"));
-                proposal.setSimplePlot(proposalJSON.getString("simplePlot"));
-
-                proposalList.add(proposal);
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+            proposalList.add(movie);
         }
+ 
+        fillCardList();
     }
 
     /**
      *
      */
-    private void drawResult() {
+    private void fillCardList() {
         for (int i = 0; i < proposalList.size(); i++) {
             ProposalCard card = new ProposalCard(context);
             final Movie proposal = proposalList.get(i);
@@ -255,83 +261,44 @@ public class ProposalFragment extends BaseFragment {
                 }
             });
             
-            proposal_material_list_view.add(card);
+            cardList.add(card);
         }
+
+        materialListViewAdapter.addAll(cardList);
     }
 
     /**
      *
      */
     private void get(String url) {
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
+        Ion.with(context)
+                .load(url)
+                .as(new TypeToken<ServerResponse.ProposalResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
+                    public void onCompleted(Exception e, ServerResponse.ProposalResponse result) {
                         proposalList.clear();
+                        cardList.clear();
 
-                        parseResponse(response);
-
-                        drawResult();
+                        parseResponse(result.data);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                    }
-                }
-        );
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+                });
     }
 
-    private void addWatched(String url,String id){
-        /**
-         * Creates a new request.
-         * @param method the HTTP method to use
-         * @param url URL to fetch the JSON from
-         * @param jsonRequest A {@link org.json.JSONObject} to post with the request. Null is allowed and
-         *   indicates no parameters will be posted along with request.
-         * @param listener Listener to receive the JSON response
-         * @param errorListener Error listener, or null to ignore errors.
-         */
-        JSONObject toBePosted = new JSONObject();
-        try{
-            toBePosted.put("idIMDB",id);
-        }
-        catch (JSONException e){
-            Log.e(TAG, e.toString());
-            Toast.makeText(context, "JSON Exception in post request", Toast.LENGTH_LONG).show();
-        }
+    private void addWatched(String url, String id) {
+        JsonObject json = new JsonObject();
+        json.addProperty("idIMDB", id);
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                toBePosted,
-                new Response.Listener<JSONObject>() {
-
+        Ion.with(getActivity())
+                .load("POST", url)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        Toast.makeText(context,"Film aggiunto nella lista dei film visti",Toast.LENGTH_LONG).show();
-
+                    public void onCompleted(Exception e, JsonObject result) {
                     }
-                },
-                new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(context,"Errore nell'aggiunta del film",Toast.LENGTH_LONG).show();
-                    }
-                }
-        );
-
-        AppController.getInstance().addToRequestQueue(postRequest);
+                });
     }
 
     private boolean aDayIsPassed(){

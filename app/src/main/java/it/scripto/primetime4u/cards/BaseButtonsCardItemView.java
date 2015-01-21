@@ -1,4 +1,4 @@
-package it.scripto.primetime4u;
+package it.scripto.primetime4u.cards;
 
 import android.annotation.TargetApi;
 import android.content.Context;

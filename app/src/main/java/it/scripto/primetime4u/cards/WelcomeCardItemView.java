@@ -1,4 +1,4 @@
-package it.scripto.primetime4u;
+package it.scripto.primetime4u.cards;
 
 import android.content.Context;
 import android.util.AttributeSet;

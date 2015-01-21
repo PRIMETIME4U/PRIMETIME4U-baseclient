@@ -1,19 +1,15 @@
-package it.scripto.primetime4u;
+package it.scripto.primetime4u.utils;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import com.koushikdutta.ion.Ion;
+
+import it.scripto.primetime4u.BuildConfig;
 
 /**
  * Base actionbar activity with logging.
- *
- * @author pincopallino93
- * @version 1.0
- * @since 08 nov 2014
  */
 public abstract class BaseActivity extends ActionBarActivity {
 
@@ -26,15 +22,13 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        .setDefaultFontPath("fonts/Roboto-RobotoRegular.ttf")
-                        .setFontAttrId(R.attr.fontPath)
-                        .build()
-        );
 
         setContentView(getLayoutResourceId());
 
-        if (BuildConfig.DEBUG) Log.v(TAG, "onCreate");
+        if (BuildConfig.DEBUG) {
+            Ion.getDefault(this).configure().setLogging(TAG, Log.DEBUG);
+            Log.v(TAG, "onCreate");
+        }
     }
 
     @Override
@@ -71,10 +65,5 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void onDestroy() {
         super.onDestroy();
         if (BuildConfig.DEBUG) Log.v(TAG, "onDestroy");
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

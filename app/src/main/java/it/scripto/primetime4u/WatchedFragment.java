@@ -1,43 +1,41 @@
 package it.scripto.primetime4u;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import primetime4u.app.AppController;
-import primetime4u.model.Movie;
-import primetime4u.util.Utils;
+import it.scripto.primetime4u.cards.MaterialWatchedCardListAdapter;
+import it.scripto.primetime4u.cards.WatchedCard;
+import it.scripto.primetime4u.model.Movie;
+import it.scripto.primetime4u.model.ServerResponse;
+import it.scripto.primetime4u.model.Watched;
+import it.scripto.primetime4u.utils.BaseFragment;
+import it.scripto.primetime4u.utils.Utils;
 
 public class WatchedFragment extends BaseFragment {
 
-    private MaterialListView watched_material_list_view;
     private List<Movie> watchedList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
     private List<Integer> tasteList = new ArrayList<>();
+    private ArrayList<WatchedCard> cardList = new ArrayList<>();
     private String account;
+    private MaterialWatchedCardListAdapter materialListViewAdapter;
+
+    private onTasteChangeListener onTasteChangeListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -68,7 +66,7 @@ public class WatchedFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Setting up material list
-        watched_material_list_view = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
+        MaterialListView watched_material_list_view = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
 
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
@@ -77,25 +75,41 @@ public class WatchedFragment extends BaseFragment {
         // Generate URL
         String url = Utils.SERVER_API + "watched/" + account;
 
-
-
         // Get watched
         get(url);
+
+        // Create and set adapter
+        materialListViewAdapter = new MaterialWatchedCardListAdapter(getActivity());
+        watched_material_list_view.setAdapter(materialListViewAdapter);
         
         return view;
     }
 
+    private void parseResponse(ServerResponse.WatchedResponse response) {
+        for (Watched watched : response.data.watched) {
+            Movie movie = new Movie();
+            movie.setOriginalTitle(watched.getOriginalTitle());
+            movie.setIdIMDB(watched.getIdIMDB());
+            movie.setPoster(watched.getPoster());
+
+            watchedList.add(movie);
+            dateList.add(watched.getDate());
+            tasteList.add(watched.getTasted());
+        }
+        fillCardList();
+    }
 
     /**
      * draws cards of watched list
      */
-    private void drawResult() {
+    private void fillCardList() {
 
         for (int i = 0; i < watchedList.size(); i++) {
             final Movie watched = watchedList.get(i);
 
             final WatchedCard watchedCard = new WatchedCard(context);
             final String id = watched.getIdIMDB();
+            
             watchedCard.setTitle(watched.getOriginalTitle());
             watchedCard.setDate(dateList.get(i));
             watchedCard.setTaste(tasteList.get(i) == 1);
@@ -105,132 +119,101 @@ public class WatchedFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (watchedCard.getTaste()) {
-                        Toast.makeText(context,"Film aggiunto alla tua lista gusti",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"Film aggiunto alla tua lista gusti", Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
-                        Log.i(TAG, url);
                         addTaste(url, id);
                     } else {
-                        Toast.makeText(context,"Film rimosso dalla tua lista gusti",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"Film rimosso dalla tua lista gusti", Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
                         deleteTaste(url);
                     }
                 }
             });
 
-            watched_material_list_view.add(watchedCard);
+            cardList.add(watchedCard);
         }
+
+        materialListViewAdapter.addAll(cardList);
     }
     /**
      * gets "watched" list and parses the response
      */
     private void get(String url) {
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(
-                Request.Method.GET, 
-                url, 
-                null,
-                new Response.Listener<JSONObject>() {
+        Ion.with(context)
+                .load(url)
+                .as(new TypeToken<ServerResponse.WatchedResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.WatchedResponse>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
+                    public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
                         watchedList.clear();
                         dateList.clear();
                         tasteList.clear();
+                        cardList.clear();
 
-                        try {
-                            JSONObject data = response.getJSONObject("data");
-                            JSONArray watcheds = data.getJSONArray("watched");
-
-                            for (int i = 0; i < watcheds.length(); i++) {
-                                JSONObject watchedJSON = watcheds.getJSONObject(i);
-
-                                Movie watched = new Movie();
-                                watched.setOriginalTitle(watchedJSON.getString("originalTitle"));
-                                watched.setIdIMDB(watchedJSON.getString("idIMDB"));
-                                watched.setPoster(watchedJSON.getString("poster"));
-
-                                watchedList.add(watched);
-                                dateList.add(watchedJSON.getString("date"));
-                                tasteList.add(watchedJSON.getInt("tasted"));
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-
-                        drawResult();
+                        parseResponse(result);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                    }
-                 }
-        );
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+                });
     }
+
     /**
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
+        JsonObject json = new JsonObject();
+        json.addProperty("idIMDB", id);
 
-        JsonObject toBePosted = new JsonObject();
-
-        toBePosted.addProperty("idIMDB", id);
-
-        Ion.with(context)
-                .load("POST",url)
-                .setJsonObjectBody(toBePosted)
+        Ion.with(getActivity())
+                .load("POST", url)
+                .setJsonObjectBody(json)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-
+                        onTasteChangeListener.onTasteChanged();
                     }
                 });
-
-
-        //alert of refreshing is now active
-        MainActivity base = (MainActivity) this.getActivity();
-        base.shouldIRefresh = true;
     }
 
     /**
      * deletes from user's taste list
      */
     private void deleteTaste(String url) {
-        JsonObjectRequest tasteDelete = new JsonObjectRequest(
-                Request.Method.DELETE,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
+        Ion.with(context)
+                .load("DELETE", url)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
+                    public void onCompleted(Exception e, JsonObject result) {
+                        onTasteChangeListener.onTasteChanged();
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                    }
-                }
-        );
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(tasteDelete);
-        //alert of refreshing is now active
-        MainActivity base = (MainActivity) this.getActivity();
-        base.shouldIRefresh = true;
+                });
     }
     
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
         // TODO: save watchedsList in order to reuse after
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onTasteChangeListener = (onTasteChangeListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onTasteChangeListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onTasteChangeListener = null;
+    }
+
+    public interface onTasteChangeListener {
+        public void onTasteChanged();
     }
 }

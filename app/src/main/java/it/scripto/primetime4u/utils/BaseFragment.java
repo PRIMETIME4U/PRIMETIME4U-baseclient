@@ -1,4 +1,4 @@
-package it.scripto.primetime4u;
+package it.scripto.primetime4u.utils;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.koushikdutta.ion.Ion;
+
+import it.scripto.primetime4u.BuildConfig;
+
 /**
  * Base fragment with logging.
- *
- * @author pincopallino93
- * @version 1.0
- * @since 08 nov 2014
  */
 public abstract class BaseFragment extends Fragment {
 
@@ -40,7 +40,10 @@ public abstract class BaseFragment extends Fragment {
 
         view = inflater.inflate(getLayoutResourceId(), container, false);
 
-        if (BuildConfig.DEBUG) Log.v(TAG, "onCreateView");
+        if (BuildConfig.DEBUG) {
+            Ion.getDefault(getActivity()).configure().setLogging(TAG, Log.DEBUG);
+            Log.v(TAG, "onCreateView");
+        }
         return view;
     }
 

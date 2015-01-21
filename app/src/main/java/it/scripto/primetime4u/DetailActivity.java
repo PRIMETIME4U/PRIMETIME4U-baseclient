@@ -2,27 +2,19 @@ package it.scripto.primetime4u;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import primetime4u.app.AppController;
-import primetime4u.model.Movie;
-import primetime4u.util.Utils;
+import it.scripto.primetime4u.model.Artist;
+import it.scripto.primetime4u.model.Detail;
+import it.scripto.primetime4u.model.ServerResponse;
+import it.scripto.primetime4u.utils.BaseActivity;
+import it.scripto.primetime4u.utils.Utils;
 
 public class DetailActivity extends BaseActivity {
     
@@ -81,7 +73,7 @@ public class DetailActivity extends BaseActivity {
     /**
      *
      */
-    private void drawResult(Movie movie) {
+    private void drawResult(ServerResponse.DetailResponse movie) {
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
         TextView movieInfoTextView = (TextView) findViewById(R.id.movie_info_text_view);
         TextView timeGenreTextView = (TextView) findViewById(R.id.time_genre_text_view);
@@ -90,122 +82,52 @@ public class DetailActivity extends BaseActivity {
         TextView actorsTextView = (TextView) findViewById(R.id.actors_value_text_view);
         TextView plotTextView = (TextView) findViewById(R.id.plot_value_text_view);
         
-        titleTextView.setText(movie.getOriginalTitle());
-        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), movie.getChannel(), movie.getTime()));
-        timeGenreTextView.setText(movie.getRunTimes() + " - " + movie.getGenres());
+        Detail detail = movie.data.detail;
+        
+        titleTextView.setText(detail.getOriginalTitle());
+        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), channel, time));
+        timeGenreTextView.setText(detail.getRunTimes() + " - " + detail.getGenres());
         
         // Set actors
         String actorsText = "";
-        for (String actor : movie.getActors()) {
-            actorsText = actorsText + (!(actorsText).equals("") ? ", " : "") + actor;
+        for (Artist actor : detail.getActors()) {
+            actorsText = actorsText + (!(actorsText).equals("") ? ", " : "") + actor.getName();
         }
         actorsTextView.setText(actorsText);
 
         // Set directors
         String directorsText = "";
-        for (String director : movie.getDirectors()) {
-            directorsText = directorsText + (!(directorsText).equals("") ? ", " : "") + director;
+        for (Artist director : detail.getDirectors()) {
+            directorsText = directorsText + (!(directorsText).equals("") ? ", " : "") + director.getName();
         }
         directorsTextView.setText(directorsText);
 
         // Set writers
         String writersText = "";
-        for (String writer : movie.getWriters()) {
-            writersText = writersText + (!(writersText).equals("") ? ", " : "") + writer;
+        for (Artist writer : detail.getWriters()) {
+            writersText = writersText + (!(writersText).equals("") ? ", " : "") + writer.getName();
         }
         writersTextView.setText(writersText);
 
-        plotTextView.setText(movie.getPlot());
-    }
-    
-    /**
-     *
-     */
-    private Movie parseResponse(JSONObject response) {
-
-        Movie movie = new Movie();
-        movie.setChannel(channel);
-        movie.setTime(time);
-
-        try {
-            JSONObject data = response.getJSONObject("data");
-            JSONObject detail = data.getJSONObject("detail");
-    
-            movie.setOriginalTitle(detail.getString("original_title"));
-            movie.setPlot(detail.getString("plot"));
-            movie.setPoster(detail.getString("poster"));
-            movie.setRated(detail.getString("rated"));
-            movie.setRunTimes(detail.getString("run_times"));
-            movie.setSimplePlot(detail.getString("simple_plot"));
-            movie.setTitle(detail.getString("title"));
-            movie.setTrailer(detail.getString("trailer"));
-            movie.setYear(detail.getString("year"));
-            movie.setGenres(detail.getString("genres"));
-            
-            // Get actors
-            ArrayList<String> actors = new ArrayList<>();
-            JSONArray actorsJSON = detail.getJSONArray("actors");
-            for (int i = 0; i < actorsJSON.length(); i++) {
-                JSONObject actorJSON = actorsJSON.getJSONObject(i);
-                actors.add(actorJSON.getString("name"));
-            }
-            movie.setActors(actors);
-
-            // Get directors
-            ArrayList<String> directors = new ArrayList<>();
-            JSONArray directorsJSON = detail.getJSONArray("directors");
-            for (int i = 0; i < directorsJSON.length(); i++) {
-                JSONObject actorJSON = directorsJSON.getJSONObject(i);
-                directors.add(actorJSON.getString("name"));
-            }
-            movie.setDirectors(directors);
-            
-            // Get writers
-            ArrayList<String> writers = new ArrayList<>();
-            JSONArray writersJSON = detail.getJSONArray("writers");
-            for (int i = 0; i < writersJSON.length(); i++) {
-                JSONObject actorJSON = writersJSON.getJSONObject(i);
-                writers.add(actorJSON.getString("name"));
-            }
-            movie.setWriters(writers);
-            
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-        }
-        return movie;
+        plotTextView.setText(detail.getPlot());
     }
 
     /**
      *
      */
     private void get(String url) {
-        JsonObjectRequest proposalRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
+        Ion.with(this)
+                .load(url)
+                .as(new TypeToken<ServerResponse.DetailResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.DetailResponse>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-
-                        Movie movie = parseResponse(response);
-
-                        drawResult(movie);
+                    public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
+                        drawResult(result);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.d(TAG, "Error: " + error.getMessage());
-                    }
-                }
-        );
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(proposalRequest);
+                });
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

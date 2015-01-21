@@ -1,4 +1,4 @@
-package it.scripto.primetime4u;
+package it.scripto.primetime4u.cards;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,10 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.koushikdutta.ion.Ion;
+
+import it.scripto.primetime4u.R;
 
 public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView<T> {
     public TasteCardItemView(Context context) {
@@ -54,7 +58,18 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
         CardView cardView = (CardView) findViewById(R.id.cardView);
         
         if (card.getType() == 1) {
-            cardView.getLayoutParams().width = width / 2 - 8;
+            cardView.getLayoutParams().width = width / 2 - (int)getResources().getDimension(R.dimen.small_padding);
+        } else {
+            cardView.getLayoutParams().width = width - (int)getResources().getDimension(R.dimen.small_padding);
         }
+
+        // Set poster
+        ImageView mPoster = (ImageView) findViewById(R.id.imageView);
+        Ion.with(mPoster)
+                //.placeholder(R.drawable.placeholder_image)
+                //.error(R.drawable.error_image)
+                //.animateLoad(spinAnimation)
+                //.animateIn(fadeInAnimation)
+                .load(card.getPoster());
     }
 }

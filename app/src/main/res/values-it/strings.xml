@@ -24,4 +24,6 @@
     <string name="actors">Attori:</string>
     <string name="plot">Trama:</string>
     <string name="action_search">Ricerca gusti</string>
+    <string name="title_activity_tutorial">TutorialActivity</string>
+    <string name="skip_button">SALTA</string>
 </resources>
