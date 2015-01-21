@@ -15,6 +15,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -173,35 +176,23 @@ public class WatchedFragment extends BaseFragment {
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
-        
-        JSONObject toBePosted = new JSONObject();
-        try {
-            toBePosted.put("idIMDB", id);
-        }
-        catch (JSONException e){
-            Log.d(TAG,e.toString());
-        }
-        
-        JsonObjectRequest tasteAdd = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                toBePosted,
-                new Response.Listener<JSONObject>() {
+
+        JsonObject toBePosted = new JsonObject();
+
+        toBePosted.addProperty("idIMDB", id);
+
+        Ion.with(context)
+                .load("POST",url)
+                .setJsonObjectBody(toBePosted)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
+                    public void onCompleted(Exception e, JsonObject result) {
 
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                    }
-                }
-        );
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(tasteAdd);
+                });
+
+
         //alert of refreshing is now active
         MainActivity base = (MainActivity) this.getActivity();
         base.shouldIRefresh = true;

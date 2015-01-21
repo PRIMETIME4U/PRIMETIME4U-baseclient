@@ -1,9 +1,11 @@
 package it.scripto.primetime4u;
 
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,11 +26,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.astuetz.PagerSlidingTabStrip;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+
+import java.lang.reflect.Method;
 
 import primetime4u.app.AppController;
 import primetime4u.util.Utils;
@@ -261,7 +269,7 @@ public class MainActivity extends BaseActivity {
                         if (response.has("title_popular")){
                             //film
                             try {
-                                Toast.makeText(getBaseContext(),"Il film verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(),"Il film verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
                                 JSONArray popArray= response.getJSONArray("title_popular");
                                 JSONObject movie = popArray.getJSONObject(0);
                                 id[0] = movie.getString("id");
@@ -278,7 +286,7 @@ public class MainActivity extends BaseActivity {
                         else if (response.has("name_popular")){
                             //artista
                             try {
-                                Toast.makeText(getBaseContext(),"L'attore verrà aggiunto alla tua lista gusti",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(),"L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
                                 JSONArray popArray= response.getJSONArray("name_popular");
                                 JSONObject movie = popArray.getJSONObject(0);
                                 id[0] = movie.getString("id");
@@ -325,42 +333,27 @@ public class MainActivity extends BaseActivity {
          *     "idIMDB" = id
          * }
          */
-        System.out.println("Sto facendo HTTP post sul server");
+
         String url = Utils.SERVER_API + "tastes/" + account + "/" + type;
-        JSONObject toBePosted = new JSONObject();
-        try{
-            toBePosted.put("idIMDB",idimdb);
-        }
-        catch (JSONException e ){
-            Toast.makeText(getBaseContext(),e.getMessage(),Toast.LENGTH_LONG).show();
-        }
+        JsonObject toBePosted = new JsonObject();
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                toBePosted,
-                new Response.Listener<JSONObject>() {
+        toBePosted.addProperty("idIMDB",idimdb);
 
-                        @Override
-                            public void onResponse(JSONObject jsonObject) {
 
-                                refreshTastes();
-
-                            }
-                },
-                new Response.ErrorListener() {
-
-                        @Override
-                            public void onErrorResponse(VolleyError volleyError) {
-
-                                refreshTastes();
-                            }
-                }
-        );
-        AppController.getInstance().addToRequestQueue(postRequest);
-
+        Ion.with(getBaseContext())
+                .load("POST",url)
+                .setJsonObjectBody(toBePosted)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        refreshTastes();
+                    }
+                });
 
     }
+
+
     private class MainAdapter extends FragmentPagerAdapter {
 
         private final String[] TITLES = {

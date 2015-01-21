@@ -35,5 +35,6 @@ dependencies {
     compile ('com.github.dexafree:materiallist:2.0.1'){
         exclude group: 'com.nhaarman.listviewanimations'
     }
+    compile 'com.koushikdutta.ion:ion:2.+'
     compile 'uk.co.chrisjenx:calligraphy:2.0.0'
 }

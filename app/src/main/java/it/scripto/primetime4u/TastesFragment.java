@@ -80,7 +80,7 @@ public class TastesFragment extends BaseFragment {
 
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
-        
+
         // Get tastes
         get(url);
         
@@ -150,7 +150,7 @@ public class TastesFragment extends BaseFragment {
                     } else {
 
                         card.dismiss();
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context,"Elemento rimosso dalla tua lista di gusti, attendi...",Toast.LENGTH_LONG).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -179,7 +179,7 @@ public class TastesFragment extends BaseFragment {
                     } else {
 
                         card.dismiss();
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context,"Elemento rimosso dalla tua lista di gusti, attendi...",Toast.LENGTH_LONG).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -189,6 +189,7 @@ public class TastesFragment extends BaseFragment {
 
             tastes_material_list_view.add(artistCard);
         }
+
 
     }
 
@@ -207,10 +208,8 @@ public class TastesFragment extends BaseFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
-
                         tastesList.clear();
                         tastesListArtist.clear();
-
                         parseResponse(response);
 
                     }
@@ -228,7 +227,7 @@ public class TastesFragment extends BaseFragment {
     }
 
     /**
-     *
+     *  cancella gusti
      */
     private void deleteTaste(String url) {
         JsonObjectRequest tasteDelete = new JsonObjectRequest(
@@ -241,6 +240,8 @@ public class TastesFragment extends BaseFragment {
                         Log.d(TAG, response.toString());
                         tastesListArtist.clear();
                         tastesList.clear();
+                        MainActivity base = (MainActivity) getActivity();
+                        base.refreshTastes();
 
                     }
                 },
@@ -254,10 +255,7 @@ public class TastesFragment extends BaseFragment {
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(tasteDelete);
-        //alert of refreshing is now active
-        MainActivity base = (MainActivity)this.getActivity();
-        base.shouldIRefresh = true;
-        base.refreshTastes();
+
     }
 
     @Override

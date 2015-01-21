@@ -92,6 +92,8 @@ public class StartFragment extends BaseFragment {
 
 
         start_material_list_view.add(welcome);
+        if (username.equals("Utente sconosciuto")) return view;
+
         if (username.charAt(username.length()-1)=='D' && username.charAt(username.length()-2)=='L' && username.charAt(username.length()-3)=='O'){
             //se è vecchio
             int end = username.length()-3;

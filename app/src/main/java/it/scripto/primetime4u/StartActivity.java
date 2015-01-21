@@ -78,6 +78,9 @@ public class StartActivity extends BaseActivity {
             account=accountName;
             preferences = getPreferences(Context.MODE_PRIVATE);
             editor = preferences.edit();
+            if (preferences.contains("ACCOUNT")){
+                editor.remove("ACCOUNT");
+            }
             editor.putString("ACCOUNT",account);
             editor.commit();
             createFrag();
@@ -111,7 +114,18 @@ public class StartActivity extends BaseActivity {
             //utente vecchio
             createFrag();
             account = preferences.getString("ACCOUNT","");
-            account = account + "OLD";
+            if (account.equals("Utente sconosciuto")){
+                try {
+                    Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                            new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
+
+                    startActivityForResult(intent, REQUEST_CODE_EMAIL);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+                }
+            }
+            else
+                account = account + "OLD";
         }
 
         else
