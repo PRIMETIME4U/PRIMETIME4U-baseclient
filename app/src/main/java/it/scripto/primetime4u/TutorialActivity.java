@@ -94,6 +94,7 @@ public class TutorialActivity extends BaseActivity {
     private void goToMain() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -127,7 +128,7 @@ public class TutorialActivity extends BaseActivity {
             Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
         }
     }
-    
+
     private class TutorialAdapter extends FragmentPagerAdapter {
 
         private int pagerCount = 5;
