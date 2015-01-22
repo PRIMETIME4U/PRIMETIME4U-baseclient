@@ -146,6 +146,10 @@ public class WatchedFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.WatchedResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         watchedList.clear();
                         dateList.clear();
                         tasteList.clear();
@@ -170,6 +174,10 @@ public class WatchedFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         onTasteChangeListener.onTasteChanged();
                     }
                 });
@@ -185,6 +193,10 @@ public class WatchedFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         onTasteChangeListener.onTasteChanged();
                     }
                 });

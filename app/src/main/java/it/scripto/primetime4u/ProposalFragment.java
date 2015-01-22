@@ -266,6 +266,10 @@ public class ProposalFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.ProposalResponse result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         proposalList.clear();
                         cardList.clear();
 
@@ -285,6 +289,10 @@ public class ProposalFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                     }
                 });
     }

@@ -43,7 +43,7 @@ public class TastesFragment extends BaseFragment {
     private onTasteChangeListener onTasteChangeListener;
     private MenuItem searchItem;
 
-    private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&q=";
+    private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&nr=1&q=";
 
     /**
      * Use this factory method to create a new instance of
@@ -122,6 +122,10 @@ public class TastesFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         if (result.has("title_popular")){
                             //film
                             Toast.makeText(getActivity(), "Il film verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
@@ -141,7 +145,18 @@ public class TastesFragment extends BaseFragment {
                             String url = Utils.SERVER_API + "tastes/" + account + "/artist";
 
                             addTaste(url, id);
-                        } else {
+                        }
+                        else if (result.has("name_exact")){
+                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
+                            JsonArray popArray= result.getAsJsonArray("name_exact");
+                            JsonObject artist = popArray.get(0).getAsJsonObject();
+                            String id = artist.get("id").getAsString();
+                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
+
+                            addTaste(url, id);
+                        }
+
+                        else {
                             Toast.makeText(getActivity(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
                         }
                     }
@@ -162,6 +177,10 @@ public class TastesFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         onTasteChangeListener.onTasteChanged();
                     }
                 });
@@ -277,6 +296,10 @@ public class TastesFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.TasteResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.TasteResponse result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         tastesListArtist.clear();
                         tastesListMovie.clear();
                         cardList.clear();
@@ -296,6 +319,10 @@ public class TastesFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null){
+                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         onTasteChangeListener.onTasteChanged();
                     }
                 });
