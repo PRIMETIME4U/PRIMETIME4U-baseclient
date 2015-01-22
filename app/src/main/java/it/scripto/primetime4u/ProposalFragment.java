@@ -111,21 +111,9 @@ public class ProposalFragment extends BaseFragment {
                 public void onButtonPressedListener(View view, Card card) {
                     Toast.makeText(context, "L'hai guardato", Toast.LENGTH_SHORT).show();
 
-                    /**
-                     * Cosa fare: ricordo l'idIMDB e il titolo
-                     *
-                     *  http://hale-kite-786.appspot.com/api/watched/<id>
 
-                     mettendo il json
-                     {
-
-                     "idIMDB":"id"
-                     }
-                     */
                     String lastMovieId = preferences.getString("PENDING_MOVIE","");
-                    /**
-                     * faccio add di questo ID ai watched dell'utente con HTTP POST
-                     */
+
                     card.setDismissible(true);
                     card.dismiss();
                     editor.remove("TOBEANSWERED");

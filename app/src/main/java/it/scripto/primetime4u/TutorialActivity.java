@@ -49,7 +49,7 @@ public class TutorialActivity extends BaseActivity {
 
         preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
-        if (preferences.contains(ACCOUNT)){
+        if (preferences.contains(ACCOUNT) && !preferences.getString(ACCOUNT,"").equals("invalidUser")){
             goToMain();    
         } else {
             final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
@@ -87,14 +87,34 @@ public class TutorialActivity extends BaseActivity {
                 startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(ACCOUNT, "invalidUser");
+                editor.apply();
+
             }
         }
     }
 
     private void goToMain() {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-        finish();
+        if (!preferences.getString(ACCOUNT,"").equals("invalidUser")) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else{
+            try {
+                Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                        new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
+
+                startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(ACCOUNT, "invalidUser");
+                editor.apply();
+
+            }
+        }
     }
 
     @Override
@@ -120,12 +140,18 @@ public class TutorialActivity extends BaseActivity {
                         @Override
                         public void onCompleted(Exception e, JsonObject result) {
                             SharedPreferences.Editor editor = preferences.edit();
+                            if (preferences.contains("ACCOUNT")){
+                                editor.remove("ACCOUNT");
+                            }
                             editor.putString(ACCOUNT, accountName);
                             editor.apply();
                         }
                     });
         } else {
-            Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Seleziona un account valido", Toast.LENGTH_LONG).show();
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(ACCOUNT, "invalidUser");
+            editor.apply();
         }
     }
 
