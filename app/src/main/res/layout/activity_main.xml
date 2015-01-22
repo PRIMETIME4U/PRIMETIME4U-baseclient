@@ -15,7 +15,6 @@
         android:background="@color/primary"
         tools:ignore="UnusedAttribute" />
 
-
     <!-- Tab -->
     <com.astuetz.PagerSlidingTabStrip
         android:id="@+id/main_activity_pager_sliding_tab_strip"

@@ -131,7 +131,7 @@ public class TutorialActivity extends BaseActivity {
 
     private class TutorialAdapter extends FragmentPagerAdapter {
 
-        private int pagerCount = 5;
+        private int pagerCount = 1;
 
         public TutorialAdapter(FragmentManager fm) {
             super(fm);
@@ -147,14 +147,6 @@ public class TutorialActivity extends BaseActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return FirstFragment.newInstance();
-                case 1:
-                    return FirstFragment.newInstance();
-                case 2:
-                    return FirstFragment.newInstance();
-                case 3:
-                    return FirstFragment.newInstance();
-                case 4:
                     return FirstFragment.newInstance();
                 default:
                     break;

@@ -25,7 +25,7 @@
     <string name="actors">Actors:</string>
     <string name="plot">Plot:</string>
     <string name="action_search">Taste Search</string>
-    <string name="title_activity_tutorial">TutorialActivity</string>
     <string name="skip_button">SKIP</string>
+    <string name="app_slogan">The only app that allows you to plop down to the couch and simply enjoy a movie</string>
 
 </resources>

@@ -1,5 +1,41 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="it.scripto.primetime4u.FirstFragment">
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    tools:context="it.scripto.primetime4u.FirstFragment">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:gravity="center|center_horizontal"
+        android:padding="@dimen/big_padding">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton"
+            android:src="@drawable/ic_launcher"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal"
+            style="@style/PrimeTime.Display1"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingBottom="@dimen/small_padding" />
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_slogan"
+            android:layout_gravity="center_horizontal"
+            style="@style/PrimeTime.Title"
+            android:gravity="center" />
+    </LinearLayout>
 </FrameLayout>
