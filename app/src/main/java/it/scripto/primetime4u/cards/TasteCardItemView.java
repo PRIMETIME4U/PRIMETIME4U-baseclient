@@ -57,11 +57,12 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
         int width = displayMetrics.widthPixels;
         CardView cardView = (CardView) findViewById(R.id.cardView);
         
-        if (card.getType() == 1) {
-            cardView.getLayoutParams().width = width / 2 - (int)getResources().getDimension(R.dimen.small_padding);
-        } else {
-            cardView.getLayoutParams().width = width - (int)getResources().getDimension(R.dimen.small_padding);
-        }
+        // TODO: Resolve problem with width.. the card is cutted
+//        if (card.getType() == 1) {
+//            cardView.getLayoutParams().width = width / 2 - (int)getResources().getDimension(R.dimen.small_padding);
+//        } else {
+//            cardView.getLayoutParams().width = width - (int)getResources().getDimension(R.dimen.small_padding);
+//        }
 
         // Set poster
         ImageView mPoster = (ImageView) findViewById(R.id.imageView);
@@ -70,6 +71,7 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
                 //.error(R.drawable.error_image)
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
+                .centerCrop()
                 .load(card.getPoster());
     }
 }

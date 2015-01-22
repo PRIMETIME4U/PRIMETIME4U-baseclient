@@ -38,6 +38,7 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
                 //.error(R.drawable.error_image)
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
+                .centerCrop()
                 .load(card.getPoster());
     }
 }

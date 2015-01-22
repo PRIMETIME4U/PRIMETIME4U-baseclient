@@ -38,6 +38,7 @@ public class WatchedCardItemView<T extends WatchedCard> extends TasteCardItemVie
                 //.error(R.drawable.error_image)
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
+                .centerCrop()
                 .load(card.getPoster());
     }
 }
