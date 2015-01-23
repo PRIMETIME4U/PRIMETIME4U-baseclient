@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.koushikdutta.ion.Ion;
 
+import java.util.Random;
+
 import it.scripto.primetime4u.R;
 
 public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView<T> {
@@ -49,7 +51,17 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
         
         // Set description
         TextView mDescription = (TextView) findViewById(R.id.descriptionTextView);
-        mDescription.setText(card.getType() == 0 ? getResources().getString(R.string.movie) : getResources().getString(R.string.artist));
+        String description = null;
+        
+        if (card.getType() == TasteCard.MOVIE_TYPE) {
+            description = getResources().getString(R.string.movie);    
+        } else if (card.getType() == TasteCard.ARTIST_TYPE) {
+            description = getResources().getString(R.string.artist);
+        } else if (card.getType() == TasteCard.GENRE_TYPE) {
+            description = card.getDescription();
+        }
+
+        mDescription.setText(description);
         
         // Set width
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -63,15 +75,24 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
 //        } else {
 //            cardView.getLayoutParams().width = width - (int)getResources().getDimension(R.dimen.small_padding);
 //        }
-
-        // Set poster
-        ImageView mPoster = (ImageView) findViewById(R.id.imageView);
-        Ion.with(mPoster)
-                //.placeholder(R.drawable.placeholder_image)
-                //.error(R.drawable.error_image)
-                //.animateLoad(spinAnimation)
-                //.animateIn(fadeInAnimation)
-                .centerCrop()
-                .load(card.getPoster());
+        
+        
+        if (card.getType() != TasteCard.GENRE_TYPE) {
+            // Set poster
+            ImageView mPoster = (ImageView) findViewById(R.id.imageView);
+            Ion.with(mPoster)
+                    //.placeholder(R.drawable.placeholder_image)
+                    //.error(R.drawable.error_image)
+                    //.animateLoad(spinAnimation)
+                    //.animateIn(fadeInAnimation)
+                    .centerCrop()
+                    .load(card.getPoster());
+        } else {
+            // Set first letter of the genre
+            TextView genreText = (TextView) findViewById(R.id.taste_genre_letter);
+            genreText.setText(Character.toString(card.getDescription().charAt(0)));
+            Random random = new Random();
+            genreText.setBackgroundColor((0xff000000 | random.nextInt(0x00ffffff)));
+        }
     }
 }

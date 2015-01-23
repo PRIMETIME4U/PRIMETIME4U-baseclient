@@ -2,6 +2,7 @@ package it.scripto.primetime4u;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ public class DetailActivity extends BaseActivity {
     public final static String EXTRA_ORIGINAL_TITLE = "ORIGINAL_TITLE";
     public final static String EXTRA_CHANNEL = "CHANNEL";
     public final static String EXTRA_TIME = "TIME";
+    private String originalTitle;
     private String channel;
     private String time;
 
@@ -46,8 +48,7 @@ public class DetailActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String idIMDB = null;
-        String originalTitle = null;
-        
+
         // TODO: pass parcable and not all strings
         // Get movie info
         Bundle extras = getIntent().getExtras();
@@ -84,7 +85,7 @@ public class DetailActivity extends BaseActivity {
         
         Detail detail = movie.data.detail;
         
-        titleTextView.setText(detail.getOriginalTitle());
+        titleTextView.setText(originalTitle);
         movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), channel, time));
         timeGenreTextView.setText(detail.getRunTimes() + " - " + detail.getGenres());
         
@@ -123,6 +124,7 @@ public class DetailActivity extends BaseActivity {
                 .setCallback(new FutureCallback<ServerResponse.DetailResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
+                        Log.i(TAG, String.valueOf(result));
                         drawResult(result);
                     }
                 });

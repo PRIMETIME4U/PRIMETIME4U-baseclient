@@ -281,6 +281,15 @@ public class TastesFragment extends BaseFragment {
 
             cardList.add(artistCard);
         }
+        
+/*
+        TasteCard genreCard = new TasteCard(context);
+        genreCard.setDescription("Action");
+        genreCard.setTaste(true);
+        genreCard.setDismissible(false);
+        genreCard.setType(TasteCard.GENRE_TYPE);
+        cardList.add(genreCard);
+*/
 
         materialListViewAdapter.addAll(cardList);
     }

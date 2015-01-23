@@ -82,6 +82,21 @@
                 tools:ignore="RtlHardcoded,RtlSymmetry"
                 android:contentDescription="@string/add_taste_content_description" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="G"
+                android:id="@+id/taste_genre_letter"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_above="@+id/descriptionTextView"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                style="@style/PrimeTime.Display4"
+                android:textStyle="bold" />
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

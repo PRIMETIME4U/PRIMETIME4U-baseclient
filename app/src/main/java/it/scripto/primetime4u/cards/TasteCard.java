@@ -12,7 +12,8 @@ public class TasteCard extends BigImageCard {
 
     public static final int MOVIE_TYPE = 0;
     public static final int ARTIST_TYPE = 1;
-    
+    public static final int GENRE_TYPE = 2;
+
     protected OnButtonPressListener onTasteButtonPressedListener;
     protected boolean taste = false;
     protected int type = MOVIE_TYPE;
