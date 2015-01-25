@@ -13,13 +13,15 @@ import android.view.Menu;
 
 import com.astuetz.PagerSlidingTabStrip;
 
+import java.util.List;
+
 import it.scripto.primetime4u.utils.BaseActivity;
+import it.scripto.primetime4u.utils.RefreshFragment;
 
 public class MainActivity extends BaseActivity implements WatchedFragment.onTasteChangeListener, 
         TastesFragment.onTasteChangeListener {
 
     private String account;
-    private MainAdapter adapter;
 
     @Override
     protected String getTagLog() {
@@ -45,31 +47,42 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
  
         // Initialize the ViewPager and set an adapter
         ViewPager pager = (ViewPager) findViewById(R.id.main_activity_view_pager);
-        adapter = new MainAdapter(getSupportFragmentManager());
+        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
 
         // Bind the tabs to the ViewPager
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.main_activity_pager_sliding_tab_strip);
         tabs.setViewPager(pager);
     }
-
-    public void refreshTastes(){
-       adapter.notifyDataSetChanged();
-    }
-
+    
+    /**
+     *
+     */
     public String getAccount() {
         return account;
     }
     
+    /**
+     *
+     */
     @Override
     public void onTasteChanged() {
-        refreshTastes();
+        List<Fragment> allFragments = getSupportFragmentManager().getFragments();
+        if (allFragments != null) {
+            for (Fragment fragment : allFragments) {
+                try {
+                    RefreshFragment refreshFragment = (RefreshFragment) fragment;
+                    refreshFragment.refresh();
+                } catch (ClassCastException ignored) {
+                }
+            }
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 

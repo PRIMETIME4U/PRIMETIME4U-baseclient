@@ -3,11 +3,14 @@ package it.scripto.primetime4u;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dexafree.materialList.cards.model.Card;
@@ -17,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.ProgressCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +42,8 @@ public class ProposalFragment extends BaseFragment {
     private ArrayList<ProposalCard> cardList = new ArrayList<>();
     private MaterialProposalCardListAdapter materialListViewAdapter;
 
+    private ProgressBar progressBar;
+    
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
 
@@ -70,15 +76,17 @@ public class ProposalFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Setting up material list
-        MaterialListView proposal_material_list_view = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
+        MaterialListView proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
+        // Get progress bar
+        progressBar = (ProgressBar) view.findViewById(R.id.proposal_progress_bar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
+        
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         final String account = base.getAccount();
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-
-
 
         // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
         if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
@@ -131,7 +139,7 @@ public class ProposalFragment extends BaseFragment {
                 }
             });
 
-            proposal_material_list_view.add(welcomeCard);
+            proposalMaterialListView.add(welcomeCard);
         }
         
         // Generate URL
@@ -142,8 +150,9 @@ public class ProposalFragment extends BaseFragment {
 
         // Create and set adapter
         materialListViewAdapter = new MaterialProposalCardListAdapter(getActivity());
-        proposal_material_list_view.setAdapter(materialListViewAdapter);
-        
+        proposalMaterialListView.setAdapter(materialListViewAdapter);
+        //proposalMaterialListView.setEmptyView(view.findViewById(R.id.no_proposal_text_view));
+
         return view;
     }
     
@@ -261,6 +270,13 @@ public class ProposalFragment extends BaseFragment {
     private void get(String url) {
         Ion.with(context)
                 .load(url)
+                .progressBar(progressBar)
+                .progressHandler(new ProgressCallback() {
+                    @Override
+                    public void onProgress(long downloaded, long total) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
+                })
                 .as(new TypeToken<ServerResponse.ProposalResponse>() {
                 })
                 .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {
@@ -274,6 +290,8 @@ public class ProposalFragment extends BaseFragment {
                         cardList.clear();
 
                         parseResponse(result.data);
+                        
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }

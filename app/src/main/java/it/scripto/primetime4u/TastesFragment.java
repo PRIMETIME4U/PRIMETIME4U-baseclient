@@ -1,7 +1,10 @@
 package it.scripto.primetime4u;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -10,11 +13,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -29,10 +34,10 @@ import it.scripto.primetime4u.cards.TasteCard;
 import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
-import it.scripto.primetime4u.utils.BaseFragment;
+import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
 
-public class TastesFragment extends BaseFragment {
+public class TastesFragment extends RefreshFragment {
 
     private List<Movie> tastesListMovie = new ArrayList<>();
     private List<Artist> tastesListArtist = new ArrayList<>();
@@ -41,8 +46,9 @@ public class TastesFragment extends BaseFragment {
     private MaterialTasteCardListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
+    private ProgressBar progressBar;
     private MenuItem searchItem;
-
+    
     private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&nr=1&q=";
 
     /**
@@ -70,9 +76,46 @@ public class TastesFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+
+        setHasOptionsMenu(true);
+
+        // Setting up material list
+        MaterialListView tastesMaterialListView = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+
+        // Get progress bar
+        progressBar = (ProgressBar) view.findViewById(R.id.taste_progress_bar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
+
+        // Get user_id
+        MainActivity base = (MainActivity) this.getActivity();
+        account = base.getAccount();
+
+        // Create and set adapter
+        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
+        tastesMaterialListView.setAdapter(materialListViewAdapter);
+
+        // Get data
+        refresh();
         
+        // TODO: doesn't work...
+        //tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
+        
+        return view;
+    }
+
+    @Override
+    public void refresh() {
+        // Clear adapter
+        materialListViewAdapter.clear();
+        materialListViewAdapter.notifyDataSetChanged();
+
+        // Generate URL
+        String url = Utils.SERVER_API + "tastes/" + account + "/all";
+
+        // Get tastes
+        get(url);
     }
 
     @Override
@@ -116,6 +159,7 @@ public class TastesFragment extends BaseFragment {
     }
 
     private void getIMDb(String url) {
+        progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(url)
                 .asJsonObject()
@@ -159,6 +203,8 @@ public class TastesFragment extends BaseFragment {
                         else {
                             Toast.makeText(getActivity(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
                         }
+                        
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
@@ -167,11 +213,18 @@ public class TastesFragment extends BaseFragment {
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
+        // Clear adapter
+        clearAdapter();
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+
+        // Create JSON object
         JsonObject json = new JsonObject();
         json.addProperty("idIMDB", id);
-
+        // Do connection
         Ion.with(getActivity())
                 .load("POST", url)
+                .progressBar(progressBar)
                 .setJsonObjectBody(json)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
@@ -181,35 +234,23 @@ public class TastesFragment extends BaseFragment {
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
                             return;
                         }
+                        // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+                                    @Override
+                                    public void onMessageClick(Parcelable parcelable) {
+                                        //TODO: create UNDO
+                                    }
+                                })
+                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_added)
+                                .show();
                     }
                 });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        
-        setHasOptionsMenu(true);
-        
-        // Setting up material list
-        MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
-        
-        // Get user_id
-        MainActivity base = (MainActivity) this.getActivity();
-        account = base.getAccount();
-
-        // Generate URL
-        String url = Utils.SERVER_API + "tastes/" + account + "/all";
-        
-        // Get tastes
-        get(url);
-
-        // Create and set adapter
-        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
-        tastes_material_list_view.setAdapter(materialListViewAdapter);
-        
-        return view;
     }
     
     /**
@@ -220,10 +261,11 @@ public class TastesFragment extends BaseFragment {
         for (Movie movie : response.data.tastes.movies) {
             tastesListMovie.add(movie);
         }
+        // Parse artists list
         for (Artist artist : response.data.tastes.artists){
             tastesListArtist.add(artist);
         }
-
+        
         fillCardList();
     }
     
@@ -244,8 +286,6 @@ public class TastesFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!movieCard.getTaste()) {
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
-
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -264,13 +304,11 @@ public class TastesFragment extends BaseFragment {
             artistCard.setTaste(true);
             artistCard.setDismissible(false);
             artistCard.setType(TasteCard.ARTIST_TYPE);
-            artistCard.setPoster(taste.getPoster());
+            artistCard.setPoster(taste.getPhoto());
             artistCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!artistCard.getTaste()) {
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
-                        
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
                         
@@ -298,6 +336,9 @@ public class TastesFragment extends BaseFragment {
      *
      */
     private void get(String url) {
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        // Do connection
         Ion.with(context)
                 .load(url)
                 .as(new TypeToken<ServerResponse.TasteResponse>() {
@@ -305,15 +346,16 @@ public class TastesFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.TasteResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.TasteResponse result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                        if (e != null) {
+                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
                             return;
                         }
-                        tastesListArtist.clear();
-                        tastesListMovie.clear();
-                        cardList.clear();
-
+                        // Clear all data list
+                        clearData();
+                        // Parse response
                         parseResponse(result);
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
@@ -321,7 +363,21 @@ public class TastesFragment extends BaseFragment {
     /**
      *
      */
+    private void clearData() {
+        tastesListArtist.clear();
+        tastesListMovie.clear();
+        cardList.clear();
+    }
+
+    /**
+     *
+     */
     private void deleteTaste(String url) {
+        // Clear adapter
+        clearAdapter();
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        // Do connection
         Ion.with(context)
                 .load("DELETE", url)
                 .asJsonObject()
@@ -332,11 +388,30 @@ public class TastesFragment extends BaseFragment {
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
                             return;
                         }
+                        // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+                                    @Override
+                                    public void onMessageClick(Parcelable parcelable) {
+                                        //TODO: create UNDO
+                                    }
+                                })
+                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_deleted)
+                                .show();
                     }
                 });
     }
-    
+
+    private void clearAdapter() {
+        materialListViewAdapter.clear();
+        materialListViewAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);

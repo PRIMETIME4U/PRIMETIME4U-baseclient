@@ -35,6 +35,7 @@ public class TasteCard extends BigImageCard {
 
     public void setOnTasteButtonPressedListener(OnButtonPressListener onTasteButtonPressedListener) {
         this.onTasteButtonPressedListener = onTasteButtonPressedListener;
+        BusProvider.dataSetChanged();
     }
 
     public boolean getTaste() {
@@ -48,6 +49,7 @@ public class TasteCard extends BigImageCard {
     
     public void setType(int type) {
         this.type = type;
+        BusProvider.dataSetChanged();
     } 
     
     public int getType() {
@@ -60,5 +62,6 @@ public class TasteCard extends BigImageCard {
 
     public void setPoster(String poster) {
         this.poster = poster;
+        BusProvider.dataSetChanged();
     }
 }

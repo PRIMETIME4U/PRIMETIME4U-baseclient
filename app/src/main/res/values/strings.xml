@@ -27,5 +27,11 @@
     <string name="action_search">Taste Search</string>
     <string name="skip_button">SKIP</string>
     <string name="app_slogan">The only app that allows you to plop down to the couch and simply enjoy a movie</string>
+    <string name="no_proposal">There are no proposal for you</string>
+    <string name="no_taste">There are no tastes yet</string>
+    <string name="no_watched">There are no already watched movies</string>
+    <string name="taste_deleted">Taste deleted</string>
+    <string name="taste_added">Taste added</string>
+    <string name="undo">UNDO</string>
 
 </resources>

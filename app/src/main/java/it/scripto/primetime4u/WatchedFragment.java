@@ -1,15 +1,20 @@
 package it.scripto.primetime4u;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
@@ -23,10 +28,10 @@ import it.scripto.primetime4u.cards.WatchedCard;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.model.Watched;
-import it.scripto.primetime4u.utils.BaseFragment;
+import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
 
-public class WatchedFragment extends BaseFragment {
+public class WatchedFragment extends RefreshFragment {
 
     private List<Movie> watchedList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
@@ -36,6 +41,7 @@ public class WatchedFragment extends BaseFragment {
     private MaterialWatchedCardListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
+    private ProgressBar progressBar;
 
     /**
      * Use this factory method to create a new instance of
@@ -66,25 +72,43 @@ public class WatchedFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Setting up material list
-        MaterialListView watched_material_list_view = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
+        MaterialListView watchedMaterialListView = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
+
+        // Get progress bar
+        progressBar = (ProgressBar) view.findViewById(R.id.watched_progress_bar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
 
-        // Generate URL
-        String url = Utils.SERVER_API + "watched/" + account;
-
-        // Get watched
-        get(url);
-
         // Create and set adapter
         materialListViewAdapter = new MaterialWatchedCardListAdapter(getActivity());
-        watched_material_list_view.setAdapter(materialListViewAdapter);
-        
+        watchedMaterialListView.setAdapter(materialListViewAdapter);
+
+        // Get data
+        refresh();
+
         return view;
     }
 
+    /**
+     *  
+     */
+    @Override
+    public void refresh() {
+        // Clear adapter
+        clearAdapter();
+        // Generate URL
+        String url = Utils.SERVER_API + "watched/" + account;
+        // Get watched
+        get(url);
+    }
+
+    /**
+     * * 
+     * @param response
+     */
     private void parseResponse(ServerResponse.WatchedResponse response) {
         for (Watched watched : response.data.watched) {
             Movie movie = new Movie();
@@ -119,11 +143,9 @@ public class WatchedFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (watchedCard.getTaste()) {
-                        Toast.makeText(context,"Film aggiunto alla tua lista gusti", Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
                         addTaste(url, id);
                     } else {
-                        Toast.makeText(context,"Film rimosso dalla tua lista gusti", Toast.LENGTH_SHORT).show();
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
                         deleteTaste(url);
                     }
@@ -135,10 +157,14 @@ public class WatchedFragment extends BaseFragment {
 
         materialListViewAdapter.addAll(cardList);
     }
+    
     /**
      * gets "watched" list and parses the response
      */
     private void get(String url) {
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        // Do connection
         Ion.with(context)
                 .load(url)
                 .as(new TypeToken<ServerResponse.WatchedResponse>() {
@@ -146,27 +172,43 @@ public class WatchedFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.WatchedResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
-                        if (e != null){
+                        if (e != null) {
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
                             return;
                         }
-                        watchedList.clear();
-                        dateList.clear();
-                        tasteList.clear();
-                        cardList.clear();
-
+                        // Clear all data list
+                        clearData();
+                        // Parse response
                         parseResponse(result);
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
+    }
+    
+    /**
+     *
+     */
+    private void clearData() {
+        watchedList.clear();
+        dateList.clear();
+        tasteList.clear();
+        cardList.clear();
     }
 
     /**
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
+        // Clear adapter
+        clearAdapter();
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+       
+        // Create JSON object
         JsonObject json = new JsonObject();
         json.addProperty("idIMDB", id);
-
+        // Do connection
         Ion.with(getActivity())
                 .load("POST", url)
                 .setJsonObjectBody(json)
@@ -178,7 +220,21 @@ public class WatchedFragment extends BaseFragment {
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
                             return;
                         }
+                        // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+                                    @Override
+                                    public void onMessageClick(Parcelable parcelable) {
+                                        //TODO: create UNDO
+                                    }
+                                })
+                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_added)
+                                .show();
                     }
                 });
     }
@@ -187,6 +243,12 @@ public class WatchedFragment extends BaseFragment {
      * deletes from user's taste list
      */
     private void deleteTaste(String url) {
+        // Clear adapter
+        clearAdapter();
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        
+        // Do connection
         Ion.with(context)
                 .load("DELETE", url)
                 .asJsonObject()
@@ -197,9 +259,31 @@ public class WatchedFragment extends BaseFragment {
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
                             return;
                         }
+                        // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+                                    @Override
+                                    public void onMessageClick(Parcelable parcelable) {
+                                        //TODO: create UNDO
+                                    }
+                                })
+                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_deleted)
+                                .show();
                     }
                 });
+    }
+
+    /**
+     * 
+     */
+    private void clearAdapter() {
+        materialListViewAdapter.clear();
+        materialListViewAdapter.notifyDataSetChanged();
     }
     
     @Override

@@ -2,6 +2,8 @@ package it.scripto.primetime4u.cards;
 
 import android.content.Context;
 
+import com.dexafree.materialList.events.BusProvider;
+
 import it.scripto.primetime4u.R;
 
 public class WatchedCard extends TasteCard {
@@ -37,6 +39,7 @@ public class WatchedCard extends TasteCard {
         if (date.contains(" November ")) date = date.replace(" November ", "-11-");
         if (date.contains(" December ")) date = date.replace(" December ", "-12-");
         this.date = date;
+        BusProvider.dataSetChanged();
     }
 
 }

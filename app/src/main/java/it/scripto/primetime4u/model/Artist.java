@@ -1,12 +1,9 @@
 package it.scripto.primetime4u.model;
 
-/**
- * Created by Giovanni on 19/01/2015.
- */
 public class Artist {
     private String idIMDB;
     private String name;
-    private String poster;
+    private String photo;
     public Artist(){
 
     }
@@ -16,8 +13,8 @@ public class Artist {
     public String getName(){
         return name;
     }
-    public String getPoster(){
-        return poster;
+    public String getPhoto(){
+        return photo;
     }
 
     public void setIdIMDB(String idIMDB) {
@@ -28,7 +25,7 @@ public class Artist {
         this.name = name;
     }
 
-    public void setPoster(String poster) {
-        this.poster = poster;
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }

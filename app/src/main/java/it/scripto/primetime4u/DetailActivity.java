@@ -1,11 +1,16 @@
 package it.scripto.primetime4u;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
@@ -26,6 +31,7 @@ public class DetailActivity extends BaseActivity {
     private String originalTitle;
     private String channel;
     private String time;
+    private ProgressBar progressBar;
 
     @Override
     protected String getTagLog() {
@@ -46,6 +52,10 @@ public class DetailActivity extends BaseActivity {
         setSupportActionBar(detailActivityToolbar);
         // Set home back/home button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Get progress bar
+        progressBar = (ProgressBar) findViewById(R.id.detail_progress_bar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
         String idIMDB = null;
 
@@ -78,10 +88,14 @@ public class DetailActivity extends BaseActivity {
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
         TextView movieInfoTextView = (TextView) findViewById(R.id.movie_info_text_view);
         TextView timeGenreTextView = (TextView) findViewById(R.id.time_genre_text_view);
-        TextView directorsTextView = (TextView) findViewById(R.id.directors_value_text_view);
-        TextView writersTextView = (TextView) findViewById(R.id.writers_value_text_view);
-        TextView actorsTextView = (TextView) findViewById(R.id.actors_value_text_view);
-        TextView plotTextView = (TextView) findViewById(R.id.plot_value_text_view);
+        TextView directorsValueTextView = (TextView) findViewById(R.id.directors_value_text_view);
+        TextView writersValueTextView = (TextView) findViewById(R.id.writers_value_text_view);
+        TextView actorsValueTextView = (TextView) findViewById(R.id.actors_value_text_view);
+        TextView plotValueTextView = (TextView) findViewById(R.id.plot_value_text_view);
+        TextView directorsTextView = (TextView) findViewById(R.id.directors_text_view);
+        TextView writersTextView = (TextView) findViewById(R.id.writers_text_view);
+        TextView actorsTextView = (TextView) findViewById(R.id.actors_text_view);
+        TextView plotTextView = (TextView) findViewById(R.id.plot_text_view);
         
         Detail detail = movie.data.detail;
         
@@ -94,29 +108,34 @@ public class DetailActivity extends BaseActivity {
         for (Artist actor : detail.getActors()) {
             actorsText = actorsText + (!(actorsText).equals("") ? ", " : "") + actor.getName();
         }
-        actorsTextView.setText(actorsText);
+        actorsValueTextView.setText(actorsText);
 
         // Set directors
         String directorsText = "";
         for (Artist director : detail.getDirectors()) {
             directorsText = directorsText + (!(directorsText).equals("") ? ", " : "") + director.getName();
         }
-        directorsTextView.setText(directorsText);
+        directorsValueTextView.setText(directorsText);
 
         // Set writers
         String writersText = "";
         for (Artist writer : detail.getWriters()) {
             writersText = writersText + (!(writersText).equals("") ? ", " : "") + writer.getName();
         }
-        writersTextView.setText(writersText);
+        writersValueTextView.setText(writersText);
 
-        plotTextView.setText(detail.getPlot());
+        plotValueTextView.setText(detail.getPlot());
+        directorsTextView.setVisibility(View.VISIBLE);
+        writersTextView.setVisibility(View.VISIBLE);
+        actorsTextView.setVisibility(View.VISIBLE);
+        plotTextView.setVisibility(View.VISIBLE);
     }
 
     /**
      *
      */
     private void get(String url) {
+        progressBar.setVisibility(View.VISIBLE);
         Ion.with(this)
                 .load(url)
                 .as(new TypeToken<ServerResponse.DetailResponse>() {
@@ -124,8 +143,13 @@ public class DetailActivity extends BaseActivity {
                 .setCallback(new FutureCallback<ServerResponse.DetailResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
-                        Log.i(TAG, String.valueOf(result));
+                        if (e != null) {
+                            Toast.makeText(getBaseContext(), "Errore di rete", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         drawResult(result);
+                        
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
@@ -133,7 +157,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        //getMenuInflater().inflate(R.menu.menu_detail, menu);
         return true;
     }
 

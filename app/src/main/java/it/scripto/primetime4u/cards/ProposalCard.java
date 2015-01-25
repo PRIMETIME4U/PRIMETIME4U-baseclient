@@ -24,10 +24,6 @@ public class ProposalCard extends ExtendedCard {
         return mMovieInfo;
     }
 
-    public void setMovieInfoText(int movieInfoId) {
-        setDescription(getString(movieInfoId));
-    }
-
     public void setMovieInfoText(String movieInfo) {
         this.mMovieInfo = movieInfo;
         BusProvider.dataSetChanged();
@@ -39,5 +35,6 @@ public class ProposalCard extends ExtendedCard {
 
     public void setPoster(String poster) {
         this.poster = poster;
+        BusProvider.dataSetChanged();
     }
 }

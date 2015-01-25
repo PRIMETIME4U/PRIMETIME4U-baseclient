@@ -5,14 +5,30 @@
     android:layout_height="match_parent" 
     tools:context="it.scripto.primetime4u.TastesFragment">
 
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_taste"
+        android:id="@+id/no_taste_text_view"
+        android:textColor="@color/grey_title"
+        android:layout_gravity="center"
+        style="@style/PrimeTime.Title"
+        android:gravity="center"
+        android:paddingLeft="@dimen/big_padding"
+        android:paddingRight="@dimen/big_padding" />-->
+    
     <com.dexafree.materialList.view.MaterialListView
         android:listSelector="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tastes_material_list_view"
         android:paddingBottom="@dimen/small_padding"
-        android:clipToPadding="false"
-        tools:column_count_portrait="2"
-        tools:column_count_land="3"/>
+        android:clipToPadding="false" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/taste_progress_bar"
+        android:layout_gravity="center" />
     
 </FrameLayout>

@@ -2,6 +2,7 @@ package it.scripto.primetime4u.cards;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -107,6 +108,12 @@ public class MaterialTasteCardListAdapter extends ArrayAdapter<TasteCard> {
     public int getViewTypeCount() {
         // BugFix: Can't have a viewTypCount < 1 (Exception)
         return mClassList.isEmpty() ? 1 : mClassList.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        Log.i("MaterialTasteCardListAdapter", "Chiamo isEmpty()");
+        return mClassList.isEmpty();
     }
     
     // TODO: they don't work...
