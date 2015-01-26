@@ -33,5 +33,13 @@
     <string name="taste_deleted">Taste deleted</string>
     <string name="taste_added">Taste added</string>
     <string name="undo">UNDO</string>
+    <string name="no_more_tutorial">Dont\'t show again</string>
+    <string name="got_it">Got it</string>
+    <string name="welcome_tastes_tutorial">Welcome into Tastes section</string>
+    <string name="tastes_tutorial">Search your favorite movies, artists and genres and add to your tastes</string>
+    <string name="welcome_watched_tutorial">Welcome into Watched section</string>
+    <string name="welcome_proposal_tutorial">Welcome into Proposal section</string>
+    <string name="watched_tutorial">In this section we collect for you all movies that you watch</string>
+    <string name="proposal_tutorial">Here you can find all movie proposal evaluated just for you</string>
 
 </resources>

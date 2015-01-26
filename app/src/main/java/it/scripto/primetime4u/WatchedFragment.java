@@ -1,6 +1,8 @@
 package it.scripto.primetime4u;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -23,22 +25,25 @@ import com.koushikdutta.ion.Ion;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.scripto.primetime4u.cards.MaterialWatchedCardListAdapter;
 import it.scripto.primetime4u.cards.WatchedCard;
+import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.model.Watched;
+import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
 
 public class WatchedFragment extends RefreshFragment {
+
+    private static final String WATCHED_TUTORIAL = "WATCHED_TUTORIAL";
 
     private List<Movie> watchedList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
     private List<Integer> tasteList = new ArrayList<>();
     private ArrayList<WatchedCard> cardList = new ArrayList<>();
     private String account;
-    private MaterialWatchedCardListAdapter materialListViewAdapter;
+    private MaterialListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
     private ProgressBar progressBar;
@@ -82,12 +87,47 @@ public class WatchedFragment extends RefreshFragment {
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
 
+        // Get preferences
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+
         // Create and set adapter
-        materialListViewAdapter = new MaterialWatchedCardListAdapter(getActivity());
+        materialListViewAdapter = new MaterialListAdapter(getActivity());
         watchedMaterialListView.setAdapter(materialListViewAdapter);
 
         // Get data
         refresh();
+
+        // Tutorial card if is the first time
+        if (!preferences.contains(WATCHED_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(WATCHED_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
 
         return view;
     }
@@ -106,8 +146,7 @@ public class WatchedFragment extends RefreshFragment {
     }
 
     /**
-     * * 
-     * @param response
+     *
      */
     private void parseResponse(ServerResponse.WatchedResponse response) {
         for (Watched watched : response.data.watched) {

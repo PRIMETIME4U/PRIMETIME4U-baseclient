@@ -7,7 +7,9 @@
     android:paddingBottom="-8dp"
     android:paddingLeft="@dimen/small_padding"
     android:paddingRight="@dimen/small_padding"
-    style="@style/MainLayout" >
+    style="@style/MainLayout"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
 
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"

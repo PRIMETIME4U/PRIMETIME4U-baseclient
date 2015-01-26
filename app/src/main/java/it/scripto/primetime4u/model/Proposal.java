@@ -5,6 +5,8 @@ public class Proposal {
     private String idIMDB;
     private String italianPlot;
     private String originalTitle;
+    private String title;
+    private String runTimes;
     private String poster;
     private String simplePlot;
     private String time;
@@ -66,5 +68,21 @@ public class Proposal {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getRunTimes() {
+        return runTimes;
+    }
+
+    public void setRunTimes(String runTimes) {
+        this.runTimes = runTimes;
     }
 }

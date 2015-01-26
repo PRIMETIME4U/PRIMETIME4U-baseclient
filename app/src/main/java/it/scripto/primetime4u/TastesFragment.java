@@ -1,6 +1,8 @@
 package it.scripto.primetime4u;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -18,7 +20,6 @@ import android.widget.Toast;
 
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
-import com.dexafree.materialList.view.MaterialListView;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -29,21 +30,25 @@ import com.koushikdutta.ion.Ion;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.scripto.primetime4u.cards.MaterialTasteCardListAdapter;
 import it.scripto.primetime4u.cards.TasteCard;
+import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
+import it.scripto.primetime4u.utils.MaterialListAdapter;
+import it.scripto.primetime4u.utils.MaterialListView;
 import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
 
 public class TastesFragment extends RefreshFragment {
 
+    private static final String TASTES_TUTORIAL = "TASTES_TUTORIAL";
+
     private List<Movie> tastesListMovie = new ArrayList<>();
     private List<Artist> tastesListArtist = new ArrayList<>();
     private ArrayList<TasteCard> cardList = new ArrayList<>();
     private String account;
-    private MaterialTasteCardListAdapter materialListViewAdapter;
+    private MaterialListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
     private ProgressBar progressBar;
@@ -92,15 +97,50 @@ public class TastesFragment extends RefreshFragment {
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
 
+        // Get preferences
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+
         // Create and set adapter
-        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
+        materialListViewAdapter = new MaterialListAdapter(getActivity());
         tastesMaterialListView.setAdapter(materialListViewAdapter);
 
         // Get data
         refresh();
         
         // TODO: doesn't work...
-        //tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
+        tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
+
+        // Tutorial card if is the first time
+        if (!preferences.contains(TASTES_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_tastes_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.tastes_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(TASTES_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
         
         return view;
     }

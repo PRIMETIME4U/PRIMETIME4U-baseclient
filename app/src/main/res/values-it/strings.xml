@@ -32,4 +32,12 @@
     <string name="taste_deleted">Gusto eliminato</string>
     <string name="taste_added">Gusto aggiunto</string>
     <string name="undo">UNDO</string>
+    <string name="no_more_tutorial">Non mostrare più</string>
+    <string name="got_it">Fatto</string>
+    <string name="tastes_tutorial">Cerca i tuoi film, artisti e generi preferiti e aggiungili tra i tuoi gusti</string>
+    <string name="welcome_tastes_tutorial">Benvenuto nella sezione gusti</string>
+    <string name="welcome_watched_tutorial">Benvenuto nella sezione visti</string>
+    <string name="welcome_proposal_tutorial">Benvenuto nella sezione proposte</string>
+    <string name="watched_tutorial">In questa sezione raccoglieremo per te tutti i film che hai visto</string>
+    <string name="proposal_tutorial">Qui puoi trovare tutte le proposte che abbiamo scelto solo per te</string>
 </resources>

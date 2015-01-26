@@ -26,21 +26,26 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import it.scripto.primetime4u.cards.MaterialProposalCardListAdapter;
 import it.scripto.primetime4u.cards.ProposalCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.Proposal;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseFragment;
+import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.Utils;
 
 
 public class ProposalFragment extends BaseFragment {
 
+    private static final String PROPOSAL_TUTORIAL = "PROPOSAL_TUTORIAL";
+    private static final String PENDING_MOVIE = "PENDING_MOVIE";
+    private static final String PENDING_TITLE = "PENDING_TITLE";
+    private static final String FINISIH_TIME = "FINISH_TIME";
+    
     private List<Movie> proposalList = new ArrayList<>();
-    private ArrayList<ProposalCard> cardList = new ArrayList<>();
-    private MaterialProposalCardListAdapter materialListViewAdapter;
+    private ArrayList<Card> cardList = new ArrayList<>();
+    private MaterialListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
     
@@ -86,62 +91,10 @@ public class ProposalFragment extends BaseFragment {
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         final String account = base.getAccount();
+        
+        // Get preferences
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        // welcome card scorso film, compare solo alla prima esecuzione, se e solo se ho un già un film da guardare
-        if (preferences.contains("PENDING_MOVIE") && preferences.contains("PENDING_TITLE") && preferences.contains("TOBEANSWERED") && aDayIsPassed()) {
-            final WelcomeCard welcomeCard = new WelcomeCard(context);
-            editor = preferences.edit();
-            welcomeCard.setFullWidthDivider(true);
-            welcomeCard.setDividerVisible(true);
-            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
-            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString("PENDING_TITLE","")));
-            welcomeCard.setLeftButtonText(getString(R.string.no_text));
-            welcomeCard.setRightButtonText(getString(R.string.yes_text));
-            welcomeCard.setDismissible(false);
-            welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Peccato", Toast.LENGTH_SHORT).show();
-                    //TODO: non è piaciuto
-                    card.setDismissible(true);
-                    card.dismiss();
-                    editor.remove("TOBEANSWERED");
-                    editor.remove("PENDING_MOVIE");
-                    editor.remove("PENDING_TITLE");
-                    editor.remove("PENDING_TIME");
-                    editor.remove("TIME_HOUR");
-                    editor.commit();
-                }
-            });
-            welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "L'hai guardato", Toast.LENGTH_SHORT).show();
-
-
-                    String lastMovieId = preferences.getString("PENDING_MOVIE","");
-
-                    card.setDismissible(true);
-                    card.dismiss();
-                    editor.remove("TOBEANSWERED");
-                    editor.remove("PENDING_MOVIE");
-                    editor.remove("PENDING_TITLE");
-                    editor.remove("PENDING_TIME");
-                    editor.remove("TIME_HOUR");
-                    editor.commit();
-                    
-                    // Generate URL
-                    String url = Utils.SERVER_API + "watched/" + account;
-                    
-                    // Add watched movie
-                    addWatched(url, lastMovieId);
-                }
-            });
-
-            proposalMaterialListView.add(welcomeCard);
-        }
-        
         // Generate URL
         String url = Utils.SERVER_API + "proposal/" + account;
         
@@ -149,14 +102,104 @@ public class ProposalFragment extends BaseFragment {
         get(url);
 
         // Create and set adapter
-        materialListViewAdapter = new MaterialProposalCardListAdapter(getActivity());
+        materialListViewAdapter = new MaterialListAdapter(getActivity());
         proposalMaterialListView.setAdapter(materialListViewAdapter);
         //proposalMaterialListView.setEmptyView(view.findViewById(R.id.no_proposal_text_view));
+
+        // Welcome Card for feedback
+        if (preferences.contains(PENDING_MOVIE) && movieIsFinished()) {
+            final WelcomeCard welcomeCard = new WelcomeCard(context);
+            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString(PENDING_TITLE, "")));
+
+            welcomeCard.setFullWidthDivider(true);
+            welcomeCard.setDividerVisible(true);
+            welcomeCard.setDismissible(false);
+
+            welcomeCard.setLeftButtonText(getString(R.string.no_text));
+            welcomeCard.setRightButtonText(getString(R.string.yes_text));
+
+            editor = preferences.edit();
+
+            welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(welcomeCard);
+                    editor.remove(PENDING_MOVIE);
+                    editor.remove(PENDING_TITLE);
+                    editor.remove(FINISIH_TIME);
+                    editor.apply();
+                }
+            });
+            welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    // Get movie ID
+                    String movieId = preferences.getString(PENDING_MOVIE,"");
+
+                    materialListViewAdapter.remove(welcomeCard);
+                    editor.remove(PENDING_MOVIE);
+                    editor.remove(PENDING_TITLE);
+                    editor.remove(FINISIH_TIME);
+                    editor.apply();
+
+                    // Generate URL
+                    String url = Utils.SERVER_API + "watched/" + account;
+
+                    // Add watched movie
+                    addWatched(url, movieId);
+                }
+            });
+
+            materialListViewAdapter.add(welcomeCard);
+        }
+
+        // Tutorial card if is the first time
+        if (!preferences.contains(PROPOSAL_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_proposal_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.proposal_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(PROPOSAL_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
 
         return view;
     }
     
-    //
+    /**
+     *
+     */
+    private boolean movieIsFinished() {
+        long finishTime = preferences.getLong("FINISH_TIME", 0);
+        return Calendar.getInstance().getTimeInMillis() - finishTime >= 0;
+    }
+
+    /**
+     *
+     */
     private void parseResponse(ServerResponse.ProposalData response) {
         List<Proposal> proposals = response.proposal;
         
@@ -166,6 +209,8 @@ public class ProposalFragment extends BaseFragment {
 
             Movie movie = new Movie();
             movie.setOriginalTitle(proposal.getOriginalTitle());
+            movie.setTitle(proposal.getTitle());
+            movie.setRunTimes(proposal.getRunTimes());
             movie.setChannel(proposal.getChannel());
             movie.setTime(proposal.getTime());
             movie.setIdIMDB(proposal.getIdIMDB());
@@ -188,12 +233,20 @@ public class ProposalFragment extends BaseFragment {
 
             final String originalTitle = proposal.getOriginalTitle();
             final String idIMDB = proposal.getIdIMDB();
-
-
+            // Get hours and minutes from movie's time
+            String time = proposal.getTime();
+            final int hourInt = Integer.parseInt(time.substring(0, 2));
+            final int minInt = Integer.parseInt(time.substring(3, 5));
+            // Get movie's run times
+            String runTimes = proposal.getRunTimes();
+            // TODO: manage runtimes null
+            if (runTimes != null) {
+                final int runTimesInt = Integer.parseInt(runTimes.substring(0, runTimes.length() - 4));
+            } else {
+                final int runTimesInt = 90;
+            }
             card.setTitle(originalTitle);
-            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
-
-            final String info = card.getMovieInfoText();
+            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), time));
             card.setDescription(proposal.getSimplePlot());
             card.setPoster(proposal.getPoster());
 
@@ -207,42 +260,20 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
-
-
-                    preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    Log.i(TAG, "I'LL WATCH IT");
+                    // Calculate finish time
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.HOUR_OF_DAY, hourInt);
+                    cal.set(Calendar.MINUTE, minInt);
+                    long finishTime = 10;//cal.getTimeInMillis() + (runTimesInt * 60 * 1000);
+                    
                     editor = preferences.edit();
 
-                    if (!preferences.contains("PENDING_MOVIE")){
-                        editor.putString("PENDING_MOVIE", idIMDB);
-                        editor.putString("PENDING_TITLE", originalTitle);
-                        editor.putString("TIME_HOUR",info);
-                        editor.putString("TOBEANSWERED","true");
-                        //inizializzo il timer
-                        Calendar c = Calendar.getInstance();
-                        long day = c.getTimeInMillis();
-                        editor.putLong("PENDING_TIME",day);
+                    editor.putString(PENDING_MOVIE, idIMDB);
+                    editor.putString(PENDING_TITLE, originalTitle);
+                    editor.putLong(FINISIH_TIME, finishTime);
 
-                        editor.commit();
-                    }
-                    else{
-                        editor.remove("PENDING_MOVIE");
-                        editor.remove("PENDING_TITLE");
-                        editor.remove("PENDING_TIME");
-                        editor.remove("TIME_HOUR");
-
-                        editor.putString("PENDING_MOVIE", idIMDB);
-                        editor.putString("PENDING_TITLE",originalTitle);
-                        editor.putString("TOBEANSWERED","true");
-                        editor.putString("TIME_HOUR",info);
-                        //inizializzo il timer
-                        Calendar c = Calendar.getInstance();
-                        long day = c.getTimeInMillis();
-                        editor.putLong("PENDING_TIME",day);
-
-                        editor.commit();
-                    }
-
+                    editor.apply();
                 }
             });
 
@@ -309,25 +340,11 @@ public class ProposalFragment extends BaseFragment {
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null){
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
-                            return;
                         }
                     }
                 });
     }
 
-    private boolean aDayIsPassed(){
-        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        //inizializzo il timer
-        Calendar c = Calendar.getInstance();
-        long now = c.getTimeInMillis();
-        long yday = preferences.getLong("PENDING_TIME",0);
-        long diff = now - yday;
-        //possiamo far comparire la card dopo la giornata: 86 400 000
-        //TEST: uso 10 minuti, 600 000, test OK
-        if (diff > 72000000) return true;
-        else return false;
-
-    }
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);

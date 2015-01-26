@@ -16,14 +16,22 @@
         android:gravity="center"
         android:paddingLeft="@dimen/big_padding"
         android:paddingRight="@dimen/big_padding" />-->
-
-    <com.dexafree.materialList.view.MaterialListView
-        android:listSelector="@color/transparent"
+    
+    
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/proposal_material_list_view"
-        android:paddingBottom="@dimen/small_padding"
-        android:clipToPadding="false" />
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
+
+        <com.dexafree.materialList.view.MaterialListView
+            android:listSelector="@color/transparent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/proposal_material_list_view"
+            android:paddingBottom="@dimen/small_padding"
+            android:clipToPadding="false" />
+    </LinearLayout>
 
     <ProgressBar
         android:layout_width="wrap_content"
