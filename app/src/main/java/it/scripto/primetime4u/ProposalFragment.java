@@ -21,6 +21,7 @@ import com.koushikdutta.ion.Ion;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import it.scripto.primetime4u.cards.MaterialProposalCardListAdapter;
 import it.scripto.primetime4u.cards.ProposalCard;
@@ -103,7 +104,7 @@ public class ProposalFragment extends BaseFragment {
                     editor.remove("PENDING_TITLE");
                     editor.remove("PENDING_TIME");
                     editor.remove("TIME_HOUR");
-                    editor.commit();
+                    editor.apply();
                 }
             });
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
@@ -121,7 +122,7 @@ public class ProposalFragment extends BaseFragment {
                     editor.remove("PENDING_TITLE");
                     editor.remove("PENDING_TIME");
                     editor.remove("TIME_HOUR");
-                    editor.commit();
+                    editor.apply();
                     
                     // Generate URL
                     String url = Utils.SERVER_API + "watched/" + account;
@@ -161,7 +162,9 @@ public class ProposalFragment extends BaseFragment {
             movie.setTime(proposal.getTime());
             movie.setIdIMDB(proposal.getIdIMDB());
             movie.setPoster(proposal.getPoster());
-            movie.setSimplePlot(proposal.getSimplePlot());
+            if (Locale.getDefault().getLanguage().equals("it")) movie.setSimplePlot(proposal.getItalianPlot());
+            else movie.setSimplePlot(proposal.getSimplePlot());
+            movie.setPlotIt(proposal.getItalianPlot());
 
             proposalList.add(movie);
         }
@@ -214,7 +217,7 @@ public class ProposalFragment extends BaseFragment {
                         long day = c.getTimeInMillis();
                         editor.putLong("PENDING_TIME",day);
 
-                        editor.commit();
+                        editor.apply();
                     }
                     else{
                         editor.remove("PENDING_MOVIE");
@@ -231,7 +234,7 @@ public class ProposalFragment extends BaseFragment {
                         long day = c.getTimeInMillis();
                         editor.putLong("PENDING_TIME",day);
 
-                        editor.commit();
+                        editor.apply();
                     }
 
                 }
@@ -291,7 +294,7 @@ public class ProposalFragment extends BaseFragment {
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null){
                             Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
-                            return;
+
                         }
                     }
                 });
@@ -306,8 +309,7 @@ public class ProposalFragment extends BaseFragment {
         long diff = now - yday;
         //possiamo far comparire la card dopo la giornata: 86 400 000
         //TEST: uso 10 minuti, 600 000, test OK
-        if (diff > 72000000) return true;
-        else return false;
+        return diff > 72000000;
 
     }
     @Override

@@ -10,6 +10,8 @@ import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.util.Locale;
+
 import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Detail;
 import it.scripto.primetime4u.model.ServerResponse;
@@ -109,7 +111,13 @@ public class DetailActivity extends BaseActivity {
         }
         writersTextView.setText(writersText);
 
-        plotTextView.setText(detail.getPlot());
+        //recognize italian language
+        if (!Locale.getDefault().getLanguage().equals("it")) {
+            plotTextView.setText(detail.getPlot());
+        }
+        else {
+            plotTextView.setText(detail.getPlotIt());
+        }
     }
 
     /**
