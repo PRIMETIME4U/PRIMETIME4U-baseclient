@@ -1,6 +1,8 @@
 package it.scripto.primetime4u;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import it.scripto.primetime4u.cards.MaterialTasteCardListAdapter;
 import it.scripto.primetime4u.cards.TasteCard;
+import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
@@ -39,6 +42,9 @@ public class TastesFragment extends BaseFragment {
     private ArrayList<TasteCard> cardList = new ArrayList<>();
     private String account;
     private MaterialTasteCardListAdapter materialListViewAdapter;
+
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
 
     private onTasteChangeListener onTasteChangeListener;
     private MenuItem searchItem;
@@ -200,9 +206,40 @@ public class TastesFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         
         setHasOptionsMenu(true);
+        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         
         // Setting up material list
         MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        // Create and set adapter
+        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
+        tastes_material_list_view.setAdapter(materialListViewAdapter);
+
+        if (!preferences.contains("NO_MORE_PLACEHOLDER")){
+            final WelcomeCard placeholder = new WelcomeCard(context);
+            editor = preferences.edit();
+            placeholder.setFullWidthDivider(true);
+            placeholder.setDividerVisible(true);
+            placeholder.setTitle("Benvenuto nella sezione gusti");
+            placeholder.setDescription("Ricerca i tuoi attori e film preferiti nella barra in alto per aggiungerli automaticamente ai tuoi gusti");
+            placeholder.setLeftButtonText("Ok");
+            placeholder.setRightButtonText(getString(R.string.no_more_placeholder));
+            placeholder.setDismissible(false);
+            placeholder.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    card.dismiss();
+                }
+            });
+            placeholder.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    editor.putString("NO_MORE_PLACEHOLDER","");
+                    editor.apply();
+                    card.dismiss();
+                }
+            });
+            tastes_material_list_view.add(placeholder);
+        }
         
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
@@ -214,9 +251,7 @@ public class TastesFragment extends BaseFragment {
         // Get tastes
         get(url);
 
-        // Create and set adapter
-        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
-        tastes_material_list_view.setAdapter(materialListViewAdapter);
+
         
         return view;
     }

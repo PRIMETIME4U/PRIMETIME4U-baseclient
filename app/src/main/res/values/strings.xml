@@ -27,5 +27,6 @@
     <string name="action_search">Taste Search</string>
     <string name="skip_button">SKIP</string>
     <string name="app_slogan">The only app that allows you to plop down to the couch and simply enjoy a movie</string>
+    <string name="no_more_placeholder">Don\'t show it again</string>
 
 </resources>

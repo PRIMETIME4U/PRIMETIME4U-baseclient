@@ -5,6 +5,7 @@
     android:layout_height="match_parent" 
     tools:context="it.scripto.primetime4u.TastesFragment">
 
+
     <com.dexafree.materialList.view.MaterialListView
         android:listSelector="@color/transparent"
         android:layout_width="match_parent"
@@ -14,5 +15,7 @@
         android:clipToPadding="false"
         tools:column_count_portrait="2"
         tools:column_count_land="3"/>
+
+
     
 </FrameLayout>
