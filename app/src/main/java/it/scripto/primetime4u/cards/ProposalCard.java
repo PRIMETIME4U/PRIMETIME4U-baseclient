@@ -40,4 +40,8 @@ public class ProposalCard extends ExtendedCard {
     public void setPoster(String poster) {
         this.poster = poster;
     }
+
+    public String getTitle() {
+        return super.getTitle();
+    }
 }

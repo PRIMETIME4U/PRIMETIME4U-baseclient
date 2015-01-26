@@ -157,13 +157,18 @@ public class ProposalFragment extends BaseFragment {
         for (Proposal proposal : proposals) {
 
             Movie movie = new Movie();
-            movie.setOriginalTitle(proposal.getOriginalTitle());
             movie.setChannel(proposal.getChannel());
             movie.setTime(proposal.getTime());
             movie.setIdIMDB(proposal.getIdIMDB());
             movie.setPoster(proposal.getPoster());
-            if (Locale.getDefault().getLanguage().equals("it")) movie.setSimplePlot(proposal.getItalianPlot());
-            else movie.setSimplePlot(proposal.getSimplePlot());
+            if (Locale.getDefault().getLanguage().equals("it")) {
+                movie.setSimplePlot(proposal.getItalianPlot());
+                movie.setTitle(proposal.getTitle());
+            }
+            else {
+                movie.setSimplePlot(proposal.getSimplePlot());
+                movie.setTitle(proposal.getOriginalTitle());
+            }
             movie.setPlotIt(proposal.getItalianPlot());
 
             proposalList.add(movie);
@@ -181,10 +186,11 @@ public class ProposalFragment extends BaseFragment {
             final Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
+            final String italianTitle = proposal.getTitle();
             final String idIMDB = proposal.getIdIMDB();
 
-
-            card.setTitle(originalTitle);
+            if (Locale.getDefault().getLanguage().equals("it")) card.setTitle(italianTitle);
+            else card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
 
             final String info = card.getMovieInfoText();
@@ -201,7 +207,8 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Toast.makeText(context, "Guarderai " + originalTitle + " , buona visione!", Toast.LENGTH_SHORT).show();
+                    ProposalCard current = (ProposalCard) card;
+                    Toast.makeText(context, "Guarderai " +  current.getTitle() + " , buona visione!", Toast.LENGTH_SHORT).show();
 
 
                     preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -209,7 +216,7 @@ public class ProposalFragment extends BaseFragment {
 
                     if (!preferences.contains("PENDING_MOVIE")){
                         editor.putString("PENDING_MOVIE", idIMDB);
-                        editor.putString("PENDING_TITLE", originalTitle);
+                        editor.putString("PENDING_TITLE", current.getTitle());
                         editor.putString("TIME_HOUR",info);
                         editor.putString("TOBEANSWERED","true");
                         //inizializzo il timer
@@ -226,7 +233,7 @@ public class ProposalFragment extends BaseFragment {
                         editor.remove("TIME_HOUR");
 
                         editor.putString("PENDING_MOVIE", idIMDB);
-                        editor.putString("PENDING_TITLE",originalTitle);
+                        editor.putString("PENDING_TITLE",current.getTitle());
                         editor.putString("TOBEANSWERED","true");
                         editor.putString("TIME_HOUR",info);
                         //inizializzo il timer
@@ -243,9 +250,10 @@ public class ProposalFragment extends BaseFragment {
             card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
+                    ProposalCard current = (ProposalCard) card;
                     Intent intent = new Intent(context, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
-                    intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, proposal.getOriginalTitle());
+                    intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, current.getTitle());
                     intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
                     intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
                     startActivity(intent);

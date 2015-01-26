@@ -8,6 +8,8 @@ public class Proposal {
     private String poster;
     private String simplePlot;
     private String time;
+    private String runTimes;
+    private String title;
 
     public Proposal() {
     }
@@ -66,5 +68,18 @@ public class Proposal {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public void setRunTimes(String runTimes) {
+        this.runTimes = runTimes;
+    }
+    public String getRunTimes(){
+        return runTimes;
+    }
+    public void setTitle(String title){
+        this.title=title;
+    }
+    public String getTitle(){
+        return title;
     }
 }
