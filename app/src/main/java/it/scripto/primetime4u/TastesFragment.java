@@ -155,6 +155,15 @@ public class TastesFragment extends BaseFragment {
 
                             addTaste(url, id);
                         }
+                        else if (result.has("name_approx")){
+                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
+                            JsonArray popArray= result.getAsJsonArray("name_approx");
+                            JsonObject artist = popArray.get(0).getAsJsonObject();
+                            String id = artist.get("id").getAsString();
+                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
+
+                            addTaste(url, id);
+                        }
 
                         else {
                             Toast.makeText(getActivity(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
