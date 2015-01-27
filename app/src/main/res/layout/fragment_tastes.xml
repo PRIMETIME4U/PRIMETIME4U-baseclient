@@ -5,7 +5,7 @@
     android:layout_height="match_parent" 
     tools:context="it.scripto.primetime4u.TastesFragment">
 
-    <TextView
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_taste"
@@ -15,9 +15,9 @@
         style="@style/PrimeTime.Title"
         android:gravity="center"
         android:paddingLeft="@dimen/big_padding"
-        android:paddingRight="@dimen/big_padding" />
+        android:paddingRight="@dimen/big_padding" />-->
     
-    <it.scripto.primetime4u.utils.MaterialListView
+    <com.dexafree.materialList.view.MaterialListView
         android:listSelector="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

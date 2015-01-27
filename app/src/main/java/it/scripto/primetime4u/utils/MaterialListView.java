@@ -1,6 +1,8 @@
 package it.scripto.primetime4u.utils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +35,7 @@ public class MaterialListView extends com.dexafree.materialList.view.MaterialLis
         mAdapter = adapter;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void setEmptyView(View emptyView) {
         mEmptyView = emptyView;
@@ -46,7 +49,7 @@ public class MaterialListView extends com.dexafree.materialList.view.MaterialLis
         }
 
         final MaterialListViewAdapter adapter = getAdapter();
-        final boolean empty = (adapter == null) || adapter.isEmpty());
+        final boolean empty = (adapter == null) || adapter.isEmpty();
         Log.i("ADAPTER", "mi dicono che sono vuoto " + String.valueOf(empty));
         updateEmptyStatus(empty);
     }

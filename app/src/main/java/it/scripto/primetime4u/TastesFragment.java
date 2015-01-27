@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
+import com.dexafree.materialList.view.MaterialListView;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -36,7 +37,6 @@ import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.MaterialListAdapter;
-import it.scripto.primetime4u.utils.MaterialListView;
 import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
 
@@ -108,7 +108,7 @@ public class TastesFragment extends RefreshFragment {
         refresh();
         
         // TODO: doesn't work...
-        tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
+        //tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
 
         // Tutorial card if is the first time
         if (!preferences.contains(TASTES_TUTORIAL)) {

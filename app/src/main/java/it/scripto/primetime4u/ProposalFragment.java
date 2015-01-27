@@ -240,10 +240,11 @@ public class ProposalFragment extends BaseFragment {
             // Get movie's run times
             String runTimes = proposal.getRunTimes();
             // TODO: manage runtimes null
+            final int runTimesInt;
             if (runTimes != null) {
-                final int runTimesInt = Integer.parseInt(runTimes.substring(0, runTimes.length() - 4));
+                runTimesInt = Integer.parseInt(runTimes.substring(0, runTimes.length() - 4));
             } else {
-                final int runTimesInt = 90;
+                runTimesInt = 90;
             }
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), time));
@@ -265,7 +266,7 @@ public class ProposalFragment extends BaseFragment {
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.HOUR_OF_DAY, hourInt);
                     cal.set(Calendar.MINUTE, minInt);
-                    long finishTime = 10;//cal.getTimeInMillis() + (runTimesInt * 60 * 1000);
+                    long finishTime = cal.getTimeInMillis() + (runTimesInt * 60 * 1000);
                     
                     editor = preferences.edit();
 
