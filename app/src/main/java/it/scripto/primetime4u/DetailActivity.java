@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +26,10 @@ import it.scripto.primetime4u.utils.Utils;
 public class DetailActivity extends BaseActivity {
     
     public final static String EXTRA_ID_IMDB = "ID_IMDB";
-    public final static String EXTRA_ORIGINAL_TITLE = "ORIGINAL_TITLE";
+    public final static String EXTRA_TITLE = "TITLE";
     public final static String EXTRA_CHANNEL = "CHANNEL";
     public final static String EXTRA_TIME = "TIME";
-    private String originalTitle;
+    private String title;
     private String channel;
     private String time;
     private ProgressBar progressBar;
@@ -66,14 +65,14 @@ public class DetailActivity extends BaseActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             idIMDB = extras.getString(EXTRA_ID_IMDB);
-            originalTitle = extras.getString(EXTRA_ORIGINAL_TITLE);
+            title = extras.getString(EXTRA_TITLE);
             channel = extras.getString(EXTRA_CHANNEL);
             time = extras.getString(EXTRA_TIME);
         }
         
         // Set ActionBar title with movie's title
-        if (originalTitle != null) {
-            getSupportActionBar().setTitle(originalTitle);
+        if (title != null) {
+            getSupportActionBar().setTitle(title);
         }
         
         // Generate URL
@@ -103,7 +102,7 @@ public class DetailActivity extends BaseActivity {
         
         // Recognize italian language for plot
         if (!Locale.getDefault().getLanguage().equals("it")) {
-            titleTextView.setText(originalTitle);
+            titleTextView.setText(title);
         } else {
             titleTextView.setText(detail.getTitle());
         }

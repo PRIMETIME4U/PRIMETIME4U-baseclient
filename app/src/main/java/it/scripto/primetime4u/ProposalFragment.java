@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
@@ -51,6 +52,7 @@ public class ProposalFragment extends BaseFragment {
     
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+    private View fragmentView;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,7 +81,9 @@ public class ProposalFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-
+        
+        fragmentView = view;
+        
         // Setting up material list
         MaterialListView proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
@@ -236,7 +240,7 @@ public class ProposalFragment extends BaseFragment {
      */
     private void fillCardList() {
         for (int i = 0; i < proposalList.size(); i++) {
-            ProposalCard card = new ProposalCard(context);
+            final ProposalCard card = new ProposalCard(context);
             final Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
@@ -264,6 +268,8 @@ public class ProposalFragment extends BaseFragment {
                 card.setTitle(title);
             }
             
+            final String message = String.format(getResources().getString(R.string.will_watch), card.getTitle());
+
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
 
             card.setDescription(proposal.getSimplePlot());
@@ -279,20 +285,37 @@ public class ProposalFragment extends BaseFragment {
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    Log.i(TAG, "I'LL WATCH IT");
                     // Calculate finish time
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.HOUR_OF_DAY, hourInt);
                     cal.set(Calendar.MINUTE, minInt);
                     long finishTime = cal.getTimeInMillis() + (runTimesInt * 60 * 1000);
-                    
+
                     editor = preferences.edit();
 
                     editor.putString(PENDING_MOVIE, idIMDB);
-                    editor.putString(PENDING_TITLE, originalTitle);
+
+                    if (!Locale.getDefault().getLanguage().equals("it")) {
+                        editor.putString(PENDING_TITLE, originalTitle);
+                    } else {
+                        editor.putString(PENDING_TITLE, title);
+                    }
+                    
                     editor.putLong(FINISIH_TIME, finishTime);
 
                     editor.apply();
+
+                    // Create snackbar
+                    new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
+//                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                @Override
+//                                public void onMessageClick(Parcelable parcelable) {
+//                                    //TODO: create UNDO
+//                                }
+//                            })
+//                            .withActionMessageId(R.string.undo)
+                            .withMessage(message)
+                            .show();
                 }
             });
 
@@ -301,7 +324,13 @@ public class ProposalFragment extends BaseFragment {
                 public void onButtonPressedListener(View view, Card card) {
                     Intent intent = new Intent(context, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
-                    intent.putExtra(DetailActivity.EXTRA_ORIGINAL_TITLE, proposal.getOriginalTitle());
+
+                    if (!Locale.getDefault().getLanguage().equals("it")) {
+                        intent.putExtra(DetailActivity.EXTRA_TITLE, originalTitle);
+                    } else {
+                        intent.putExtra(DetailActivity.EXTRA_TITLE, title);
+                    }
+                    
                     intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
                     intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
                     startActivity(intent);
@@ -355,6 +384,20 @@ public class ProposalFragment extends BaseFragment {
                         }
                     }
                 });
+
+        // Create snackbar
+        new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
+//                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                @Override
+//                                public void onMessageClick(Parcelable parcelable) {
+//                                    //TODO: create UNDO
+//                                }
+//                            })
+//                            .withActionMessageId(R.string.undo)
+                .withMessageId(R.string.watched_added)
+                .show();
+        
+        // TODO: send "message" to watched fragment in order to refresh it
     }
 
     @Override

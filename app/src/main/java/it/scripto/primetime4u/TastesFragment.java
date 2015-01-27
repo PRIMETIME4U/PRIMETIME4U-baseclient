@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -177,6 +176,7 @@ public class TastesFragment extends RefreshFragment {
                         if (s == null || s.isEmpty() || s.length() == 0) {
                             Toast.makeText(getActivity(), "Non hai cercato nulla", Toast.LENGTH_LONG).show();
                         }
+                        assert s != null;
                         String rebuilt = s.replace(" ", "+"); //sostituisco spazi con +
                         String url = IMDB_SEARCH_LINK + rebuilt;
                         
@@ -279,8 +279,8 @@ public class TastesFragment extends RefreshFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                        if (e != null) {
+                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -289,12 +289,12 @@ public class TastesFragment extends RefreshFragment {
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
                         new SnackBar.Builder(getActivity().getApplicationContext(), view)
-                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-                                    @Override
-                                    public void onMessageClick(Parcelable parcelable) {
-                                        //TODO: create UNDO
-                                    }
-                                })
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//                                        //TODO: create UNDO
+//                                    }
+//                                })
                                 .withActionMessageId(R.string.undo)
                                 .withMessageId(R.string.taste_added)
                                 .show();
@@ -302,32 +302,6 @@ public class TastesFragment extends RefreshFragment {
                 });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        
-        setHasOptionsMenu(true);
-        
-        // Setting up material list
-        MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
-        
-        // Get user_id
-        MainActivity base = (MainActivity) this.getActivity();
-        account = base.getAccount();
-
-        // Generate URL
-        String url = Utils.SERVER_API + "tastes/" + account + "/all";
-        
-        // Get tastes
-        get(url);
-
-        // Create and set adapter
-        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
-        tastes_material_list_view.setAdapter(materialListViewAdapter);
-        
-        return view;
-    }
-    
     /**
      *
      */
@@ -361,8 +335,6 @@ public class TastesFragment extends RefreshFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!movieCard.getTaste()) {
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
-
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -387,10 +359,10 @@ public class TastesFragment extends RefreshFragment {
                 public void onButtonPressedListener(View view, Card card) {
                     if (!artistCard.getTaste()) {
                         Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
-                        
+
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
-                        
+
                         materialListViewAdapter.remove(artistCard);
                     }
                 }
@@ -463,8 +435,8 @@ public class TastesFragment extends RefreshFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                        if (e != null) {
+                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -473,13 +445,13 @@ public class TastesFragment extends RefreshFragment {
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
                         new SnackBar.Builder(getActivity().getApplicationContext(), view)
-                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-                                    @Override
-                                    public void onMessageClick(Parcelable parcelable) {
-                                        //TODO: create UNDO
-                                    }
-                                })
-                                .withActionMessageId(R.string.undo)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//                                        //TODO: create UNDO
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
                                 .withMessageId(R.string.taste_deleted)
                                 .show();
                     }

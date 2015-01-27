@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,7 +171,7 @@ public class WatchedFragment extends RefreshFragment {
 
             final WatchedCard watchedCard = new WatchedCard(context);
             final String id = watched.getIdIMDB();
-            
+
             watchedCard.setTitle(watched.getOriginalTitle());
             watchedCard.setDate(dateList.get(i));
             watchedCard.setTaste(tasteList.get(i) == 1);
@@ -255,8 +254,8 @@ public class WatchedFragment extends RefreshFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                        if (e != null) {
+                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -265,13 +264,13 @@ public class WatchedFragment extends RefreshFragment {
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
                         new SnackBar.Builder(getActivity().getApplicationContext(), view)
-                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-                                    @Override
-                                    public void onMessageClick(Parcelable parcelable) {
-                                        //TODO: create UNDO
-                                    }
-                                })
-                                .withActionMessageId(R.string.undo)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//                                        //TODO: create UNDO
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
                                 .withMessageId(R.string.taste_added)
                                 .show();
                     }
@@ -294,8 +293,8 @@ public class WatchedFragment extends RefreshFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                        if (e != null) {
+                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -304,13 +303,13 @@ public class WatchedFragment extends RefreshFragment {
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
                         new SnackBar.Builder(getActivity().getApplicationContext(), view)
-                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-                                    @Override
-                                    public void onMessageClick(Parcelable parcelable) {
-                                        //TODO: create UNDO
-                                    }
-                                })
-                                .withActionMessageId(R.string.undo)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//                                        //TODO: create UNDO
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
                                 .withMessageId(R.string.taste_deleted)
                                 .show();
                     }
