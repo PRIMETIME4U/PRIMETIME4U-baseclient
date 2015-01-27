@@ -16,6 +16,8 @@ import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.util.Locale;
+
 import it.scripto.primetime4u.model.Artist;
 import it.scripto.primetime4u.model.Detail;
 import it.scripto.primetime4u.model.ServerResponse;
@@ -99,7 +101,13 @@ public class DetailActivity extends BaseActivity {
         
         Detail detail = movie.data.detail;
         
-        titleTextView.setText(originalTitle);
+        // Recognize italian language for plot
+        if (!Locale.getDefault().getLanguage().equals("it")) {
+            titleTextView.setText(originalTitle);
+        } else {
+            titleTextView.setText(detail.getTitle());
+        }
+        
         movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), channel, time));
         timeGenreTextView.setText(detail.getRunTimes() + " - " + detail.getGenres());
         
@@ -124,7 +132,13 @@ public class DetailActivity extends BaseActivity {
         }
         writersValueTextView.setText(writersText);
 
-        plotValueTextView.setText(detail.getPlot());
+        // Recognize italian language for plot
+        if (!Locale.getDefault().getLanguage().equals("it")) {
+            plotValueTextView.setText(detail.getPlot());
+        } else {
+            plotValueTextView.setText(detail.getPlotIt());
+        }
+        
         directorsTextView.setVisibility(View.VISIBLE);
         writersTextView.setVisibility(View.VISIBLE);
         actorsTextView.setVisibility(View.VISIBLE);

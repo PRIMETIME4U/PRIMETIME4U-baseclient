@@ -20,11 +20,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.ProgressCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import it.scripto.primetime4u.cards.ProposalCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
@@ -153,7 +153,7 @@ public class ProposalFragment extends BaseFragment {
 
             materialListViewAdapter.add(welcomeCard);
         }
-
+        
         // Tutorial card if is the first time
         if (!preferences.contains(PROPOSAL_TUTORIAL)) {
             final WelcomeCard tutorialCard = new WelcomeCard(context);
@@ -215,7 +215,15 @@ public class ProposalFragment extends BaseFragment {
             movie.setTime(proposal.getTime());
             movie.setIdIMDB(proposal.getIdIMDB());
             movie.setPoster(proposal.getPoster());
-            movie.setSimplePlot(proposal.getSimplePlot());
+            if (Locale.getDefault().getLanguage().equals("it")) {
+                movie.setSimplePlot(proposal.getItalianPlot());
+                movie.setTitle(proposal.getTitle());
+            }
+            else {
+                movie.setSimplePlot(proposal.getSimplePlot());
+                movie.setTitle(proposal.getOriginalTitle());
+            }
+            movie.setPlotIt(proposal.getItalianPlot());
 
             proposalList.add(movie);
         }
@@ -232,6 +240,7 @@ public class ProposalFragment extends BaseFragment {
             final Movie proposal = proposalList.get(i);
 
             final String originalTitle = proposal.getOriginalTitle();
+            final String title = proposal.getTitle();
             final String idIMDB = proposal.getIdIMDB();
             // Get hours and minutes from movie's time
             String time = proposal.getTime();
@@ -248,6 +257,15 @@ public class ProposalFragment extends BaseFragment {
             }
             card.setTitle(originalTitle);
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), time));
+
+            if (!Locale.getDefault().getLanguage().equals("it")) {
+                card.setTitle(originalTitle);
+            } else {
+                card.setTitle(title);
+            }
+            
+            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
+
             card.setDescription(proposal.getSimplePlot());
             card.setPoster(proposal.getPoster());
 
@@ -302,13 +320,6 @@ public class ProposalFragment extends BaseFragment {
     private void get(String url) {
         Ion.with(context)
                 .load(url)
-                .progressBar(progressBar)
-                .progressHandler(new ProgressCallback() {
-                    @Override
-                    public void onProgress(long downloaded, long total) {
-                        progressBar.setVisibility(View.VISIBLE);
-                    }
-                })
                 .as(new TypeToken<ServerResponse.ProposalResponse>() {
                 })
                 .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {

@@ -16,4 +16,6 @@ public class WelcomeCard extends BasicButtonsCard {
     public int getLayout() {
         return R.layout.welcome_card_layout;
     }
+
+
 }

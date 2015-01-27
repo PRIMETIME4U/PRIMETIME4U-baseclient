@@ -1,11 +1,16 @@
 package it.scripto.primetime4u;
 
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -79,40 +84,55 @@ public class TutorialActivity extends BaseActivity {
                     }
                 }
             });
-            
-            try {
-                Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                        new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
 
-                startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(ACCOUNT, "invalidUser");
-                editor.apply();
+            if (verifyConnection()) {
+                try {
+                    Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                            new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
 
+                    startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(ACCOUNT, "invalidUser");
+                    editor.apply();
+
+                }
+            }
+            else {
+                showSettingsAlert();
             }
         }
     }
 
     private void goToMain() {
         if (!preferences.getString(ACCOUNT,"").equals("invalidUser")) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
+            if (verifyConnection()) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else {
+                showSettingsAlert();
+            }
         }
         else{
-            try {
-                Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                        new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
+            if (verifyConnection()) {
+                try {
+                    Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                            new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
 
-                startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(ACCOUNT, "invalidUser");
-                editor.apply();
+                    startActivityForResult(intent, TutorialActivity.REQUEST_CODE_EMAIL);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "Impossibile trovare un account associato a questo dispositivo", Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(ACCOUNT, "invalidUser");
+                    editor.apply();
 
+                }
+            }
+            else {
+                showSettingsAlert();
             }
         }
     }
@@ -128,8 +148,8 @@ public class TutorialActivity extends BaseActivity {
             // TODO: generify request
             JsonObject json = new JsonObject();
             json.addProperty("userId", accountName);
-            json.addProperty("userName", "Claudio");
-            json.addProperty("userBirthYear", "1993");
+            json.addProperty("userName", "Utente");
+            json.addProperty("userBirthYear", "1990");
             json.addProperty("userGender", "M");
 
             Ion.with(getApplicationContext())
@@ -153,6 +173,52 @@ public class TutorialActivity extends BaseActivity {
             editor.putString(ACCOUNT, "invalidUser");
             editor.apply();
         }
+    }
+
+    private boolean verifyConnection(){
+        Context _context=getApplicationContext();
+        ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null) {
+                for (NetworkInfo anInfo : info) {
+                    if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+                }
+            }
+
+        }
+        return false;
+    }
+
+    public void showSettingsAlert(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        // titolo dialog
+        alertDialog.setTitle("Status connessione");
+
+        // messaggio dialog
+        alertDialog.setMessage("Connessione internet assente, vuoi accedere alle impostazioni?");
+
+        // bottone impostazioni
+        alertDialog.setPositiveButton("Impostazioni", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        // annulla
+        alertDialog.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                finish();
+            }
+        });
+        alertDialog.show();
     }
 
     private class TutorialAdapter extends FragmentPagerAdapter {

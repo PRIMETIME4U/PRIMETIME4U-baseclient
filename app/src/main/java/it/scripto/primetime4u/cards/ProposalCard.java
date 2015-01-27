@@ -37,4 +37,8 @@ public class ProposalCard extends ExtendedCard {
         this.poster = poster;
         BusProvider.dataSetChanged();
     }
+
+    public String getTitle() {
+        return super.getTitle();
+    }
 }

@@ -239,6 +239,15 @@ public class TastesFragment extends RefreshFragment {
 
                             addTaste(url, id);
                         }
+                        else if (result.has("name_approx")){
+                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
+                            JsonArray popArray= result.getAsJsonArray("name_approx");
+                            JsonObject artist = popArray.get(0).getAsJsonObject();
+                            String id = artist.get("id").getAsString();
+                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
+
+                            addTaste(url, id);
+                        }
 
                         else {
                             Toast.makeText(getActivity(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
@@ -292,6 +301,32 @@ public class TastesFragment extends RefreshFragment {
                     }
                 });
     }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        
+        setHasOptionsMenu(true);
+        
+        // Setting up material list
+        MaterialListView tastes_material_list_view = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        
+        // Get user_id
+        MainActivity base = (MainActivity) this.getActivity();
+        account = base.getAccount();
+
+        // Generate URL
+        String url = Utils.SERVER_API + "tastes/" + account + "/all";
+        
+        // Get tastes
+        get(url);
+
+        // Create and set adapter
+        materialListViewAdapter = new MaterialTasteCardListAdapter(getActivity());
+        tastes_material_list_view.setAdapter(materialListViewAdapter);
+        
+        return view;
+    }
     
     /**
      *
@@ -326,6 +361,8 @@ public class TastesFragment extends RefreshFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!movieCard.getTaste()) {
+                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
 
@@ -349,6 +386,8 @@ public class TastesFragment extends RefreshFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!artistCard.getTaste()) {
+                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
+                        
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
                         
