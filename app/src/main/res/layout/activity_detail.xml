@@ -29,13 +29,14 @@
             <!-- CardView -->
             <android.support.v7.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/card_view"
+                android:id="@+id/detail_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/content_top_padding"
                 android:layout_marginRight="@dimen/small_padding"
                 android:layout_marginLeft="@dimen/small_padding"
-                card_view:cardCornerRadius="@dimen/card_corner_radius">
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                android:visibility="invisible">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -55,7 +56,8 @@
                         android:textStyle="bold"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true" />
+                        android:layout_alignParentStart="true"
+                        android:visibility="visible" />
 
                     <TextView
                         android:id="@+id/movie_info_text_view"
@@ -70,7 +72,8 @@
                         tools:text="Movie info"
                         android:layout_below="@+id/title_text_view"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true" />
+                        android:layout_alignParentStart="true"
+                        android:visibility="visible" />
 
                     <TextView
                         android:id="@+id/time_genre_text_view"
@@ -86,7 +89,8 @@
                         android:textStyle="bold"
                         android:layout_below="@+id/movie_info_text_view"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true" />
+                        android:layout_alignParentStart="true"
+                        android:visibility="visible" />
 
                     <TextView
                         android:id="@+id/directors_text_view"
@@ -101,7 +105,7 @@
                         android:layout_below="@+id/time_genre_text_view"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                     <TextView
                         tools:text="@string/writers"
@@ -118,7 +122,7 @@
                         android:layout_below="@+id/directors_value_text_view"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                     <TextView
                         tools:text="@string/actors"
@@ -135,7 +139,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:text="@string/actors"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -150,7 +154,8 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:paddingLeft="@dimen/big_padding"
-                        android:paddingRight="@dimen/big_padding" />
+                        android:paddingRight="@dimen/big_padding"
+                        android:visibility="visible" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -165,7 +170,8 @@
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
                         android:paddingLeft="@dimen/big_padding"
-                        android:paddingRight="@dimen/big_padding" />
+                        android:paddingRight="@dimen/big_padding"
+                        android:visibility="visible" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -181,7 +187,8 @@
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
                         android:paddingLeft="@dimen/big_padding"
-                        android:paddingRight="@dimen/big_padding" />
+                        android:paddingRight="@dimen/big_padding"
+                        android:visibility="visible" />
 
                     <TextView
                         android:text="@string/plot"
@@ -197,7 +204,7 @@
                         android:layout_below="@+id/actors_value_text_view"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                     <TextView
                         tools:text="@string/plot"
@@ -213,7 +220,8 @@
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
                         android:paddingLeft="@dimen/big_padding"
-                        android:paddingRight="@dimen/big_padding" />
+                        android:paddingRight="@dimen/big_padding"
+                        android:visibility="visible" />
 
                 </RelativeLayout>
             </android.support.v7.widget.CardView>

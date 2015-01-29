@@ -3,6 +3,7 @@ package it.scripto.primetime4u.model;
 public class Watched {
     private String date;
     private String idIMDB;
+    private String title;
     private String originalTitle;
     private String poster;
     private int tasted;
@@ -48,5 +49,13 @@ public class Watched {
 
     public void setTasted(int tasted) {
         this.tasted = tasted;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

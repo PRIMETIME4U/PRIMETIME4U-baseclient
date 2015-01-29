@@ -23,6 +23,7 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import it.scripto.primetime4u.cards.WatchedCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
@@ -151,6 +152,7 @@ public class WatchedFragment extends RefreshFragment {
         for (Watched watched : response.data.watched) {
             Movie movie = new Movie();
             movie.setOriginalTitle(watched.getOriginalTitle());
+            movie.setTitle(watched.getTitle());
             movie.setIdIMDB(watched.getIdIMDB());
             movie.setPoster(watched.getPoster());
 
@@ -172,7 +174,12 @@ public class WatchedFragment extends RefreshFragment {
             final WatchedCard watchedCard = new WatchedCard(context);
             final String id = watched.getIdIMDB();
 
-            watchedCard.setTitle(watched.getOriginalTitle());
+            if (!Locale.getDefault().getLanguage().equals("it")) {
+                watchedCard.setTitle(watched.getOriginalTitle());
+            } else {
+                watchedCard.setTitle(watched.getTitle());
+            }
+            
             watchedCard.setDate(dateList.get(i));
             watchedCard.setTaste(tasteList.get(i) == 1);
             watchedCard.setDismissible(false);

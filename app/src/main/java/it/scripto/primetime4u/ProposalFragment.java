@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,7 +44,8 @@ public class ProposalFragment extends BaseFragment {
     private static final String PENDING_MOVIE = "PENDING_MOVIE";
     private static final String PENDING_TITLE = "PENDING_TITLE";
     private static final String FINISIH_TIME = "FINISH_TIME";
-    
+    private static final String PENDING_DATE = "PENDING_DATE";
+
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
     private MaterialListAdapter materialListViewAdapter;
@@ -140,6 +142,7 @@ public class ProposalFragment extends BaseFragment {
                 public void onButtonPressedListener(View view, Card card) {
                     // Get movie ID
                     String movieId = preferences.getString(PENDING_MOVIE,"");
+                    String date = preferences.getString(PENDING_DATE, "");
 
                     materialListViewAdapter.remove(welcomeCard);
                     editor.remove(PENDING_MOVIE);
@@ -151,7 +154,7 @@ public class ProposalFragment extends BaseFragment {
                     String url = Utils.SERVER_API + "watched/" + account;
 
                     // Add watched movie
-                    addWatched(url, movieId);
+                    addWatched(url, movieId, date);
                 }
             });
 
@@ -286,6 +289,7 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     // Calculate finish time
+                    // TODO: manage in better way date
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.HOUR_OF_DAY, hourInt);
                     cal.set(Calendar.MINUTE, minInt);
@@ -300,7 +304,12 @@ public class ProposalFragment extends BaseFragment {
                     } else {
                         editor.putString(PENDING_TITLE, title);
                     }
+
+                    SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
+                    Log.i(TAG, simpleDateFormat.format(cal.getTime()));
                     
+                    editor.putString(PENDING_DATE, simpleDateFormat.format(cal.getTime()));
+                            
                     editor.putLong(FINISIH_TIME, finishTime);
 
                     editor.apply();
@@ -368,9 +377,10 @@ public class ProposalFragment extends BaseFragment {
                 });
     }
 
-    private void addWatched(String url, String id) {
+    private void addWatched(String url, String id, String date) {
         JsonObject json = new JsonObject();
         json.addProperty("idIMDB", id);
+        json.addProperty("date", date);
 
         Ion.with(getActivity())
                 .load("POST", url)

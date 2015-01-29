@@ -3,6 +3,7 @@ package it.scripto.primetime4u;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
 
+@SuppressWarnings("ResourceType")
 public class DetailActivity extends BaseActivity {
     
     public final static String EXTRA_ID_IMDB = "ID_IMDB";
@@ -93,10 +95,7 @@ public class DetailActivity extends BaseActivity {
         TextView writersValueTextView = (TextView) findViewById(R.id.writers_value_text_view);
         TextView actorsValueTextView = (TextView) findViewById(R.id.actors_value_text_view);
         TextView plotValueTextView = (TextView) findViewById(R.id.plot_value_text_view);
-        TextView directorsTextView = (TextView) findViewById(R.id.directors_text_view);
-        TextView writersTextView = (TextView) findViewById(R.id.writers_text_view);
-        TextView actorsTextView = (TextView) findViewById(R.id.actors_text_view);
-        TextView plotTextView = (TextView) findViewById(R.id.plot_text_view);
+        CardView cardView = (CardView) findViewById(R.id.detail_card_view);
         
         Detail detail = movie.data.detail;
         
@@ -138,10 +137,7 @@ public class DetailActivity extends BaseActivity {
             plotValueTextView.setText(detail.getPlotIt());
         }
         
-        directorsTextView.setVisibility(View.VISIBLE);
-        writersTextView.setVisibility(View.VISIBLE);
-        actorsTextView.setVisibility(View.VISIBLE);
-        plotTextView.setVisibility(View.VISIBLE);
+        cardView.setVisibility(View.VISIBLE);
     }
 
     /**

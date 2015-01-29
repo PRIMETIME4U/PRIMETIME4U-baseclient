@@ -29,6 +29,7 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import it.scripto.primetime4u.cards.TasteCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
@@ -326,7 +327,12 @@ public class TastesFragment extends RefreshFragment {
         for (final Movie taste : tastesListMovie) {
             final TasteCard movieCard = new TasteCard(context);
             
-            movieCard.setTitle(taste.getOriginalTitle());
+            if (!Locale.getDefault().getLanguage().equals("it")) {
+                movieCard.setTitle(taste.getOriginalTitle());
+            } else {
+                movieCard.setTitle(taste.getTitle());
+            }
+
             movieCard.setTaste(true);
             movieCard.setDismissible(false);
             movieCard.setType(TasteCard.MOVIE_TYPE);
@@ -358,8 +364,6 @@ public class TastesFragment extends RefreshFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     if (!artistCard.getTaste()) {
-                        Toast.makeText(context,"L'elemento è stato rimosso dalla tua lista di gusti",Toast.LENGTH_LONG).show();
-
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
 
