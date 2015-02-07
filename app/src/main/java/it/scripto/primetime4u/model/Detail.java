@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class Detail {
+public class Detail extends Taste {
     private String title;
     private String originalTitle;
     @SerializedName("simple_plot")

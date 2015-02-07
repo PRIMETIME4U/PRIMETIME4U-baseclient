@@ -153,7 +153,7 @@ public class DetailActivity extends BaseActivity {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
                         if (e != null) {
-                            Toast.makeText(getBaseContext(), "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         drawResult(result);

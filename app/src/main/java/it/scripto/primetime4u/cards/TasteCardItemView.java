@@ -75,9 +75,10 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
 //        } else {
 //            cardView.getLayoutParams().width = width - (int)getResources().getDimension(R.dimen.small_padding);
 //        }
-        
-        
+
+        TextView genreText = (TextView) findViewById(R.id.taste_genre_letter);
         if (card.getType() != TasteCard.GENRE_TYPE) {
+            genreText.setVisibility(INVISIBLE);
             // Set poster
             ImageView mPoster = (ImageView) findViewById(R.id.imageView);
             Ion.with(mPoster)
@@ -89,7 +90,7 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
                     .load(card.getPoster());
         } else {
             // Set first letter of the genre
-            TextView genreText = (TextView) findViewById(R.id.taste_genre_letter);
+            genreText.setVisibility(VISIBLE);
             genreText.setText(Character.toString(card.getDescription().charAt(0)));
             Random random = new Random();
             genreText.setBackgroundColor((0xff000000 | random.nextInt(0x00ffffff)));

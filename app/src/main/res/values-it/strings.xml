@@ -42,4 +42,7 @@
     <string name="proposal_tutorial">Qui puoi trovare tutte le proposte che abbiamo scelto solo per te</string>
     <string name="will_watch">Guarderai \"%1$s\"</string>
     <string name="watched_added">Film aggiunto alla lista dei film visti</string>
+    <string name="search_hint">Film, artisti, generi</string>
+    <string name="generic_error">Ci dispiace, si è verificato un errore</string>
+    <string name="query_error">Cerca qualcosa…</string>
 </resources>

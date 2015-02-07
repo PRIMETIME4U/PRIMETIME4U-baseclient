@@ -42,6 +42,7 @@ public class ServerResponse {
     public static class TastesData {
         public List<Artist> artists;
         public List<Movie> movies;
+        public List<Genre> genres;
     }
 
     public static class WatchedResponse extends Response {
@@ -51,5 +52,16 @@ public class ServerResponse {
     
     public static class WatchedData {
         public List<Watched> watched;
+    }
+
+    public static class SuggestResponse extends Response {
+        public SuggestData data;
+        public String query;
+    }
+
+    public static class SuggestData {
+        public List<Artist> artists;
+        public List<Genre> genres;
+        public List<Movie> movies;
     }
 }

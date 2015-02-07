@@ -218,7 +218,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
                         if (e != null) {
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Clear all data list
@@ -252,7 +252,7 @@ public class WatchedFragment extends RefreshFragment {
        
         // Create JSON object
         JsonObject json = new JsonObject();
-        json.addProperty("idIMDB", id);
+        json.addProperty("data", id);
         // Do connection
         Ion.with(getActivity())
                 .load("POST", url)
@@ -262,7 +262,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
-                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -301,7 +301,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
-                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes

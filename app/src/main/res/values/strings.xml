@@ -43,5 +43,8 @@
     <string name="proposal_tutorial">Here you can find all movie proposal evaluated just for you</string>
     <string name="will_watch">You\'ll watch \"%1$s\"</string>
     <string name="watched_added">Movie added into watched list</string>
+    <string name="search_hint">Movies, artists, genres</string>
+    <string name="generic_error">Sorry, there is an error</string>
+    <string name="query_error">Search something…</string>
 
 </resources>

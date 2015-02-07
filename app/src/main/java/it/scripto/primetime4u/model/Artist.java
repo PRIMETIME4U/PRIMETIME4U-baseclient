@@ -1,6 +1,6 @@
 package it.scripto.primetime4u.model;
 
-public class Artist {
+public class Artist extends Taste {
     private String idIMDB;
     private String name;
     private String photo;

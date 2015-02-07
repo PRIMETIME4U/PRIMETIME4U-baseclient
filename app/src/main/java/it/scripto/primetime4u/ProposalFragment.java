@@ -364,7 +364,7 @@ public class ProposalFragment extends BaseFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.ProposalResponse result) {
                         if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
                         proposalList.clear();
@@ -390,7 +390,7 @@ public class ProposalFragment extends BaseFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                         }
                     }
                 });

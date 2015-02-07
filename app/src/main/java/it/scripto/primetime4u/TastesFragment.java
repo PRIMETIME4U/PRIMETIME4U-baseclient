@@ -21,7 +21,6 @@ import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.mrengineer13.snackbar.SnackBar;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
@@ -34,11 +33,14 @@ import java.util.Locale;
 import it.scripto.primetime4u.cards.TasteCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Artist;
+import it.scripto.primetime4u.model.Genre;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
+
+import static it.scripto.primetime4u.utils.Utils.sanitize;
 
 public class TastesFragment extends RefreshFragment {
 
@@ -46,6 +48,7 @@ public class TastesFragment extends RefreshFragment {
 
     private List<Movie> tastesListMovie = new ArrayList<>();
     private List<Artist> tastesListArtist = new ArrayList<>();
+    private List<Genre> tastesListGenre = new ArrayList<>();
     private ArrayList<TasteCard> cardList = new ArrayList<>();
     private String account;
     private MaterialListAdapter materialListViewAdapter;
@@ -53,8 +56,7 @@ public class TastesFragment extends RefreshFragment {
     private onTasteChangeListener onTasteChangeListener;
     private ProgressBar progressBar;
     private MenuItem searchItem;
-    
-    private String IMDB_SEARCH_LINK = "http://www.imdb.com/xml/find?json=1&nr=1&q=";
+    private MaterialListView tastesMaterialListView;
 
     /**
      * Use this factory method to create a new instance of
@@ -87,7 +89,7 @@ public class TastesFragment extends RefreshFragment {
         setHasOptionsMenu(true);
 
         // Setting up material list
-        MaterialListView tastesMaterialListView = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        tastesMaterialListView = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
 
         // Get progress bar
         progressBar = (ProgressBar) view.findViewById(R.id.taste_progress_bar);
@@ -148,8 +150,7 @@ public class TastesFragment extends RefreshFragment {
     @Override
     public void refresh() {
         // Clear adapter
-        materialListViewAdapter.clear();
-        materialListViewAdapter.notifyDataSetChanged();
+        clearAdapter();
 
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
@@ -169,19 +170,20 @@ public class TastesFragment extends RefreshFragment {
         switch (item.getItemId()) {
             case R.id.menu_search:
                 final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-                searchView.setQueryHint("Movie/artist, es: Matrix, Di Caprio");
+                searchView.setQueryHint(getString(R.string.search_hint));
 
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    public boolean modified;
+
                     @Override
                     public boolean onQueryTextSubmit(String s) {
                         if (s == null || s.isEmpty() || s.length() == 0) {
-                            Toast.makeText(getActivity(), "Non hai cercato nulla", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), getString(R.string.query_error), Toast.LENGTH_LONG).show();
                         }
-                        assert s != null;
-                        String rebuilt = s.replace(" ", "+"); //sostituisco spazi con +
-                        String url = IMDB_SEARCH_LINK + rebuilt;
                         
-                        getIMDb(url);
+                        String url = Utils.SERVER_API + "search/" + account + "/" + sanitize(s, false);
+                        
+                        getSearch(url);
 
                         searchView.clearFocus();
                         return true;
@@ -189,6 +191,18 @@ public class TastesFragment extends RefreshFragment {
 
                     @Override
                     public boolean onQueryTextChange(String s) {
+                        if (s.length() > 0) {
+                            modified = true;
+                            String url = Utils.SERVER_API + "suggest/" + account + "/" + sanitize(s, true);
+
+                            getSuggest(url);
+                            return true;
+                        } else if (s.length() == 0 && modified) {
+                            clearData();
+                            refresh();
+                            return true;
+                        }
+
                         return false;
                     }
                 });
@@ -199,66 +213,48 @@ public class TastesFragment extends RefreshFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getIMDb(String url) {
+    private void getSearch(String url) {
         progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(url)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
+                .as(new TypeToken<ServerResponse.SuggestResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.SuggestResponse>() {
                     @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
-                            Toast.makeText(context,"Errore di rete",Toast.LENGTH_LONG).show();
+                    public void onCompleted(Exception e, ServerResponse.SuggestResponse result) {
+                        if (e != null) {
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
-                        if (result.has("title_popular")){
-                            //film
-                            Toast.makeText(getActivity(), "Il film verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
-                            JsonArray popArray= result.getAsJsonArray("title_popular");
-                            JsonObject movie = popArray.get(0).getAsJsonObject();
-                            String id = movie.get("id").getAsString();
-                            String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+                        // Parse response
+                        parseSuggestResponse(result);
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });    
+    }
 
-                            addTaste(url, id);
+    private void getSuggest(String url) {
+        progressBar.setVisibility(View.VISIBLE);
+        Ion.with(context)
+                .load(url)
+                .as(new TypeToken<ServerResponse.SuggestResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.SuggestResponse>() {
+                    @Override
+                    public void onCompleted(Exception e, ServerResponse.SuggestResponse result) {
+                        if (e != null) {
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                            return;
                         }
-                        else if (result.has("name_popular")){
-                            //artista
-                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
-                            JsonArray popArray= result.getAsJsonArray("name_popular");
-                            JsonObject artist = popArray.get(0).getAsJsonObject();
-                            String id = artist.get("id").getAsString();
-                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
-
-                            addTaste(url, id);
-                        }
-                        else if (result.has("name_exact")){
-                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
-                            JsonArray popArray= result.getAsJsonArray("name_exact");
-                            JsonObject artist = popArray.get(0).getAsJsonObject();
-                            String id = artist.get("id").getAsString();
-                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
-
-                            addTaste(url, id);
-                        }
-                        else if (result.has("name_approx")){
-                            Toast.makeText(getActivity(), "L'artista verrà aggiunto alla tua lista gusti, attendi...",Toast.LENGTH_LONG).show();
-                            JsonArray popArray= result.getAsJsonArray("name_approx");
-                            JsonObject artist = popArray.get(0).getAsJsonObject();
-                            String id = artist.get("id").getAsString();
-                            String url = Utils.SERVER_API + "tastes/" + account + "/artist";
-
-                            addTaste(url, id);
-                        }
-
-                        else {
-                            Toast.makeText(getActivity(),"Provare con una ricerca più specifica",Toast.LENGTH_LONG).show();
-                        }
-                        
+                        // Parse response
+                        parseSuggestResponse(result);
+                        // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
-
+    
     /**
      * adds taste to user's taste list
      */
@@ -270,7 +266,7 @@ public class TastesFragment extends RefreshFragment {
 
         // Create JSON object
         JsonObject json = new JsonObject();
-        json.addProperty("idIMDB", id);
+        json.addProperty("data", id);
         // Do connection
         Ion.with(getActivity())
                 .load("POST", url)
@@ -281,7 +277,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
-                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
@@ -296,7 +292,7 @@ public class TastesFragment extends RefreshFragment {
 //                                        //TODO: create UNDO
 //                                    }
 //                                })
-                                .withActionMessageId(R.string.undo)
+//                                .withActionMessageId(R.string.undo)
                                 .withMessageId(R.string.taste_added)
                                 .show();
                     }
@@ -315,8 +311,39 @@ public class TastesFragment extends RefreshFragment {
         for (Artist artist : response.data.tastes.artists){
             tastesListArtist.add(artist);
         }
+        // Parse genres list
+        for (Genre genre : response.data.tastes.genres){
+            tastesListGenre.add(genre);
+        }
         
         fillCardList();
+    }
+
+    /**
+     *
+     */
+    private void parseSuggestResponse(ServerResponse.SuggestResponse response) {
+
+        if (!response.data.movies.isEmpty() || !response.data.artists.isEmpty() || !response.data.genres.isEmpty()) {
+            // Clear all data list
+            clearData();
+            // Parse movies list
+            for (Movie movie : response.data.movies) {
+                tastesListMovie.add(movie);
+            }
+            // Parse artists list
+            for (Artist artist : response.data.artists) {
+                tastesListArtist.add(artist);
+            }
+            // Parse genres list
+            for (Genre genre : response.data.genres) {
+                tastesListGenre.add(genre);
+            }
+
+            clearAdapter();
+
+            fillCardList();
+        }
     }
     
     /**
@@ -333,17 +360,19 @@ public class TastesFragment extends RefreshFragment {
                 movieCard.setTitle(taste.getTitle());
             }
 
-            movieCard.setTaste(true);
+            movieCard.setTaste(taste.isTaste());
             movieCard.setDismissible(false);
             movieCard.setType(TasteCard.MOVIE_TYPE);
             movieCard.setPoster(taste.getPoster());
             movieCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    if (!movieCard.getTaste()) {
+                    if (movieCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+                        addTaste(url, taste.getIdIMDB());
+                    } else {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + taste.getIdIMDB();
                         deleteTaste(url);
-
                         materialListViewAdapter.remove(movieCard);
                     }
                 }
@@ -356,17 +385,19 @@ public class TastesFragment extends RefreshFragment {
             final TasteCard artistCard = new TasteCard(context);
             
             artistCard.setTitle(taste.getName());
-            artistCard.setTaste(true);
+            artistCard.setTaste(taste.isTaste());
             artistCard.setDismissible(false);
             artistCard.setType(TasteCard.ARTIST_TYPE);
             artistCard.setPoster(taste.getPhoto());
             artistCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-                    if (!artistCard.getTaste()) {
+                    if (artistCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/artist";
+                        addTaste(url, taste.getIdIMDB());
+                    } else {
                         String url = Utils.SERVER_API + "tastes/" + account + "/artist/" + taste.getIdIMDB();
                         deleteTaste(url);
-
                         materialListViewAdapter.remove(artistCard);
                     }
                 }
@@ -374,17 +405,34 @@ public class TastesFragment extends RefreshFragment {
 
             cardList.add(artistCard);
         }
-        
-/*
-        TasteCard genreCard = new TasteCard(context);
-        genreCard.setDescription("Action");
-        genreCard.setTaste(true);
-        genreCard.setDismissible(false);
-        genreCard.setType(TasteCard.GENRE_TYPE);
-        cardList.add(genreCard);
-*/
+
+        // Create genres cards
+        for (final Genre taste : tastesListGenre) {
+            final TasteCard genreCard = new TasteCard(context);
+
+            genreCard.setDescription(taste.getName());
+            genreCard.setTaste(taste.isTaste());
+            genreCard.setDismissible(false);
+            genreCard.setType(TasteCard.GENRE_TYPE);
+            genreCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    if (genreCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/genre";
+                        addTaste(url, taste.getName());
+                    } else {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/genre/" + taste.getName();
+                        deleteTaste(url);
+                        materialListViewAdapter.remove(genreCard);
+                    }
+                }
+            });
+
+            cardList.add(genreCard);
+        }
 
         materialListViewAdapter.addAll(cardList);
+        tastesMaterialListView.smoothScrollToPosition(0);
     }
 
     /**
@@ -402,7 +450,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.TasteResponse result) {
                         if (e != null) {
-                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Clear all data list
@@ -421,6 +469,7 @@ public class TastesFragment extends RefreshFragment {
     private void clearData() {
         tastesListArtist.clear();
         tastesListMovie.clear();
+        tastesListGenre.clear();
         cardList.clear();
     }
 
@@ -440,7 +489,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
-                            Toast.makeText(context, "Errore di rete", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
