@@ -109,7 +109,7 @@ public class TastesFragment extends RefreshFragment {
         // Get data
         refresh();
         
-        // TODO: doesn't work...
+        //
         //tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
 
         // Tutorial card if is the first time
