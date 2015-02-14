@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ public class ProposalFragment extends BaseFragment {
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private View fragmentView;
+    private String account;
 
     /**
      * Use this factory method to create a new instance of
@@ -83,6 +85,24 @@ public class ProposalFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int widthPixels = displayMetrics.widthPixels;
+        float density = displayMetrics.density;
+        int densityDpi = displayMetrics.densityDpi;
+        int heightPixels= displayMetrics.heightPixels;
+        float scaledDensity = displayMetrics.scaledDensity;
+        float xdpi = displayMetrics.xdpi;
+        float ydpi = displayMetrics.ydpi;
+        Log.i(TAG, "\nWidth: " + String.valueOf(widthPixels) 
+                + "\nHeight: " + String.valueOf(heightPixels)
+                + "\ndensity: " + String.valueOf(density) 
+                + "\ndensityDpi: " + String.valueOf(densityDpi)
+                + "\nscaledDensity: " + String.valueOf(scaledDensity) 
+                + "\nxdpi: " + String.valueOf(xdpi)
+                + "\nydpi: " + String.valueOf(ydpi));
+        
         
         fragmentView = view;
         
@@ -96,7 +116,7 @@ public class ProposalFragment extends BaseFragment {
         
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
-        final String account = base.getAccount();
+        account = base.getAccount();
         
         // Get preferences
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -112,6 +132,44 @@ public class ProposalFragment extends BaseFragment {
         proposalMaterialListView.setAdapter(materialListViewAdapter);
         //proposalMaterialListView.setEmptyView(view.findViewById(R.id.no_proposal_text_view));
 
+        // Tutorial card if is the first time
+        if (!preferences.contains(PROPOSAL_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_proposal_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.proposal_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(PROPOSAL_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         // Welcome Card for feedback
         if (preferences.contains(PENDING_MOVIE) && movieIsFinished()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
@@ -160,42 +218,8 @@ public class ProposalFragment extends BaseFragment {
 
             materialListViewAdapter.add(welcomeCard);
         }
-        
-        // Tutorial card if is the first time
-        if (!preferences.contains(PROPOSAL_TUTORIAL)) {
-            final WelcomeCard tutorialCard = new WelcomeCard(context);
-            tutorialCard.setTitle(getResources().getString(R.string.welcome_proposal_tutorial));
-            tutorialCard.setDescription(getResources().getString(R.string.proposal_tutorial));
-
-            tutorialCard.setFullWidthDivider(true);
-            tutorialCard.setDividerVisible(true);
-            tutorialCard.setDismissible(false);
-
-            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
-            tutorialCard.setRightButtonText(getString(R.string.got_it));
-
-            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    SharedPreferences.Editor editor = preferences.edit();
-                    materialListViewAdapter.remove(tutorialCard);
-                    editor.putBoolean(PROPOSAL_TUTORIAL, true);
-                    editor.apply();
-                }
-            });
-            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    materialListViewAdapter.remove(tutorialCard);
-                }
-            });
-
-            materialListViewAdapter.add(tutorialCard);
-        }
-
-        return view;
     }
-    
+
     /**
      *
      */

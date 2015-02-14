@@ -186,12 +186,13 @@ public class TastesFragment extends RefreshFragment {
                         getSearch(url);
 
                         searchView.clearFocus();
+                        modified = true;
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String s) {
-                        if (s.length() > 0) {
+                        /*if (s.length() > 0) {
                             modified = true;
                             String url = Utils.SERVER_API + "suggest/" + account + "/" + sanitize(s, true);
 
@@ -202,7 +203,13 @@ public class TastesFragment extends RefreshFragment {
                             refresh();
                             return true;
                         }
-
+                        */
+                        if (s.length() == 0 && modified) {
+                            clearData();
+                            refresh();
+                            modified = false;
+                            return true;
+                        }
                         return false;
                     }
                 });

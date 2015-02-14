@@ -15,6 +15,8 @@ import java.util.Random;
 
 import it.scripto.primetime4u.R;
 
+import static it.scripto.primetime4u.utils.Utils.resizeImageUrl;
+
 public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView<T> {
     public TasteCardItemView(Context context) {
         super(context);
@@ -87,7 +89,7 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
                     //.animateLoad(spinAnimation)
                     //.animateIn(fadeInAnimation)
                     .centerCrop()
-                    .load(card.getPoster());
+                    .load(resizeImageUrl(card.getPoster(), 0));
         } else {
             // Set first letter of the genre
             genreText.setVisibility(VISIBLE);

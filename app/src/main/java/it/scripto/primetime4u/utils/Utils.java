@@ -12,4 +12,8 @@ public class Utils {
             return string.replace(" ", "%20");
         }
     }
+    
+    public static String resizeImageUrl(String string, int dimension) {
+        return string + "._V1._SX400_CR0,0,0,0_.jpg";
+    }
 }

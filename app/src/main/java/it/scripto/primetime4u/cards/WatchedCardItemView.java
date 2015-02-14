@@ -9,6 +9,8 @@ import com.koushikdutta.ion.Ion;
 
 import it.scripto.primetime4u.R;
 
+import static it.scripto.primetime4u.utils.Utils.resizeImageUrl;
+
 public class WatchedCardItemView<T extends WatchedCard> extends TasteCardItemView<T> {
     
     public WatchedCardItemView(Context context) {
@@ -39,6 +41,6 @@ public class WatchedCardItemView<T extends WatchedCard> extends TasteCardItemVie
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
                 .centerCrop()
-                .load(card.getPoster());
+                .load(resizeImageUrl(card.getPoster(), 0));
     }
 }

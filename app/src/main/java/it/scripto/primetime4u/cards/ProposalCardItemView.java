@@ -9,6 +9,8 @@ import com.koushikdutta.ion.Ion;
 
 import it.scripto.primetime4u.R;
 
+import static it.scripto.primetime4u.utils.Utils.resizeImageUrl;
+
 public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCardItemView<T> {
     
     public ProposalCardItemView(Context context) {
@@ -39,6 +41,6 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
                 .centerCrop()
-                .load(card.getPoster());
+                .load(resizeImageUrl(card.getPoster(), 0));
     }
 }

@@ -83,19 +83,20 @@
                 android:contentDescription="@string/add_taste_content_description" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 tools:text="G"
                 android:id="@+id/taste_genre_letter"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_above="@+id/descriptionTextView"
+                android:gravity="center|center_vertical|center_horizontal"
+                style="@style/PrimeTime.Display4"
+                android:textStyle="bold"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:gravity="center"
-                style="@style/PrimeTime.Display4"
-                android:textStyle="bold" />
+                android:layout_above="@+id/descriptionTextView"
+                android:layout_centerInParent="true" />
 
         </RelativeLayout>
 
