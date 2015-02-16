@@ -149,6 +149,9 @@ public class TastesFragment extends RefreshFragment {
 
     @Override
     public void refresh() {
+        // Clear data
+        clearData();
+        
         // Clear adapter
         clearAdapter();
 
