@@ -137,6 +137,8 @@ public class WatchedFragment extends RefreshFragment {
      */
     @Override
     public void refresh() {
+        // Clear data
+        clearData();
         // Clear adapter
         clearAdapter();
         // Generate URL

@@ -151,13 +151,10 @@ public class TastesFragment extends RefreshFragment {
     public void refresh() {
         // Clear data
         clearData();
-        
         // Clear adapter
         clearAdapter();
-
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
-
         // Get tastes
         get(url);
     }
