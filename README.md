@@ -18,6 +18,7 @@ Google Technologies for Cloud and Web Development - Rome 2014/2015
 ## Milestones Presentations
 * [Presentation](https://docs.google.com/presentation/d/19qKrPd4RucjXbaYAIZSWszlza7LIScu43dSb3Ocs0Ho/edit?usp=sharing)
 * [First Milestone - Proof of Concept](https://docs.google.com/presentation/d/1H3YqDTtFXiGIQH8ecC3wZh0_IsNmkk-EFlov9rLRiZs/edit?usp=sharing)
+* [Second Milestone - Release Candidate](https://docs.google.com/presentation/d/1kWeeZnHb7-r61PwAKrXXs_ju91rtxJQp4NqhB4pkPWM/edit?usp=sharing)
 
 ## Author
 Claudio Pastorini, Dorel Coman, Giovanni Colonna, Marius Ionita
