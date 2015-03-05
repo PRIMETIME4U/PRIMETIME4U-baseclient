@@ -6,7 +6,7 @@
     <string name="proposal_tab">Proposal</string>
     <string name="tastes_tab">Tastes</string>
     <string name="watched_tab">Watched</string>
-    <string name="detail_text">Detail</string>
+    <string name="already_watched_text">Already watched</string>
     <string name="watch_text">I\'ll watch it</string>
     <string name="welcome_text">Welcome back!</string>
     <string name="movie_info_text">Channel: %1$s - Time: %2$s</string>
@@ -46,5 +46,6 @@
     <string name="search_hint">Movies, artists, genres</string>
     <string name="generic_error">Sorry, there is an error</string>
     <string name="query_error">Search something…</string>
+    <string name="detail_text">Details</string>
 
 </resources>

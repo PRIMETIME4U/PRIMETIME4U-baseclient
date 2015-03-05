@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class ProposalFragment extends BaseFragment {
 
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
+    private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
     private MaterialListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
@@ -306,7 +308,7 @@ public class ProposalFragment extends BaseFragment {
             card.setDividerVisible(true);
             card.setDismissible(false);
 
-            card.setLeftButtonText(getResources().getString(R.string.detail_text));
+            card.setLeftButtonText(getResources().getString(R.string.already_watched_text));
             card.setRightButtonText(getResources().getString(R.string.watch_text));
 
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
@@ -355,6 +357,28 @@ public class ProposalFragment extends BaseFragment {
             card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
+
+                    //FILM GIA' VISTO, RIMUOVERE DA LISTA E AGGIORNARE SERVER
+
+                    alreadyWatchedList.add(card);
+                    materialListViewAdapter.remove(card);
+
+                    // Generate URL
+                    String url = Utils.SERVER_API + "watched/" + account;
+
+                    // Add watched movie
+                    SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.HOUR_OF_DAY, hourInt);
+                    cal.set(Calendar.MINUTE, minInt);
+                    addWatched(url, idIMDB, simpleDateFormat.format(cal.getTime()));
+                }
+            });
+
+            card.setOnImagePressListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+
                     Intent intent = new Intent(context, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
 
@@ -363,14 +387,26 @@ public class ProposalFragment extends BaseFragment {
                     } else {
                         intent.putExtra(DetailActivity.EXTRA_TITLE, title);
                     }
-                    
+
                     intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
                     intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
                     startActivity(intent);
                 }
             });
-            
+
+
             cardList.add(card);
+        }
+
+        //mostrare solamente le card che non sono state già inserite nella already watched list
+        for (int i=0;i<alreadyWatchedList.size();i++){
+            ProposalCard alreadyCurrent = (ProposalCard) alreadyWatchedList.get(i);
+            for (int j=0;j<cardList.size();j++){
+                ProposalCard current = (ProposalCard) cardList.get(j);
+                if (current.getTitle().equals(alreadyCurrent.getTitle())){
+                    cardList.remove(j);
+                }
+            }
         }
 
         materialListViewAdapter.addAll(cardList);
@@ -430,8 +466,9 @@ public class ProposalFragment extends BaseFragment {
 //                            .withActionMessageId(R.string.undo)
                 .withMessageId(R.string.watched_added)
                 .show();
-        
-        // TODO: send "message" to watched fragment in order to refresh it
+        //refresh activities
+        MainActivity base = (MainActivity) this.getActivity();
+        base.onTasteChanged();
     }
 
     @Override

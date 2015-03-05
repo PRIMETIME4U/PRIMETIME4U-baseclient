@@ -2,6 +2,8 @@ package it.scripto.primetime4u.cards;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,8 +35,16 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
         TextView movieInfoText = (TextView) findViewById(R.id.movie_info_text_view);
         movieInfoText.setText(card.getMovieInfoText());
 
+
+
         // Set poster
-        ImageView mPoster = (ImageView) findViewById(R.id.imageView);
+        final ImageView mPoster = (ImageView) findViewById(R.id.imageView);
+        mPoster.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                card.getOnImagePressListener().onButtonPressedListener(mPoster,card);
+            }
+        });
         Ion.with(mPoster)
                 //.placeholder(R.drawable.placeholder_image)
                 //.error(R.drawable.error_image)
