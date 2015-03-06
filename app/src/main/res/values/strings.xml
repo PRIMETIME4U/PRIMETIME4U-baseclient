@@ -47,5 +47,12 @@
     <string name="generic_error">Sorry, there is an error</string>
     <string name="query_error">Search something…</string>
     <string name="detail_text">Details</string>
+    <string name="show_sky">Show SKY</string>
+    <string name="show_premium">Show Premium</string>
+    <string name="show_free">Show free</string>
+    <string name="about">About developers</string>
+    <string name="mostra_free">Show free</string>
+    <string name="mostra_premium">Show premium</string>
+    <string name="mostra_sky">Show sky</string>
 
 </resources>

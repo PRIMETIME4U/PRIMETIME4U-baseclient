@@ -5,9 +5,29 @@
     tools:context=".MainActivity">
     
     <item 
-        android:id="@+id/action_settings" 
+        android:id="@+id/action_free"
+        android:title="@string/show_free"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sky"
+        android:title="@string/show_sky"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_premium"
+        android:title="@string/show_premium"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:orderInCategory="100" 
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:title="@string/about"
+        android:orderInCategory="100"
         app:showAsAction="never" />
 
 </menu>

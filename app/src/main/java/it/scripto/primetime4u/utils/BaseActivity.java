@@ -3,6 +3,7 @@ package it.scripto.primetime4u.utils;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.koushikdutta.ion.Ion;
 
@@ -66,4 +67,5 @@ public abstract class BaseActivity extends ActionBarActivity {
         super.onDestroy();
         if (BuildConfig.DEBUG) Log.v(TAG, "onDestroy");
     }
+
 }

@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 
@@ -82,10 +84,34 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
+    public boolean onOptionsItemSelected(MenuItem item){
+        //GESTIONE PREFERENZE PROGRAMMAZIONE
+        switch (item.getItemId()) {
+
+            case R.id.action_free:
+                Toast.makeText(this,"Hai scelto la programmazione free",Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_sky:
+                Toast.makeText(this,"Hai scelto la programmazione sky",Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_premium:
+                Toast.makeText(this,"Hai scelto la programmazione premium",Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_settings:
+                Toast.makeText(this,"Hai scelto impostazioni",Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_about:
+                Toast.makeText(this,"Claudio, Dorel, Giovanni e Marius ti salutano",Toast.LENGTH_LONG).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
     private class MainAdapter extends FragmentPagerAdapter {
 
         private final String[] TITLES = {
