@@ -1,5 +1,6 @@
 package it.scripto.primetime4u;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,8 +28,11 @@ import com.koushikdutta.ion.Ion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import it.scripto.primetime4u.cards.ProposalCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
@@ -38,6 +42,8 @@ import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseFragment;
 import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.Utils;
+
+import static java.util.Calendar.DAY_OF_WEEK;
 
 
 public class ProposalFragment extends BaseFragment {
@@ -51,6 +57,7 @@ public class ProposalFragment extends BaseFragment {
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
     private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
+    private ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
     private MaterialListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
@@ -123,11 +130,11 @@ public class ProposalFragment extends BaseFragment {
         // Get preferences
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
+        Calendar c = Calendar.getInstance();
+
         // Generate URL
         String url = Utils.SERVER_API + "proposal/" + account;
-        
-        // Get proposals
-        get(url);
+
 
         // Create and set adapter
         materialListViewAdapter = new MaterialListAdapter(getActivity());
@@ -165,6 +172,23 @@ public class ProposalFragment extends BaseFragment {
 
             materialListViewAdapter.add(tutorialCard);
         }
+
+        if (preferences.contains("ALREADY_WATCHED_LIST") && !aDayIsPassed()){
+            String s = preferences.getString("ALREADY_WATCHED_LIST","");
+            StringTokenizer st = new StringTokenizer(s,"|");
+            while(st.hasMoreTokens()){
+                alreadyWatchedTitles.add(st.nextToken());
+            }
+        }
+
+        if (aDayIsPassed()){
+            if (preferences.contains("ALREADY_WATCHED_LIST")){
+                alreadyWatchedTitles.clear();
+                preferences.edit().putString("ALREADY_WATCHED_LIST","");
+            }
+        }
+        // Get proposals
+        get(url);
 
         return view;
     }
@@ -258,6 +282,7 @@ public class ProposalFragment extends BaseFragment {
             }
             movie.setPlotIt(proposal.getItalianPlot());
 
+            if (alreadyWatchedTitles.contains(proposal.getTitle())||alreadyWatchedTitles.contains(proposal.getOriginalTitle())) continue;
             proposalList.add(movie);
         }
  
@@ -267,7 +292,11 @@ public class ProposalFragment extends BaseFragment {
     /**
      *
      */
+
     private void fillCardList() {
+
+
+
         for (int i = 0; i < proposalList.size(); i++) {
             final ProposalCard card = new ProposalCard(context);
             final Movie proposal = proposalList.get(i);
@@ -361,10 +390,25 @@ public class ProposalFragment extends BaseFragment {
                     //FILM GIA' VISTO, RIMUOVERE DA LISTA E AGGIORNARE SERVER
 
                     alreadyWatchedList.add(card);
+
+                    editor = preferences.edit();
+
+                    if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                        editor.putString("ALREADY_WATCHED_LIST",title);
+                    }
+                    else {
+                        String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                        s = s + "|" + title;
+                        editor.putString("ALREADY_WATCHED_LIST",s);
+                    }
+                    editor.apply();
+
                     materialListViewAdapter.remove(card);
 
                     // Generate URL
                     String url = Utils.SERVER_API + "watched/" + account;
+
+
 
                     // Add watched movie
                     SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
@@ -399,15 +443,19 @@ public class ProposalFragment extends BaseFragment {
         }
 
         //mostrare solamente le card che non sono state già inserite nella already watched list
-        for (int i=0;i<alreadyWatchedList.size();i++){
-            ProposalCard alreadyCurrent = (ProposalCard) alreadyWatchedList.get(i);
-            for (int j=0;j<cardList.size();j++){
-                ProposalCard current = (ProposalCard) cardList.get(j);
-                if (current.getTitle().equals(alreadyCurrent.getTitle())){
+
+        for (int j=0;j<cardList.size();j++){
+            ProposalCard current = (ProposalCard) cardList.get(j);
+            for (int i=0;i<alreadyWatchedList.size();i++){
+                ProposalCard curr2 = (ProposalCard) alreadyWatchedList.get(i);
+                if (curr2.getTitle().equals(current.getTitle())){
                     cardList.remove(j);
                 }
             }
         }
+
+
+
 
         materialListViewAdapter.addAll(cardList);
     }
@@ -471,9 +519,32 @@ public class ProposalFragment extends BaseFragment {
         base.onTasteChanged();
     }
 
+    public boolean aDayIsPassed(){
+        Calendar c = Calendar.getInstance();
+        int yy = c.get(Calendar.YEAR);
+        int mm = c.get(Calendar.MONTH);
+        int dd = c.get(Calendar.DAY_OF_MONTH);
+        String s = String.valueOf(yy+mm+dd);
+        if (preferences.contains("TODAY")){
+            String oldday = preferences.getString("TODAY","");
+            if (oldday.equals(s)) return false;
+            else{
+                preferences.edit().putString("TODAY",s).apply();
+                return true;
+            }
+        }
+        else{
+            //first call, obviously is not passed a day
+            preferences.edit().putString("TODAY",s).apply();
+            return false;
+        }
+
+    }
+
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
         // TODO: save proposalList in order to reuse after
+
     }
 }
