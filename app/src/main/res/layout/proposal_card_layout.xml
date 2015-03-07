@@ -124,6 +124,17 @@
                 style="@style/LeftButtonBaseStyle"
                 tools:text="LEFT BUTTON"/>
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/menu_image_view"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+                android:padding="@dimen/small_padding"
+                android:contentDescription="@string/proposal_menu" />
+
 
         </RelativeLayout>
 

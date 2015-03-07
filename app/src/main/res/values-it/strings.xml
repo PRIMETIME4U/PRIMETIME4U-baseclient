@@ -53,4 +53,6 @@
     <string name="show_premium">Programmazione Premium</string>
     <string name="show_sky">Programmazione SKY</string>
     <string name="about">Info sviluppatori</string>
+    <string name="proposal_menu">Menù</string>
+    <string name="untaste">Non mi piace</string>
 </resources>

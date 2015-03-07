@@ -51,8 +51,7 @@
     <string name="show_premium">Show Premium</string>
     <string name="show_free">Show free</string>
     <string name="about">About developers</string>
-    <string name="mostra_free">Show free</string>
-    <string name="mostra_premium">Show premium</string>
-    <string name="mostra_sky">Show sky</string>
+    <string name="proposal_menu">Menù</string>
+    <string name="untaste">Don\'t like it</string>
 
 </resources>
