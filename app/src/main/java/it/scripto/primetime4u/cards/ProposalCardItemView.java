@@ -1,6 +1,8 @@
 package it.scripto.primetime4u.cards;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.MenuInflater;
@@ -67,10 +69,10 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.menu_proposal, popup.getMenu());
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        // TODO: send negative taste to server and use snackbar
-                        Toast.makeText(context, "Non ti piace!", Toast.LENGTH_LONG).show();
+                        card.getOnMenuItemClickListener().onMenuItemClick(menuItem);
                         return true;
                     }
                 });

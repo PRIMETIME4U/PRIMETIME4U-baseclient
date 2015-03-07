@@ -1,6 +1,9 @@
 package it.scripto.primetime4u.cards;
 
 import android.content.Context;
+import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.PopupMenu;
 
 import com.dexafree.materialList.cards.model.ExtendedCard;
 import com.dexafree.materialList.controller.OnButtonPressListener;
@@ -12,6 +15,7 @@ public class ProposalCard extends ExtendedCard {
     protected String mMovieInfo;
     private String poster;
     protected OnButtonPressListener onButtonPressListener;
+    protected PopupMenu.OnMenuItemClickListener onMenuItemClickListener;
    
     public ProposalCard(Context context) {
         super(context);
@@ -49,6 +53,15 @@ public class ProposalCard extends ExtendedCard {
     }
     public void setOnImagePressListener(OnButtonPressListener onButtonPressListener){
         this.onButtonPressListener = onButtonPressListener;
+        BusProvider.dataSetChanged();
+    }
+
+    public PopupMenu.OnMenuItemClickListener getOnMenuItemClickListener(){
+        return onMenuItemClickListener;
+    }
+
+    public void setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener onMenuItemClickListener){
+        this.onMenuItemClickListener = onMenuItemClickListener;
         BusProvider.dataSetChanged();
     }
 }

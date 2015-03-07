@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -293,6 +296,7 @@ public class ProposalFragment extends BaseFragment {
      *
      */
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void fillCardList() {
 
 
@@ -432,6 +436,25 @@ public class ProposalFragment extends BaseFragment {
                     intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
                     intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
                     startActivity(intent);
+                }
+            });
+
+            card.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    //TODO: COMUNICARE AL SERVER CHE QUESTO FILM NON MI PIACE
+                    // Create snackbar
+                    new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
+//                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                @Override
+//                                public void onMessageClick(Parcelable parcelable) {
+//                                    //
+//                                }
+//                            })
+//                            .withActionMessageId(R.string.undo)
+                            .withMessage("Non ti piace: "+card.getTitle())
+                            .show();
+                    return true;
                 }
             });
 
