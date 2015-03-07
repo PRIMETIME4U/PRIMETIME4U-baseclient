@@ -91,6 +91,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
     public boolean onOptionsItemSelected(MenuItem item){
         //GESTIONE PREFERENZE PROGRAMMAZIONE
+        //TODO: al posto dei toast dobbiamo far ricaricare il fragment con l'url modificato in base al tipo di richiesta
         switch (item.getItemId()) {
 
             case R.id.action_free:

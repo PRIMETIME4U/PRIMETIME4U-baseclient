@@ -410,12 +410,9 @@ public class ProposalFragment extends BaseFragment {
 
 
 
-                    // Add watched movie
-                    SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.HOUR_OF_DAY, hourInt);
-                    cal.set(Calendar.MINUTE, minInt);
-                    addWatched(url, idIMDB, simpleDateFormat.format(cal.getTime()));
+                    // Add watched movie, with a special date 00-00-0000 to recognize these movies
+
+                    addWatched(url, idIMDB, "00-00-0000");
                 }
             });
 
