@@ -27,8 +27,11 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import it.scripto.primetime4u.cards.TasteCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
@@ -50,6 +53,7 @@ public class TastesFragment extends RefreshFragment {
     private List<Artist> tastesListArtist = new ArrayList<>();
     private List<Genre> tastesListGenre = new ArrayList<>();
     private ArrayList<TasteCard> cardList = new ArrayList<>();
+    private HashMap<String,String> dictionary = new HashMap<>();
     private String account;
     private MaterialListAdapter materialListViewAdapter;
 
@@ -87,6 +91,9 @@ public class TastesFragment extends RefreshFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         setHasOptionsMenu(true);
+
+        //setting up dictionary for genres search
+        setUpDictionary();
 
         // Setting up material list
         tastesMaterialListView = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
@@ -159,6 +166,39 @@ public class TastesFragment extends RefreshFragment {
         get(url);
     }
 
+    private void setUpDictionary(){
+        dictionary.put("azione","action");
+        dictionary.put("amore","romance");
+        dictionary.put("commedia","comedy");
+        dictionary.put("romantico","romance");
+        dictionary.put("romantici","romance");
+        dictionary.put("fantascienza","sci-fi");
+        dictionary.put("fantascenza","sci-fi"); //tengo conto anche degli utenti sgrammaticati :D
+        dictionary.put("fantascientifico","sci-fi");
+        dictionary.put("orrore","horror");
+        dictionary.put("giallo","crime");
+        dictionary.put("gialli","crime");
+        dictionary.put("noir","crime");
+        dictionary.put("noire","crime");
+        dictionary.put("avventura","adventure");
+        dictionary.put("guerra","war");
+        dictionary.put("documentario","documentary");
+        dictionary.put("documentari","documentary");
+        dictionary.put("biografia","biography");
+        dictionary.put("biografico","biography");
+        dictionary.put("fantasia","fantasy");
+        dictionary.put("fantastico","fantasy");
+        dictionary.put("biografici","biography");
+        dictionary.put("drammatico","drama");
+        dictionary.put("drammatici","drama");
+        dictionary.put("animazione","animation");
+        dictionary.put("cartoni","animation");
+        dictionary.put("animati","animation");
+        dictionary.put("west","western");
+
+
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_taste, menu);
@@ -179,6 +219,18 @@ public class TastesFragment extends RefreshFragment {
                     public boolean onQueryTextSubmit(String s) {
                         if (s == null || s.isEmpty() || s.length() == 0) {
                             Toast.makeText(getActivity(), getString(R.string.query_error), Toast.LENGTH_LONG).show();
+                        }
+
+                        StringTokenizer st = new StringTokenizer(s);
+                        if (st.countTokens()==1){
+                            //una sola stringa cercata, potrebbe essere un genere, che va tradotto
+                            String curr = st.nextToken();
+                            curr = curr.toLowerCase();
+                            if (dictionary.containsKey(curr)){
+                                //se sii tratta di un genere del dizionario, traduciamo prima di fare la request
+                                s = dictionary.get(curr);
+                            }
+
                         }
                         
                         String url = Utils.SERVER_API + "search/" + account + "/" + sanitize(s, false);
