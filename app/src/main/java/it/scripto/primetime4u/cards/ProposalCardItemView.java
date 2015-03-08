@@ -2,8 +2,11 @@ package it.scripto.primetime4u.cards;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.PopupMenu;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -68,6 +71,12 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
                 PopupMenu popup = new PopupMenu(getContext(), v);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.menu_proposal, popup.getMenu());
+                for(int i = 0; i < popup.getMenu().size(); i++) {
+                    MenuItem item = popup.getMenu().getItem(i);
+                    SpannableString spanString = new SpannableString(popup.getMenu().getItem(i).getTitle().toString());
+                    spanString.setSpan(new ForegroundColorSpan(Color.DKGRAY), 0, spanString.length(), 0); //fix the color to dark grey
+                    item.setTitle(spanString);
+                }
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                     @Override

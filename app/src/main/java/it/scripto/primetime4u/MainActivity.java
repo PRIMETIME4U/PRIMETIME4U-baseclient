@@ -3,12 +3,15 @@ package it.scripto.primetime4u;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -85,13 +88,18 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            spanString.setSpan(new ForegroundColorSpan(Color.DKGRAY), 0, spanString.length(), 0); //fix the color to white
+            item.setTitle(spanString);
+        }
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
         //GESTIONE PREFERENZE PROGRAMMAZIONE
-        //TODO: al posto dei toast dobbiamo far ricaricare il fragment con l'url modificato in base al tipo di richiesta
+        //TODO: impostazioni sarà un'altra activity
         switch (item.getItemId()) {
 
             case R.id.action_free:
