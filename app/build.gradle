@@ -39,5 +39,6 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:2.0.0'
     compile 'me.relex:circleindicator:1.0.0@aar'
     compile 'com.github.mrengineer13:snackbar:1.0.0'
+    compile 'com.github.machinarius:preferencefragment:0.1.1'
 
 }

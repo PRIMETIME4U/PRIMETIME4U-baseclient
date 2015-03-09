@@ -46,9 +46,6 @@
     <string name="generic_error">Ci dispiace, si è verificato un errore</string>
     <string name="query_error">Cerca qualcosa…</string>
     <string name="already_watched_text">Già visto</string>
-    <string name="mostra_sky">Programmazione SKY</string>
-    <string name="mostra_premium">Programmazione Premium</string>
-    <string name="mostra_free">Programmazione libera</string>
     <string name="show_free">Programmazione free</string>
     <string name="show_premium">Programmazione Premium</string>
     <string name="show_sky">Programmazione SKY</string>

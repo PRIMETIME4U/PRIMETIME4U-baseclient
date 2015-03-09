@@ -1,0 +1,18 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="first_preferencescreen">
+    <PreferenceCategory
+        android:title="@string/app_name"
+        android:key="pref_key_storage_settings">
+        <CheckBoxPreference
+            android:key="wifi enabled"
+            android:title="WiFi" />
+        <PreferenceScreen
+            android:key="second_preferencescreen"
+            android:title="WiFi settings">
+            <CheckBoxPreference
+                android:key="prefer wifi"
+                android:title="Prefer WiFi" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen> 

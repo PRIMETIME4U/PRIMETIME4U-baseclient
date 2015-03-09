@@ -1,12 +1,10 @@
 package it.scripto.primetime4u;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -14,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -31,10 +28,8 @@ import com.koushikdutta.ion.Ion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import it.scripto.primetime4u.cards.ProposalCard;
@@ -45,8 +40,6 @@ import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseFragment;
 import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.Utils;
-
-import static java.util.Calendar.DAY_OF_WEEK;
 
 
 public class ProposalFragment extends BaseFragment {
@@ -296,7 +289,6 @@ public class ProposalFragment extends BaseFragment {
      *
      */
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void fillCardList() {
 
 
@@ -416,7 +408,7 @@ public class ProposalFragment extends BaseFragment {
 
                     // Add watched movie, with a special date 00-00-0000 to recognize these movies
 
-                    addWatched(url, idIMDB, "00-00-0000");
+                    addWatched(url, idIMDB, "01-01-1900");
                 }
             });
 

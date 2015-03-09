@@ -2,6 +2,7 @@ package it.scripto.primetime4u;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
                 Toast.makeText(this,"Hai scelto la programmazione premium",Toast.LENGTH_LONG).show();
                 return true;
             case R.id.action_settings:
-                Toast.makeText(this,"Hai scelto impostazioni",Toast.LENGTH_LONG).show();
+                startActivity(new Intent(this, PreferencesActivity.class));
                 return true;
             case R.id.action_about:
                 Toast.makeText(this,"Claudio, Dorel, Giovanni e Marius ti salutano",Toast.LENGTH_LONG).show();
