@@ -6,12 +6,12 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -38,7 +38,7 @@ import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.Proposal;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseFragment;
-import it.scripto.primetime4u.utils.MaterialListAdapter;
+import it.scripto.primetime4u.utils.ProposalListAdapter;
 import it.scripto.primetime4u.utils.Utils;
 
 
@@ -54,7 +54,7 @@ public class ProposalFragment extends BaseFragment {
     private ArrayList<Card> cardList = new ArrayList<>();
     private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
     private ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
-    private MaterialListAdapter materialListViewAdapter;
+    private ProposalListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
     
@@ -62,6 +62,7 @@ public class ProposalFragment extends BaseFragment {
     private SharedPreferences.Editor editor;
     private View fragmentView;
     private String account;
+    private MaterialListView proposalMaterialListView;
 
     /**
      * Use this factory method to create a new instance of
@@ -91,28 +92,10 @@ public class ProposalFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int widthPixels = displayMetrics.widthPixels;
-        float density = displayMetrics.density;
-        int densityDpi = displayMetrics.densityDpi;
-        int heightPixels= displayMetrics.heightPixels;
-        float scaledDensity = displayMetrics.scaledDensity;
-        float xdpi = displayMetrics.xdpi;
-        float ydpi = displayMetrics.ydpi;
-        Log.i(TAG, "\nWidth: " + String.valueOf(widthPixels) 
-                + "\nHeight: " + String.valueOf(heightPixels)
-                + "\ndensity: " + String.valueOf(density) 
-                + "\ndensityDpi: " + String.valueOf(densityDpi)
-                + "\nscaledDensity: " + String.valueOf(scaledDensity) 
-                + "\nxdpi: " + String.valueOf(xdpi)
-                + "\nydpi: " + String.valueOf(ydpi));
-        
-        
         fragmentView = view;
         
         // Setting up material list
-        MaterialListView proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
+        proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
         // Get progress bar
@@ -131,9 +114,8 @@ public class ProposalFragment extends BaseFragment {
         // Generate URL
         String url = Utils.SERVER_API + "proposal/" + account;
 
-
         // Create and set adapter
-        materialListViewAdapter = new MaterialListAdapter(getActivity());
+        materialListViewAdapter = new ProposalListAdapter(getActivity());
         proposalMaterialListView.setAdapter(materialListViewAdapter);
         //proposalMaterialListView.setEmptyView(view.findViewById(R.id.no_proposal_text_view));
 
@@ -466,10 +448,21 @@ public class ProposalFragment extends BaseFragment {
             }
         }
 
-
-
-
         materialListViewAdapter.addAll(cardList);
+
+        final View footerView = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+        Button footerButton = (Button)footerView.findViewById(R.id.button);
+        proposalMaterialListView.addFooterView(footerView);
+
+        footerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                materialListViewAdapter.increaseCount();
+                if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
+                    proposalMaterialListView.removeFooterView(footerView);
+                }
+            }
+        });
     }
 
     /**

@@ -103,15 +103,6 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
         //TODO: impostazioni sarà un'altra activity
         switch (item.getItemId()) {
 
-            case R.id.action_free:
-                Toast.makeText(this,"Hai scelto la programmazione free",Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.action_sky:
-                Toast.makeText(this,"Hai scelto la programmazione sky",Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.action_premium:
-                Toast.makeText(this,"Hai scelto la programmazione premium",Toast.LENGTH_LONG).show();
-                return true;
             case R.id.action_settings:
                 startActivity(new Intent(this, PreferencesActivity.class));
                 return true;

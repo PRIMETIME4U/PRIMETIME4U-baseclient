@@ -4,21 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools" 
     tools:context=".MainActivity">
     
-    <item 
-        android:id="@+id/action_free"
-        android:title="@string/show_free"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_sky"
-        android:title="@string/show_sky"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_premium"
-        android:title="@string/show_premium"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"

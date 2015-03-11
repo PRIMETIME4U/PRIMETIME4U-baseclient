@@ -18,11 +18,11 @@
         android:paddingRight="@dimen/big_padding" />-->
     
     
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:weightSum="1">
 
         <com.dexafree.materialList.view.MaterialListView
             android:listSelector="@color/transparent"
@@ -31,7 +31,8 @@
             android:id="@+id/proposal_material_list_view"
             android:paddingBottom="@dimen/small_padding"
             android:clipToPadding="false" />
-    </LinearLayout>
+
+    </RelativeLayout>
 
     <ProgressBar
         android:layout_width="wrap_content"

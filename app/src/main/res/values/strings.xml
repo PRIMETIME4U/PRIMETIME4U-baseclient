@@ -53,5 +53,6 @@
     <string name="about">About developers</string>
     <string name="proposal_menu">Menù</string>
     <string name="untaste">Don\'t like it</string>
+    <string name="show_more_button">Show more</string>
 
 </resources>
