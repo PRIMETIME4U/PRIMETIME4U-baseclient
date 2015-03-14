@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,17 +25,11 @@ import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
 
-@SuppressWarnings("ResourceType")
 public class DetailActivity extends BaseActivity {
     
-    public final static String EXTRA_ID_IMDB = "ID_IMDB";
-    public final static String EXTRA_TITLE = "TITLE";
-    public final static String EXTRA_CHANNEL = "CHANNEL";
-    public final static String EXTRA_TIME = "TIME";
-    private String title;
-    private String channel;
-    private String time;
     private ProgressBar progressBar;
+    private boolean italian;
+    private Movie movie;
 
     @Override
     protected String getTagLog() {
@@ -53,6 +48,7 @@ public class DetailActivity extends BaseActivity {
         // Get and set toolbar as action bar
         Toolbar detailActivityToolbar = (Toolbar) findViewById(R.id.detail_activity_toolbar);
         setSupportActionBar(detailActivityToolbar);
+
         // Set home back/home button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -60,25 +56,19 @@ public class DetailActivity extends BaseActivity {
         progressBar = (ProgressBar) findViewById(R.id.detail_progress_bar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
-        String idIMDB = null;
+        // Get user_id
 
-        // TODO: pass parcable and not all strings
-        // Get movie info
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            idIMDB = extras.getString(EXTRA_ID_IMDB);
-            title = extras.getString(EXTRA_TITLE);
-            channel = extras.getString(EXTRA_CHANNEL);
-            time = extras.getString(EXTRA_TIME);
-        }
-        
+        // Get if is italian or not
+        italian = Locale.getDefault().getLanguage().equals("it");
+
+        // Get movie
+        movie = getIntent().getParcelableExtra(ProposalFragment.EXTRA_MOVIE);
+
         // Set ActionBar title with movie's title
-        if (title != null) {
-            getSupportActionBar().setTitle(title);
-        }
-        
+        getSupportActionBar().setTitle(italian ? movie.getTitle() : movie.getOriginalTitle());
+
         // Generate URL
-        String url = Utils.SERVER_API + "detail/movie/" + idIMDB;
+        String url = Utils.SERVER_API + "detail/movie/" + movie.getIdIMDB();
 
         // Get detail
         get(url);
@@ -87,8 +77,10 @@ public class DetailActivity extends BaseActivity {
     /**
      *
      */
-    private void drawResult(ServerResponse.DetailResponse movie) {
+    private void drawResult(ServerResponse.DetailResponse result) {
+        // Get all TextView
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
+        TextView yearTextView = (TextView) findViewById(R.id.year_text_view);
         TextView movieInfoTextView = (TextView) findViewById(R.id.movie_info_text_view);
         TextView timeGenreTextView = (TextView) findViewById(R.id.time_genre_text_view);
         TextView directorsValueTextView = (TextView) findViewById(R.id.directors_value_text_view);
@@ -96,19 +88,17 @@ public class DetailActivity extends BaseActivity {
         TextView actorsValueTextView = (TextView) findViewById(R.id.actors_value_text_view);
         TextView plotValueTextView = (TextView) findViewById(R.id.plot_value_text_view);
         CardView cardView = (CardView) findViewById(R.id.detail_card_view);
-        
-        Movie detail = movie.data.detail;
-        
-        // Recognize italian language for plot
-        if (!Locale.getDefault().getLanguage().equals("it")) {
-            titleTextView.setText(title);
-        } else {
-            titleTextView.setText(detail.getTitle());
-        }
-        
-        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), channel, time));
+
+        // Get detail
+        Movie detail = result.data.detail;
+
+        // Set info
+        titleTextView.setText(italian ? detail.getTitle() : detail.getOriginalTitle());
+        yearTextView.setText(String.format("(%s)", detail.getYear()));
+        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), movie.getChannel(), movie.getChannelNumber(), movie.getTime()));
         timeGenreTextView.setText(detail.getRunTimes() + " - " + detail.getGenres());
-        
+        plotValueTextView.setText(italian ? detail.getItalianPlot() : detail.getPlot());
+
         // Set actors
         String actorsText = "";
         for (Artist actor : detail.getActors()) {
@@ -130,13 +120,6 @@ public class DetailActivity extends BaseActivity {
         }
         writersValueTextView.setText(writersText);
 
-        // Recognize italian language for plot
-        if (!Locale.getDefault().getLanguage().equals("it")) {
-            plotValueTextView.setText(detail.getPlot());
-        } else {
-            plotValueTextView.setText(detail.getPlotIt());
-        }
-        
         cardView.setVisibility(View.VISIBLE);
     }
 
@@ -153,6 +136,7 @@ public class DetailActivity extends BaseActivity {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(getBaseContext(), getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }

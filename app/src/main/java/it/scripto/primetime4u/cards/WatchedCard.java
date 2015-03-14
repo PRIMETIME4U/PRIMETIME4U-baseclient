@@ -24,7 +24,7 @@ public class WatchedCard extends TasteCard {
     }
     
     public void setDate(String date) {
-        this.date = date;
+        this.date = !date.equals("01-01-1900") ? String.format(getResources().getString(R.string.watched_text), date) : getResources().getString(R.string.undefined) ;
         BusProvider.dataSetChanged();
     }
 

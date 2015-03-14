@@ -9,7 +9,7 @@
     <string name="already_watched_text">Already watched</string>
     <string name="watch_text">I\'ll watch it</string>
     <string name="welcome_text">Welcome back!</string>
-    <string name="movie_info_text">Channel: %1$s - Time: %2$s</string>
+    <string name="movie_info_text">Channel: %1$s (%2$s) - Time: %3$s</string>
     <string name="feedback_text">Did you watch \"%1$s\" last night?</string>
     <string name="poster_content_description">Poster</string>
     <string name="yes_text">Yes</string>
@@ -54,5 +54,7 @@
     <string name="proposal_menu">Menù</string>
     <string name="untaste">Don\'t like it</string>
     <string name="show_more_button">Show more</string>
+    <string name="undefined">Undefined</string>
+    <string name="dislike">You don\'t like \"%1$s\"</string>
 
 </resources>

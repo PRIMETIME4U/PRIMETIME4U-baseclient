@@ -15,7 +15,7 @@ public class ProposalListAdapter extends MaterialListViewAdapter {
 
     @Override
     public int getCount() {
-        return (super.getCount() == 0) ? super.getCount() : count;
+        return (super.getCount() < count) ? super.getCount() : count;
     }
 
     public void increaseCount() {
@@ -26,5 +26,9 @@ public class ProposalListAdapter extends MaterialListViewAdapter {
 
     public int getSize() {
         return super.getCount();
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

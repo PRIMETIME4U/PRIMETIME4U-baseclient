@@ -1,26 +1,24 @@
 package it.scripto.primetime4u.model;
 
-import com.google.gson.annotations.SerializedName;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-public class Movie extends Taste {
+public class Movie extends Taste implements Parcelable {
     private String date;
     private String channel;
+    private String channelNumber;
     private String idIMDB;
     private String italianPlot;
     private String time;
     private String title;
     private String originalTitle;
-    @SerializedName("simple_plot")
     private String simplePlot;
     private String plot;
-    @SerializedName("plot_it")
-    private String plotIt;
     private String poster;
     private String genres;
     private String year;
-    @SerializedName("run_times")
     private String runTimes;
     private String rated;
     private String trailer;
@@ -103,14 +101,6 @@ public class Movie extends Taste {
 
     public void setPlot(String plot) {
         this.plot = plot;
-    }
-
-    public String getPlotIt() {
-        return plotIt;
-    }
-
-    public void setPlotIt(String plotIt) {
-        this.plotIt = plotIt;
     }
 
     public String getPoster() {
@@ -200,4 +190,78 @@ public class Movie extends Taste {
     public void setActors(ArrayList<Artist> actors) {
         this.actors = actors;
     }
+
+    public String getChannelNumber() {
+        return channelNumber;
+    }
+
+    public void setChannelNumber(String channelNumber) {
+        this.channelNumber = channelNumber;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.date);
+        dest.writeString(this.channel);
+        dest.writeString(this.channelNumber);
+        dest.writeString(this.idIMDB);
+        dest.writeString(this.italianPlot);
+        dest.writeString(this.time);
+        dest.writeString(this.title);
+        dest.writeString(this.originalTitle);
+        dest.writeString(this.simplePlot);
+        dest.writeString(this.plot);
+        dest.writeString(this.poster);
+        dest.writeString(this.genres);
+        dest.writeString(this.year);
+        dest.writeString(this.runTimes);
+        dest.writeString(this.rated);
+        dest.writeString(this.trailer);
+        dest.writeSerializable(this.keywords);
+        dest.writeSerializable(this.countries);
+        dest.writeSerializable(this.directors);
+        dest.writeSerializable(this.writers);
+        dest.writeSerializable(this.actors);
+        dest.writeInt(this.tasted);
+    }
+
+    private Movie(Parcel in) {
+        this.date = in.readString();
+        this.channel = in.readString();
+        this.channelNumber = in.readString();
+        this.idIMDB = in.readString();
+        this.italianPlot = in.readString();
+        this.time = in.readString();
+        this.title = in.readString();
+        this.originalTitle = in.readString();
+        this.simplePlot = in.readString();
+        this.plot = in.readString();
+        this.poster = in.readString();
+        this.genres = in.readString();
+        this.year = in.readString();
+        this.runTimes = in.readString();
+        this.rated = in.readString();
+        this.trailer = in.readString();
+        this.keywords = (ArrayList<String>) in.readSerializable();
+        this.countries = (ArrayList<String>) in.readSerializable();
+        this.directors = (ArrayList<Artist>) in.readSerializable();
+        this.writers = (ArrayList<Artist>) in.readSerializable();
+        this.actors = (ArrayList<Artist>) in.readSerializable();
+        this.tasted = in.readInt();
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

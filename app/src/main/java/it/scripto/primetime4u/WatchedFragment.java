@@ -6,10 +6,12 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -37,16 +39,17 @@ import it.scripto.primetime4u.utils.Utils;
 public class WatchedFragment extends RefreshFragment {
 
     private static final String WATCHED_TUTORIAL = "WATCHED_TUTORIAL";
+    private static final String STATE_WATCHED_LIST = "WATCHED_LIST";
 
     private List<Movie> watchedList = new ArrayList<>();
-    private List<String> dateList = new ArrayList<>();
-    private List<Integer> tasteList = new ArrayList<>();
     private ArrayList<WatchedCard> cardList = new ArrayList<>();
     private String account;
     private MaterialListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
     private ProgressBar progressBar;
+    private MaterialListView watchedMaterialListView;
+    private String nextPage;
 
     /**
      * Use this factory method to create a new instance of
@@ -77,7 +80,7 @@ public class WatchedFragment extends RefreshFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Setting up material list
-        MaterialListView watchedMaterialListView = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
+        watchedMaterialListView = (MaterialListView) view.findViewById(R.id.watched_material_list_view);
 
         // Get progress bar
         progressBar = (ProgressBar) view.findViewById(R.id.watched_progress_bar);
@@ -94,8 +97,18 @@ public class WatchedFragment extends RefreshFragment {
         materialListViewAdapter = new MaterialListAdapter(getActivity());
         watchedMaterialListView.setAdapter(materialListViewAdapter);
 
-        // Get data
-        refresh();
+        if (savedInstanceState != null) {
+            Log.i(TAG, "Restore watchedList");
+            watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
+            Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
+            fillCardList();
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            // Get watched
+            Log.i(TAG, "Get watchedList");
+            // Get data
+            refresh();
+        }
 
         // Tutorial card if is the first time
         if (!preferences.contains(WATCHED_TUTORIAL)) {
@@ -148,30 +161,11 @@ public class WatchedFragment extends RefreshFragment {
     }
 
     /**
-     *
-     */
-    private void parseResponse(ServerResponse.WatchedResponse response) {
-        for (Movie watched : response.data.watched) {
-            Movie movie = new Movie();
-            movie.setOriginalTitle(watched.getOriginalTitle());
-            movie.setTitle(watched.getTitle());
-            movie.setIdIMDB(watched.getIdIMDB());
-            movie.setPoster(watched.getPoster());
-
-            watchedList.add(movie);
-            dateList.add(watched.getDate());
-            tasteList.add(watched.getTasted());
-        }
-        fillCardList();
-    }
-
-    /**
      * draws cards of watched list
      */
     private void fillCardList() {
 
-        for (int i = 0; i < watchedList.size(); i++) {
-            final Movie watched = watchedList.get(i);
+        for (final Movie watched : watchedList) {
 
             final WatchedCard watchedCard = new WatchedCard(context);
             final String id = watched.getIdIMDB();
@@ -182,8 +176,8 @@ public class WatchedFragment extends RefreshFragment {
                 watchedCard.setTitle(watched.getTitle());
             }
             
-            watchedCard.setDate(dateList.get(i));
-            watchedCard.setTaste(tasteList.get(i) == 1);
+            watchedCard.setDate(watched.getDate());
+            watchedCard.setTaste(watched.isTaste());
             watchedCard.setDismissible(false);
             watchedCard.setPoster(watched.getPoster());
             watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
@@ -203,6 +197,21 @@ public class WatchedFragment extends RefreshFragment {
         }
 
         materialListViewAdapter.addAll(cardList);
+
+        final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+        Button footerButton = (Button) footerView.findViewById(R.id.button);
+
+        if (nextPage != null) {
+            Log.i(TAG, String.format("Size: %d", watchedList.size()));
+            watchedMaterialListView.addFooterView(footerView);
+            footerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    get(Utils.SERVER_URL + nextPage);
+                    watchedMaterialListView.removeFooterView(footerView);
+                }
+            });
+        }
     }
     
     /**
@@ -224,10 +233,12 @@ public class WatchedFragment extends RefreshFragment {
                             Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
-                        // Clear all data list
-                        clearData();
-                        // Parse response
-                        parseResponse(result);
+                        cardList.clear();
+                        clearAdapter();
+                        nextPage = result.data.nextPage;
+                        watchedList.addAll(result.data.watched);
+                        fillCardList();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                     }
@@ -239,8 +250,6 @@ public class WatchedFragment extends RefreshFragment {
      */
     private void clearData() {
         watchedList.clear();
-        dateList.clear();
-        tasteList.clear();
         cardList.clear();
     }
 
@@ -335,11 +344,13 @@ public class WatchedFragment extends RefreshFragment {
         materialListViewAdapter.clear();
         materialListViewAdapter.notifyDataSetChanged();
     }
-    
+
     @Override
     public void onSaveInstanceState(Bundle toSave) {
+        // Save proposal, date and taste list
+        toSave.putParcelableArrayList(STATE_WATCHED_LIST, (ArrayList<? extends Parcelable>) watchedList);
+        Log.i(TAG, "Save proposalList");
         super.onSaveInstanceState(toSave);
-        // TODO: save watchedsList in order to reuse after
     }
 
     @Override
@@ -360,6 +371,6 @@ public class WatchedFragment extends RefreshFragment {
     }
 
     public interface onTasteChangeListener {
-        public void onTasteChanged();
+        void onTasteChanged();
     }
 }

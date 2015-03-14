@@ -604,6 +604,6 @@ public class TastesFragment extends RefreshFragment {
     }
 
     public interface onTasteChangeListener {
-        public void onTasteChanged();
+        void onTasteChanged();
     }    
 }

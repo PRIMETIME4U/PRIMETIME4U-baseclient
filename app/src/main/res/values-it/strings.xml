@@ -8,7 +8,7 @@
     <string name="detail_text">Dettagli</string>
     <string name="watch_text">Lo vedrò</string>
     <string name="welcome_text">Bentornato!</string>
-    <string name="movie_info_text">Canale: %1$s - Orario: %2$s</string>
+    <string name="movie_info_text">Canale: %1$s (%2$s) - Orario: %3$s</string>
     <string name="feedback_text">Hai visto \"%1$s\" ieri sera?</string>
     <string name="poster_content_description">Poster</string>
     <string name="no_text">No</string>
@@ -53,4 +53,6 @@
     <string name="proposal_menu">Menù</string>
     <string name="untaste">Non mi piace</string>
     <string name="show_more_button">Mostra altri</string>
+    <string name="undefined">Non specificato</string>
+    <string name="dislike">Non ti piace \"%1$s\"</string>
 </resources>

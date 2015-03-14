@@ -10,6 +10,11 @@ public class ServerResponse {
         public String errorType = null;
     }
 
+    public static class PaginateResponse {
+        public String nextPage;
+        public String previousPage;
+    }
+
     public static class DetailResponse extends Response {
         public DetailData data;
         public String idIMDB;
@@ -50,7 +55,7 @@ public class ServerResponse {
         public String user_id;
     }
     
-    public static class WatchedData {
+    public static class WatchedData extends PaginateResponse {
         public List<Movie> watched;
     }
 

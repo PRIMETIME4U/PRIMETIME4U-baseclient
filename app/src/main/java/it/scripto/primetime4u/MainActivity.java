@@ -1,6 +1,5 @@
 package it.scripto.primetime4u;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.astuetz.PagerSlidingTabStrip;
 
 import java.util.List;
+import java.util.Locale;
 
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.RefreshFragment;
@@ -28,6 +29,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
         TastesFragment.onTasteChangeListener {
 
     private String account;
+    private boolean italian;
 
     @Override
     protected String getTagLog() {
@@ -45,7 +47,11 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
         SharedPreferences preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 
+        // Get account
         account = preferences.getString(TutorialActivity.ACCOUNT, null);
+
+        // Get if is italian or not
+        italian = Locale.getDefault().getLanguage().equals("it");
 
         // Get and set toolbar as action bar
         Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
@@ -67,7 +73,14 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     public String getAccount() {
         return account;
     }
-    
+
+    /**
+     *
+     */
+    public boolean isItalian() {
+        return italian;
+    }
+
     /**
      *
      */
@@ -99,10 +112,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
-        //GESTIONE PREFERENZE PROGRAMMAZIONE
-        //TODO: impostazioni sarà un'altra activity
         switch (item.getItemId()) {
-
             case R.id.action_settings:
                 startActivity(new Intent(this, PreferencesActivity.class));
                 return true;
@@ -113,7 +123,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
                 return super.onOptionsItemSelected(item);
         }
     }
-    private class MainAdapter extends FragmentPagerAdapter {
+    private class MainAdapter extends FragmentStatePagerAdapter {
 
         private final String[] TITLES = {
                 getResources().getString(R.string.proposal_tab),

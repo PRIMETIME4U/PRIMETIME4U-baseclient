@@ -1,11 +1,13 @@
 package it.scripto.primetime4u;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import it.scripto.primetime4u.cards.ProposalCard;
@@ -46,21 +47,25 @@ public class ProposalFragment extends BaseFragment {
     private static final String PROPOSAL_TUTORIAL = "PROPOSAL_TUTORIAL";
     private static final String PENDING_MOVIE = "PENDING_MOVIE";
     private static final String PENDING_TITLE = "PENDING_TITLE";
-    private static final String FINISIH_TIME = "FINISH_TIME";
+    private static final String FINISH_TIME = "FINISH_TIME";
     private static final String PENDING_DATE = "PENDING_DATE";
+    private static final String STATE_PROPOSAL_LIST = "PROPOSAL_LIST";
+    private static final String STATE_COUNT = "COUNT";
+    public static final String EXTRA_MOVIE = "MOVIE";
 
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
     private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
     private ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
+
     private ProposalListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
-
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private View fragmentView;
     private String account;
+    private boolean italian;
     private MaterialListView proposalMaterialListView;
 
     /**
@@ -93,11 +98,11 @@ public class ProposalFragment extends BaseFragment {
 
         fragmentView = view;
 
-        // Setting up material list
+        // Setting up MaterialListView
         proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
 
-        // Get progress bar
+        // Get ProgressBar
         progressBar = (ProgressBar) view.findViewById(R.id.proposal_progress_bar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
@@ -105,13 +110,11 @@ public class ProposalFragment extends BaseFragment {
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
 
+        // Get if is italian or not
+        italian = base.isItalian();
+
         // Get preferences
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-
-        Calendar c = Calendar.getInstance();
-
-        // Generate URL
-        String url = Utils.SERVER_API + "proposal/" + account;
 
         // Create and set adapter
         materialListViewAdapter = new ProposalListAdapter(getActivity());
@@ -121,16 +124,19 @@ public class ProposalFragment extends BaseFragment {
         // Tutorial card if is the first time
         if (!preferences.contains(PROPOSAL_TUTORIAL)) {
             final WelcomeCard tutorialCard = new WelcomeCard(context);
-            tutorialCard.setTitle(getResources().getString(R.string.welcome_proposal_tutorial));
-            tutorialCard.setDescription(getResources().getString(R.string.proposal_tutorial));
 
+            // Set card property
             tutorialCard.setFullWidthDivider(true);
             tutorialCard.setDividerVisible(true);
             tutorialCard.setDismissible(false);
 
+            // Set card info
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_proposal_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.proposal_tutorial));
             tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
             tutorialCard.setRightButtonText(getString(R.string.got_it));
 
+            // Set ButtonPressedListener
             tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
@@ -140,6 +146,7 @@ public class ProposalFragment extends BaseFragment {
                     editor.apply();
                 }
             });
+
             tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
@@ -151,7 +158,7 @@ public class ProposalFragment extends BaseFragment {
         }
 
         if (preferences.contains("ALREADY_WATCHED_LIST") && !aDayIsPassed()){
-            String s = preferences.getString("ALREADY_WATCHED_LIST","");
+            String s = preferences.getString("ALREADY_WATCHED_LIST", "");
             StringTokenizer st = new StringTokenizer(s,"|");
             while(st.hasMoreTokens()){
                 alreadyWatchedTitles.add(st.nextToken());
@@ -159,13 +166,25 @@ public class ProposalFragment extends BaseFragment {
         }
 
         if (aDayIsPassed()){
-            if (preferences.contains("ALREADY_WATCHED_LIST")){
+            if (preferences.contains("ALREADY_WATCHED_LIST")) {
                 alreadyWatchedTitles.clear();
-                preferences.edit().putString("ALREADY_WATCHED_LIST","");
+                preferences.edit().putString("ALREADY_WATCHED_LIST", "");
             }
         }
-        // Get proposals
-        get(url);
+
+        if (savedInstanceState != null) {
+            Log.i(TAG, "Restore proposalList");
+            proposalList = savedInstanceState.getParcelableArrayList(STATE_PROPOSAL_LIST);
+            materialListViewAdapter.setCount(savedInstanceState.getInt(STATE_COUNT));
+            fillCardList();
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            Log.i(TAG, "Get proposalList");
+            // Generate URL
+            String url = Utils.SERVER_API + "proposal/" + account;
+            // Get proposals
+            get(url);
+        }
 
         return view;
     }
@@ -176,39 +195,45 @@ public class ProposalFragment extends BaseFragment {
         // Welcome Card for feedback
         if (preferences.contains(PENDING_MOVIE) && movieIsFinished()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
-            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
-            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString(PENDING_TITLE, "")));
 
+            // Set card property
             welcomeCard.setFullWidthDivider(true);
             welcomeCard.setDividerVisible(true);
             welcomeCard.setDismissible(false);
 
+            // Set card info
+            welcomeCard.setTitle(getResources().getString(R.string.welcome_text));
+            welcomeCard.setDescription(String.format(getResources().getString(R.string.feedback_text), preferences.getString(PENDING_TITLE, "")));
             welcomeCard.setLeftButtonText(getString(R.string.no_text));
             welcomeCard.setRightButtonText(getString(R.string.yes_text));
 
             editor = preferences.edit();
 
+            // Set ButtonPressedListener
             welcomeCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
+                    // Not watched
                     materialListViewAdapter.remove(welcomeCard);
                     editor.remove(PENDING_MOVIE);
                     editor.remove(PENDING_TITLE);
-                    editor.remove(FINISIH_TIME);
+                    editor.remove(FINISH_TIME);
                     editor.apply();
                 }
             });
+
             welcomeCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
+                    // Watched
                     // Get movie ID
-                    String movieId = preferences.getString(PENDING_MOVIE,"");
+                    String movieId = preferences.getString(PENDING_MOVIE, "");
                     String date = preferences.getString(PENDING_DATE, "");
 
                     materialListViewAdapter.remove(welcomeCard);
                     editor.remove(PENDING_MOVIE);
                     editor.remove(PENDING_TITLE);
-                    editor.remove(FINISIH_TIME);
+                    editor.remove(FINISH_TIME);
                     editor.apply();
 
                     // Generate URL
@@ -234,119 +259,60 @@ public class ProposalFragment extends BaseFragment {
     /**
      *
      */
-    private void parseResponse(ServerResponse.ProposalData response) {
-        List<Movie> proposals = response.proposal;
-
-        Log.i(TAG, String.valueOf(proposals));
-
-        for (Movie proposal : proposals) {
-
-            Movie movie = new Movie();
-            movie.setOriginalTitle(proposal.getOriginalTitle());
-            movie.setTitle(proposal.getTitle());
-            movie.setRunTimes(proposal.getRunTimes());
-            movie.setChannel(proposal.getChannel());
-            movie.setTime(proposal.getTime());
-            movie.setIdIMDB(proposal.getIdIMDB());
-            movie.setPoster(proposal.getPoster());
-            if (Locale.getDefault().getLanguage().equals("it")) {
-                movie.setSimplePlot(proposal.getItalianPlot());
-                movie.setTitle(proposal.getTitle());
-            }
-            else {
-                movie.setSimplePlot(proposal.getSimplePlot());
-                movie.setTitle(proposal.getOriginalTitle());
-            }
-            movie.setPlotIt(proposal.getItalianPlot());
-
-            if (alreadyWatchedTitles.contains(proposal.getTitle())||alreadyWatchedTitles.contains(proposal.getOriginalTitle())) continue;
-            proposalList.add(movie);
-        }
-
-        fillCardList();
-    }
-
-    /**
-     *
-     */
-
     private void fillCardList() {
-
-
-
-        for (int i = 0; i < proposalList.size(); i++) {
+        for (final Movie proposal: proposalList) {
             final ProposalCard card = new ProposalCard(context);
-            final Movie proposal = proposalList.get(i);
 
-            final String originalTitle = proposal.getOriginalTitle();
-            final String title = proposal.getTitle();
-            final String idIMDB = proposal.getIdIMDB();
             // Get hours and minutes from movie's time
             String time = proposal.getTime();
             final int hourInt = Integer.parseInt(time.substring(0, 2));
             final int minInt = Integer.parseInt(time.substring(3, 5));
+
             // Get movie's run times
             String runTimes = proposal.getRunTimes();
-            // TODO: manage runtimes null
             final int runTimesInt;
             if (runTimes != null) {
                 runTimesInt = Integer.parseInt(runTimes.substring(0, runTimes.length() - 4));
             } else {
                 runTimesInt = 90;
             }
-            card.setTitle(originalTitle);
-            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), time));
 
-            if (!Locale.getDefault().getLanguage().equals("it")) {
-                card.setTitle(originalTitle);
-            } else {
-                card.setTitle(title);
-            }
-
-            final String message = String.format(getResources().getString(R.string.will_watch), card.getTitle());
-
-            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
-
-            card.setDescription(proposal.getSimplePlot());
-            card.setPoster(proposal.getPoster());
-
+            // Set card property
             card.setFullWidthDivider(true);
             card.setDividerVisible(true);
             card.setDismissible(false);
 
+            // Set card info
+            card.setTitle(italian ? proposal.getTitle() : proposal.getOriginalTitle());
+            card.setDescription(italian ? proposal.getItalianPlot() : proposal.getSimplePlot());
+            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getChannelNumber(), proposal.getTime()));
+            card.setPoster(proposal.getPoster());
             card.setLeftButtonText(getResources().getString(R.string.already_watched_text));
             card.setRightButtonText(getResources().getString(R.string.watch_text));
 
+            // Set ButtonPressedListener
+            final String message = String.format(getResources().getString(R.string.will_watch), card.getTitle());
             card.setOnRightButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
+                    // Will watch
                     // Calculate finish time
-                    // TODO: manage in better way date
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.HOUR_OF_DAY, hourInt);
                     cal.set(Calendar.MINUTE, minInt);
                     long finishTime = cal.getTimeInMillis() + (runTimesInt * 60 * 1000);
 
+                    // Add to preference
                     editor = preferences.edit();
-
-                    editor.putString(PENDING_MOVIE, idIMDB);
-
-                    if (!Locale.getDefault().getLanguage().equals("it")) {
-                        editor.putString(PENDING_TITLE, originalTitle);
-                    } else {
-                        editor.putString(PENDING_TITLE, title);
-                    }
-
+                    editor.putString(PENDING_MOVIE, proposal.getIdIMDB());
+                    editor.putString(PENDING_TITLE, italian ? proposal.getTitle() : proposal.getOriginalTitle());
+                    @SuppressLint("SimpleDateFormat")
                     SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
-                    Log.i(TAG, simpleDateFormat.format(cal.getTime()));
-
                     editor.putString(PENDING_DATE, simpleDateFormat.format(cal.getTime()));
-
-                    editor.putLong(FINISIH_TIME, finishTime);
-
+                    editor.putLong(FINISH_TIME, finishTime);
                     editor.apply();
 
-                    // Create snackbar
+                    // Create SnackBar
                     new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
 //                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                @Override
@@ -363,19 +329,14 @@ public class ProposalFragment extends BaseFragment {
             card.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-
-                    //FILM GIA' VISTO, RIMUOVERE DA LISTA E AGGIORNARE SERVER
-
+                    // Already watched
                     alreadyWatchedList.add(card);
-
                     editor = preferences.edit();
-
                     if (!preferences.contains("ALREADY_WATCHED_LIST")){
-                        editor.putString("ALREADY_WATCHED_LIST",title);
-                    }
-                    else {
+                        editor.putString("ALREADY_WATCHED_LIST", proposal.getTitle());
+                    } else {
                         String s = preferences.getString("ALREADY_WATCHED_LIST","");
-                        s = s + "|" + title;
+                        s = s + "|" + proposal.getTitle();
                         editor.putString("ALREADY_WATCHED_LIST",s);
                     }
                     editor.apply();
@@ -384,30 +345,17 @@ public class ProposalFragment extends BaseFragment {
 
                     // Generate URL
                     String url = Utils.SERVER_API + "watched/" + account;
-
-
-
-                    // Add watched movie, with a special date 00-00-0000 to recognize these movies
-
-                    addWatched(url, idIMDB, "01-01-1900");
+                    // Add watched movie, with a special date 01-01-1900 to recognize these movies
+                    addWatched(url, proposal.getIdIMDB(), "01-01-1900");
                 }
             });
 
             card.setOnImagePressListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
-
+                    // Detail
                     Intent intent = new Intent(context, DetailActivity.class);
-                    intent.putExtra(DetailActivity.EXTRA_ID_IMDB, proposal.getIdIMDB());
-
-                    if (!Locale.getDefault().getLanguage().equals("it")) {
-                        intent.putExtra(DetailActivity.EXTRA_TITLE, originalTitle);
-                    } else {
-                        intent.putExtra(DetailActivity.EXTRA_TITLE, title);
-                    }
-
-                    intent.putExtra(DetailActivity.EXTRA_CHANNEL, proposal.getChannel());
-                    intent.putExtra(DetailActivity.EXTRA_TIME, proposal.getTime());
+                    intent.putExtra(EXTRA_MOVIE, proposal);
                     startActivity(intent);
                 }
             });
@@ -415,31 +363,30 @@ public class ProposalFragment extends BaseFragment {
             card.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    //TODO: COMUNICARE AL SERVER CHE QUESTO FILM NON MI PIACE
-                    // Create snackbar
+                    // Dislike it
+                    //TODO: create call for dislike
+                    // Create SnackBar
                     new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
 //                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                @Override
 //                                public void onMessageClick(Parcelable parcelable) {
-//                                    //
+//                                    //TODO: create UNDO
 //                                }
 //                            })
 //                            .withActionMessageId(R.string.undo)
-                            .withMessage("Non ti piace: "+card.getTitle())
+                            .withMessage(String.format(getResources().getString(R.string.dislike), italian ? proposal.getTitle() : proposal.getOriginalTitle()))
                             .show();
                     return true;
                 }
             });
-
-
             cardList.add(card);
         }
 
         //mostrare solamente le card che non sono state già inserite nella already watched list
 
-        for (int j=0;j<cardList.size();j++){
+        for (int j=0; j < cardList.size(); j++){
             ProposalCard current = (ProposalCard) cardList.get(j);
-            for (int i=0;i<alreadyWatchedList.size();i++){
+            for (int i=0; i < alreadyWatchedList.size(); i++){
                 ProposalCard curr2 = (ProposalCard) alreadyWatchedList.get(i);
                 if (curr2.getTitle().equals(current.getTitle())){
                     cardList.remove(j);
@@ -451,17 +398,19 @@ public class ProposalFragment extends BaseFragment {
 
         final View footerView = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
         Button footerButton = (Button)footerView.findViewById(R.id.button);
-        proposalMaterialListView.addFooterView(footerView);
 
-        footerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                materialListViewAdapter.increaseCount();
-                if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
-                    proposalMaterialListView.removeFooterView(footerView);
+        if (materialListViewAdapter.getCount() != materialListViewAdapter.getSize()) {
+            proposalMaterialListView.addFooterView(footerView);
+            footerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    materialListViewAdapter.increaseCount();
+                    if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
+                        proposalMaterialListView.removeFooterView(footerView);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -477,19 +426,25 @@ public class ProposalFragment extends BaseFragment {
                     public void onCompleted(Exception e, ServerResponse.ProposalResponse result) {
                         if (e != null) {
                             Log.e(TAG, e.toString());
-                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error), Toast.LENGTH_LONG).show();
                             return;
                         }
+                        // Clear lists
                         proposalList.clear();
                         cardList.clear();
 
-                        parseResponse(result.data);
-                        
+                        // Fill card list
+                        proposalList = result.data.proposal;
+                        fillCardList();
+
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
 
+    /**
+     *
+     */
     private void addWatched(String url, String id, String date) {
         JsonObject json = new JsonObject();
         json.addProperty("idIMDB", id);
@@ -509,7 +464,7 @@ public class ProposalFragment extends BaseFragment {
                     }
                 });
 
-        // Create snackbar
+        // Create SnackBar
         new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
 //                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                @Override
@@ -520,11 +475,15 @@ public class ProposalFragment extends BaseFragment {
 //                            .withActionMessageId(R.string.undo)
                 .withMessageId(R.string.watched_added)
                 .show();
-        //refresh activities
+
+        // Refresh data
         MainActivity base = (MainActivity) this.getActivity();
         base.onTasteChanged();
     }
 
+    /**
+     *
+     */
     public boolean aDayIsPassed(){
         Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
@@ -533,13 +492,13 @@ public class ProposalFragment extends BaseFragment {
         String s = String.valueOf(yy+mm+dd);
         if (preferences.contains("TODAY")){
             String oldday = preferences.getString("TODAY","");
-            if (oldday.equals(s)) return false;
-            else{
+            if (oldday.equals(s)) {
+                return false;
+            } else {
                 preferences.edit().putString("TODAY",s).apply();
                 return true;
             }
-        }
-        else{
+        } else {
             //first call, obviously is not passed a day
             preferences.edit().putString("TODAY",s).apply();
             return false;
@@ -549,8 +508,10 @@ public class ProposalFragment extends BaseFragment {
 
     @Override
     public void onSaveInstanceState(Bundle toSave) {
+        // Save proposal list
+        toSave.putParcelableArrayList(STATE_PROPOSAL_LIST, (ArrayList<? extends Parcelable>) proposalList);
+        toSave.putInt(STATE_COUNT, materialListViewAdapter.getCount());
+        Log.i(TAG, "Save proposalList");
         super.onSaveInstanceState(toSave);
-        // TODO: save proposalList in order to reuse after
-
     }
 }

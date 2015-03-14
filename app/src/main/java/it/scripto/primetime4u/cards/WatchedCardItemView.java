@@ -31,7 +31,7 @@ public class WatchedCardItemView<T extends WatchedCard> extends TasteCardItemVie
 
         // Set description
         TextView mDescription = (TextView) findViewById(R.id.descriptionTextView);
-        mDescription.setText(String.format(getResources().getString(R.string.watched_text), card.getDate()));
+        mDescription.setText(card.getDate());
         
         // Set poster
         ImageView mPoster = (ImageView) findViewById(R.id.imageView);
