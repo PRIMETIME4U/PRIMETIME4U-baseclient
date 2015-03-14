@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 
@@ -57,8 +56,8 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
             }
         });
         Ion.with(mPoster)
-                //.placeholder(R.drawable.placeholder_image)
-                //.error(R.drawable.error_image)
+                .placeholder(R.drawable.default_title)
+                .error(R.drawable.default_title)
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
                 .centerCrop()

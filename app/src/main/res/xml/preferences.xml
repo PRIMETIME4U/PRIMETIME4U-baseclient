@@ -6,13 +6,13 @@
         android:key="pref_key_storage_settings">
         <CheckBoxPreference
             android:key="wifi enabled"
-            android:title="WiFi" />
+            android:title="WiFi"/>
         <PreferenceScreen
             android:key="second_preferencescreen"
             android:title="WiFi settings">
             <CheckBoxPreference
                 android:key="prefer wifi"
-                android:title="Prefer WiFi" />
+                android:title="Prefer WiFi"/>
         </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen> 

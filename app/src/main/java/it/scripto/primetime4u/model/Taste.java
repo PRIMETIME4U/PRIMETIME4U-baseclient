@@ -6,4 +6,13 @@ public class Taste {
     public boolean isTaste() {
         return tasted == 1;
     }
+
+    public int getTasted() {
+        return tasted;
+    }
+
+    public void setTasted(int tasted) {
+        this.tasted = tasted;
+    }
+
 }

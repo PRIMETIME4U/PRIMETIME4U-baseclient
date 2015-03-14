@@ -19,7 +19,7 @@ import com.koushikdutta.ion.Ion;
 import java.util.Locale;
 
 import it.scripto.primetime4u.model.Artist;
-import it.scripto.primetime4u.model.Detail;
+import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
@@ -97,7 +97,7 @@ public class DetailActivity extends BaseActivity {
         TextView plotValueTextView = (TextView) findViewById(R.id.plot_value_text_view);
         CardView cardView = (CardView) findViewById(R.id.detail_card_view);
         
-        Detail detail = movie.data.detail;
+        Movie detail = movie.data.detail;
         
         // Recognize italian language for plot
         if (!Locale.getDefault().getLanguage().equals("it")) {

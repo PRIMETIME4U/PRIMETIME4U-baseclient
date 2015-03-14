@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,6 @@ import it.scripto.primetime4u.cards.WatchedCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Movie;
 import it.scripto.primetime4u.model.ServerResponse;
-import it.scripto.primetime4u.model.Watched;
 import it.scripto.primetime4u.utils.MaterialListAdapter;
 import it.scripto.primetime4u.utils.RefreshFragment;
 import it.scripto.primetime4u.utils.Utils;
@@ -151,7 +151,7 @@ public class WatchedFragment extends RefreshFragment {
      *
      */
     private void parseResponse(ServerResponse.WatchedResponse response) {
-        for (Watched watched : response.data.watched) {
+        for (Movie watched : response.data.watched) {
             Movie movie = new Movie();
             movie.setOriginalTitle(watched.getOriginalTitle());
             movie.setTitle(watched.getTitle());
@@ -220,6 +220,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -264,6 +265,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -303,6 +305,7 @@ public class WatchedFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }

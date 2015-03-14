@@ -36,8 +36,8 @@ public class WatchedCardItemView<T extends WatchedCard> extends TasteCardItemVie
         // Set poster
         ImageView mPoster = (ImageView) findViewById(R.id.imageView);
         Ion.with(mPoster)
-                //.placeholder(R.drawable.placeholder_image)
-                //.error(R.drawable.error_image)
+                .placeholder(R.drawable.default_title)
+                .error(R.drawable.default_title)
                 //.animateLoad(spinAnimation)
                 //.animateIn(fadeInAnimation)
                 .centerCrop()

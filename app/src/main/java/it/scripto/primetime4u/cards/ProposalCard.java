@@ -1,9 +1,7 @@
 package it.scripto.primetime4u.cards;
 
 import android.content.Context;
-import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.PopupMenu;
+import android.support.v7.widget.PopupMenu;
 
 import com.dexafree.materialList.cards.model.ExtendedCard;
 import com.dexafree.materialList.controller.OnButtonPressListener;

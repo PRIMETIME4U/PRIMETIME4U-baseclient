@@ -6,13 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -35,7 +35,6 @@ import java.util.StringTokenizer;
 import it.scripto.primetime4u.cards.ProposalCard;
 import it.scripto.primetime4u.cards.WelcomeCard;
 import it.scripto.primetime4u.model.Movie;
-import it.scripto.primetime4u.model.Proposal;
 import it.scripto.primetime4u.model.ServerResponse;
 import it.scripto.primetime4u.utils.BaseFragment;
 import it.scripto.primetime4u.utils.ProposalListAdapter;
@@ -57,7 +56,7 @@ public class ProposalFragment extends BaseFragment {
     private ProposalListAdapter materialListViewAdapter;
 
     private ProgressBar progressBar;
-    
+
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private View fragmentView;
@@ -93,7 +92,7 @@ public class ProposalFragment extends BaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         fragmentView = view;
-        
+
         // Setting up material list
         proposalMaterialListView = (MaterialListView) view.findViewById(R.id.proposal_material_list_view);
         // TODO add animation: proposal_material_list_view.setCardAnimation(IMaterialView.CardAnimation.SWING_BOTTOM_IN);
@@ -101,11 +100,11 @@ public class ProposalFragment extends BaseFragment {
         // Get progress bar
         progressBar = (ProgressBar) view.findViewById(R.id.proposal_progress_bar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
-        
+
         // Get user_id
         MainActivity base = (MainActivity) this.getActivity();
         account = base.getAccount();
-        
+
         // Get preferences
         preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -236,11 +235,11 @@ public class ProposalFragment extends BaseFragment {
      *
      */
     private void parseResponse(ServerResponse.ProposalData response) {
-        List<Proposal> proposals = response.proposal;
-        
+        List<Movie> proposals = response.proposal;
+
         Log.i(TAG, String.valueOf(proposals));
 
-        for (Proposal proposal : proposals) {
+        for (Movie proposal : proposals) {
 
             Movie movie = new Movie();
             movie.setOriginalTitle(proposal.getOriginalTitle());
@@ -263,7 +262,7 @@ public class ProposalFragment extends BaseFragment {
             if (alreadyWatchedTitles.contains(proposal.getTitle())||alreadyWatchedTitles.contains(proposal.getOriginalTitle())) continue;
             proposalList.add(movie);
         }
- 
+
         fillCardList();
     }
 
@@ -303,7 +302,7 @@ public class ProposalFragment extends BaseFragment {
             } else {
                 card.setTitle(title);
             }
-            
+
             final String message = String.format(getResources().getString(R.string.will_watch), card.getTitle());
 
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
@@ -340,9 +339,9 @@ public class ProposalFragment extends BaseFragment {
 
                     SimpleDateFormat simpleDateFormat= new SimpleDateFormat("dd-MM-yyyy");
                     Log.i(TAG, simpleDateFormat.format(cal.getTime()));
-                    
+
                     editor.putString(PENDING_DATE, simpleDateFormat.format(cal.getTime()));
-                            
+
                     editor.putLong(FINISIH_TIME, finishTime);
 
                     editor.apply();
@@ -476,7 +475,8 @@ public class ProposalFragment extends BaseFragment {
                 .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.ProposalResponse result) {
-                        if (e != null){
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -502,7 +502,8 @@ public class ProposalFragment extends BaseFragment {
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null){
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                         }
                     }

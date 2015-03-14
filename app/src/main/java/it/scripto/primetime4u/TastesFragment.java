@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +29,6 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -282,6 +282,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.SuggestResponse result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -303,6 +304,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.SuggestResponse result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -336,6 +338,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -509,6 +512,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, ServerResponse.TasteResponse result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -548,6 +552,7 @@ public class TastesFragment extends RefreshFragment {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
+                            Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }

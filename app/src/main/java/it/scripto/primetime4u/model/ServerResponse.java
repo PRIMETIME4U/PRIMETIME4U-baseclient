@@ -17,7 +17,7 @@ public class ServerResponse {
     }
     
     public static class DetailData {
-        public Detail detail;
+        public Movie detail;
     }
     
     public static class ProposalResponse extends Response {
@@ -25,7 +25,7 @@ public class ServerResponse {
     }
 
     public static class ProposalData {
-        public List<Proposal> proposal;
+        public List<Movie> proposal;
         public String user_id;
     }
     
@@ -51,7 +51,7 @@ public class ServerResponse {
     }
     
     public static class WatchedData {
-        public List<Watched> watched;
+        public List<Movie> watched;
     }
 
     public static class SuggestResponse extends Response {

@@ -4,15 +4,18 @@ public class Artist extends Taste {
     private String idIMDB;
     private String name;
     private String photo;
-    public Artist(){
 
+    public Artist() {
     }
+
     public String getIdIMDB(){
         return idIMDB;
     }
+
     public String getName(){
         return name;
     }
+
     public String getPhoto(){
         return photo;
     }

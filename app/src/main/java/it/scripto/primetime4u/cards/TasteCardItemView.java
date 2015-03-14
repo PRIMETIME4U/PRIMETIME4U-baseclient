@@ -83,13 +83,23 @@ public class TasteCardItemView<T extends TasteCard> extends BigImageCardItemView
             genreText.setVisibility(INVISIBLE);
             // Set poster
             ImageView mPoster = (ImageView) findViewById(R.id.imageView);
-            Ion.with(mPoster)
-                    //.placeholder(R.drawable.placeholder_image)
-                    //.error(R.drawable.error_image)
-                    //.animateLoad(spinAnimation)
-                    //.animateIn(fadeInAnimation)
-                    .centerCrop()
-                    .load(resizeImageUrl(card.getPoster(), 0));
+            if (card.getType() == TasteCard.MOVIE_TYPE) {
+                Ion.with(mPoster)
+                        .placeholder(R.drawable.default_title)
+                        .error(R.drawable.default_title)
+                        //.animateLoad(spinAnimation)
+                        //.animateIn(fadeInAnimation)
+                        .centerCrop()
+                        .load(resizeImageUrl(card.getPoster(), 0));
+            } else {
+                Ion.with(mPoster)
+                        .placeholder(R.drawable.default_name)
+                        .error(R.drawable.default_name)
+                        //.animateLoad(spinAnimation)
+                        //.animateIn(fadeInAnimation)
+                        .centerCrop()
+                        .load(resizeImageUrl(card.getPoster(), 0));
+            }
         } else {
             // Set first letter of the genre
             genreText.setVisibility(VISIBLE);
