@@ -27,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -364,13 +366,28 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     // Dislike it
-                    //TODO: create call for dislike
+                    String url = Utils.SERVER_API+"untaste/"+account;
+                    JsonObject json = new JsonObject();
+                    json.addProperty("data",proposal.getIdIMDB());
+                    Ion.with(getActivity())
+                            .load("POST", url)
+                            .setJsonObjectBody(json)
+                            .asJsonObject()
+                            .setCallback(new FutureCallback<JsonObject>() {
+                                @Override
+                                public void onCompleted(Exception e, JsonObject result) {
+                                    if (e != null) {
+                                        Log.e(TAG, e.toString());
+                                        Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
                     // Create SnackBar
                     new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
 //                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                @Override
 //                                public void onMessageClick(Parcelable parcelable) {
-//                                    //TODO: create UNDO
+//
 //                                }
 //                            })
 //                            .withActionMessageId(R.string.undo)
