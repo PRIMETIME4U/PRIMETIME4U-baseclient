@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -98,20 +99,6 @@ public class WatchedFragment extends RefreshFragment {
         materialListViewAdapter = new MaterialListAdapter(getActivity());
         watchedMaterialListView.setAdapter(materialListViewAdapter);
 
-        if (savedInstanceState != null) {
-            Log.i(TAG, "Restore watchedList");
-            watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
-            Log.i(TAG, "Restore nextPage");
-            nextPage = savedInstanceState.getString(STATE_NEXT_PAGE);
-            Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
-            fillCardList();
-            progressBar.setVisibility(View.INVISIBLE);
-        } else {
-            // Get watched
-            Log.i(TAG, "Get watchedList");
-            // Get data
-            refresh();
-        }
 
         // Tutorial card if is the first time
         if (!preferences.contains(WATCHED_TUTORIAL)) {
@@ -143,6 +130,20 @@ public class WatchedFragment extends RefreshFragment {
             });
 
             materialListViewAdapter.add(tutorialCard);
+        }
+        if (savedInstanceState != null) {
+            Log.i(TAG, "Restore watchedList");
+            watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
+            Log.i(TAG, "Restore nextPage");
+            nextPage = savedInstanceState.getString(STATE_NEXT_PAGE);
+            Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
+            fillCardList();
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            // Get watched
+            Log.i(TAG, "Get watchedList");
+            // Get data
+            refresh();
         }
 
         return view;
@@ -201,19 +202,25 @@ public class WatchedFragment extends RefreshFragment {
 
         materialListViewAdapter.addAll(cardList);
 
-        final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
-        Button footerButton = (Button) footerView.findViewById(R.id.button);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+            Button footerButton = (Button) footerView.findViewById(R.id.button);
 
-        if (nextPage != null) {
-            Log.i(TAG, String.format("Size: %d", watchedList.size()));
-            watchedMaterialListView.addFooterView(footerView);
-            footerButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    get(Utils.SERVER_URL + nextPage);
-                    watchedMaterialListView.removeFooterView(footerView);
-                }
-            });
+            if (nextPage != null) {
+                Log.i(TAG, String.format("Size: %d", watchedList.size()));
+                watchedMaterialListView.addFooterView(footerView);
+                footerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        get(Utils.SERVER_URL + nextPage);
+                        watchedMaterialListView.removeFooterView(footerView);
+                    }
+                });
+            }
+        }
+        else{
+            if (nextPage!=null)
+                get(Utils.SERVER_URL + nextPage);
         }
     }
     
@@ -346,6 +353,38 @@ public class WatchedFragment extends RefreshFragment {
     private void clearAdapter() {
         materialListViewAdapter.clear();
         materialListViewAdapter.notifyDataSetChanged();
+        // If I clear the list, I should care if tutorial card has not been removed
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if (preferences!=null && !preferences.contains(WATCHED_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(WATCHED_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
     }
 
     @Override

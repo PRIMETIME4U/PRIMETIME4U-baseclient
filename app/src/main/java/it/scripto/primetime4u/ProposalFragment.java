@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.PopupMenu;
@@ -53,6 +54,7 @@ public class ProposalFragment extends BaseFragment {
     private static final String PENDING_DATE = "PENDING_DATE";
     private static final String STATE_PROPOSAL_LIST = "PROPOSAL_LIST";
     private static final String STATE_COUNT = "COUNT";
+    private static final String STATE_ALREADY_WATCHED_TITLES = "WATCHED_LIST";
     public static final String EXTRA_MOVIE = "MOVIE";
 
     private List<Movie> proposalList = new ArrayList<>();
@@ -163,21 +165,30 @@ public class ProposalFragment extends BaseFragment {
             String s = preferences.getString("ALREADY_WATCHED_LIST", "");
             StringTokenizer st = new StringTokenizer(s,"|");
             while(st.hasMoreTokens()){
-                alreadyWatchedTitles.add(st.nextToken());
+                String s2 = st.nextToken();
+                alreadyWatchedTitles.add(s2);
+                //System.out.println(s2);
+
             }
         }
 
         if (aDayIsPassed()){
             if (preferences.contains("ALREADY_WATCHED_LIST")) {
                 alreadyWatchedTitles.clear();
+                preferences.edit().remove("ALREADY_WATCHED_LIST");
                 preferences.edit().putString("ALREADY_WATCHED_LIST", "");
+                preferences.edit().apply();
             }
         }
 
         if (savedInstanceState != null) {
-            Log.i(TAG, "Restore proposalList");
+            Log.i(TAG, "Restore proposalList and already watched list");
             proposalList = savedInstanceState.getParcelableArrayList(STATE_PROPOSAL_LIST);
             materialListViewAdapter.setCount(savedInstanceState.getInt(STATE_COUNT));
+            alreadyWatchedTitles = savedInstanceState.getStringArrayList(STATE_ALREADY_WATCHED_TITLES);
+            for (int i=0;i<alreadyWatchedTitles.size();i++){
+                Log.i(TAG,"Back from saved instance: " + alreadyWatchedTitles.get(i));
+            }
             fillCardList();
             progressBar.setVisibility(View.INVISIBLE);
         } else {
@@ -286,6 +297,9 @@ public class ProposalFragment extends BaseFragment {
 
             // Set card info
             card.setTitle(italian ? proposal.getTitle() : proposal.getOriginalTitle());
+            if (alreadyWatchedTitles.contains(card.getTitle())){
+                continue;
+            }
             card.setDescription(italian ? proposal.getItalianPlot() : proposal.getSimplePlot());
             card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
             card.setPoster(proposal.getPoster());
@@ -332,7 +346,8 @@ public class ProposalFragment extends BaseFragment {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
                     // Already watched
-                    alreadyWatchedList.add(card);
+
+                    alreadyWatchedTitles.add(proposal.getTitle());
                     editor = preferences.edit();
                     if (!preferences.contains("ALREADY_WATCHED_LIST")){
                         editor.putString("ALREADY_WATCHED_LIST", proposal.getTitle());
@@ -349,6 +364,7 @@ public class ProposalFragment extends BaseFragment {
                     String url = Utils.SERVER_API + "watched/" + account;
                     // Add watched movie, with a special date 01-01-1900 to recognize these movies
                     addWatched(url, proposal.getIdIMDB(), "01-01-1900");
+
                 }
             });
 
@@ -367,6 +383,18 @@ public class ProposalFragment extends BaseFragment {
                 public boolean onMenuItemClick(MenuItem item) {
                     // Dislike it
                     String url = Utils.SERVER_API+"untaste/"+account;
+                    // Prevent to reshow the movie card for today
+                    alreadyWatchedTitles.add(proposal.getTitle());
+                    materialListViewAdapter.remove(card);
+                    editor = preferences.edit();
+                    if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                        editor.putString("ALREADY_WATCHED_LIST", proposal.getTitle());
+                    } else {
+                        String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                        s = s + "|" + proposal.getTitle();
+                        editor.putString("ALREADY_WATCHED_LIST",s);
+                    }
+                    editor.apply();
                     JsonObject json = new JsonObject();
                     json.addProperty("data",proposal.getIdIMDB());
                     Ion.with(getActivity())
@@ -403,30 +431,34 @@ public class ProposalFragment extends BaseFragment {
 
         for (int j=0; j < cardList.size(); j++){
             ProposalCard current = (ProposalCard) cardList.get(j);
-            for (int i=0; i < alreadyWatchedList.size(); i++){
-                ProposalCard curr2 = (ProposalCard) alreadyWatchedList.get(i);
-                if (curr2.getTitle().equals(current.getTitle())){
-                    cardList.remove(j);
-                }
+            String currentTitle = current.getTitle();
+            if (alreadyWatchedTitles.contains(currentTitle)){
+                cardList.remove(j);
             }
         }
 
         materialListViewAdapter.addAll(cardList);
 
-        final View footerView = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
-        Button footerButton = (Button)footerView.findViewById(R.id.button);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+            Button footerButton = (Button) footerView.findViewById(R.id.button);
 
-        if (materialListViewAdapter.getCount() != materialListViewAdapter.getSize()) {
-            proposalMaterialListView.addFooterView(footerView);
-            footerButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    materialListViewAdapter.increaseCount();
-                    if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
-                        proposalMaterialListView.removeFooterView(footerView);
+            if (materialListViewAdapter.getCount() != materialListViewAdapter.getSize()) {
+                proposalMaterialListView.addFooterView(footerView);
+                Log.i(TAG, "Footer button has been added");
+                footerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        materialListViewAdapter.increaseCount();
+                        if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
+                            proposalMaterialListView.removeFooterView(footerView);
+                        }
                     }
-                }
-            });
+                });
+            }
+        }
+        else{
+            materialListViewAdapter.increaseCount();
         }
     }
 
@@ -527,8 +559,10 @@ public class ProposalFragment extends BaseFragment {
     public void onSaveInstanceState(Bundle toSave) {
         // Save proposal list
         toSave.putParcelableArrayList(STATE_PROPOSAL_LIST, (ArrayList<? extends Parcelable>) proposalList);
+        // Save already watched list
+        toSave.putStringArrayList(STATE_ALREADY_WATCHED_TITLES, alreadyWatchedTitles);
         toSave.putInt(STATE_COUNT, materialListViewAdapter.getCount());
-        Log.i(TAG, "Save proposalList");
+        Log.i(TAG, "Save proposalList and already watched");
         super.onSaveInstanceState(toSave);
     }
 }

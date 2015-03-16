@@ -91,7 +91,8 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
             for (Fragment fragment : allFragments) {
                 try {
                     RefreshFragment refreshFragment = (RefreshFragment) fragment;
-                    refreshFragment.refresh();
+                    if (refreshFragment != null)
+                        refreshFragment.refresh();
                 } catch (ClassCastException ignored) {
                 }
             }
