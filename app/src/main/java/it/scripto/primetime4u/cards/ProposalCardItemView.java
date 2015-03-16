@@ -44,7 +44,7 @@ public class ProposalCardItemView<T extends ProposalCard> extends BaseButtonsCar
         super.build(card);
 
         // Movie info
-        TextView movieInfoText = (TextView) findViewById(R.id.movie_info_text_view);
+        TextView movieInfoText = (TextView) findViewById(R.id.channel_text_view);
         movieInfoText.setText(card.getMovieInfoText());
 
         // Set poster

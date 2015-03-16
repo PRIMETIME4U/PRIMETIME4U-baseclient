@@ -80,8 +80,8 @@ public class DetailActivity extends BaseActivity {
     private void drawResult(ServerResponse.DetailResponse result) {
         // Get all TextView
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-        TextView yearTextView = (TextView) findViewById(R.id.year_text_view);
-        TextView movieInfoTextView = (TextView) findViewById(R.id.movie_info_text_view);
+        TextView channelTextView = (TextView) findViewById(R.id.channel_text_view);
+        TextView timeTextView = (TextView) findViewById(R.id.time_text_view);
         TextView timeGenreTextView = (TextView) findViewById(R.id.time_genre_text_view);
         TextView directorsValueTextView = (TextView) findViewById(R.id.directors_value_text_view);
         TextView writersValueTextView = (TextView) findViewById(R.id.writers_value_text_view);
@@ -94,8 +94,8 @@ public class DetailActivity extends BaseActivity {
 
         // Set info
         titleTextView.setText(italian ? detail.getTitle() : detail.getOriginalTitle());
-        yearTextView.setText(String.format("(%s)", detail.getYear()));
-        movieInfoTextView.setText(String.format(getResources().getString(R.string.movie_info_text), movie.getChannel(), movie.getChannelNumber(), movie.getTime()));
+        channelTextView.setText(String.format(getResources().getString(R.string.channel_text), movie.getChannel(), movie.getChannelNumber()));
+        timeTextView.setText(String.format(getResources().getString(R.string.time_text), movie.getTime()));
         timeGenreTextView.setText(detail.getRunTimes() + " - " + detail.getGenres());
         plotValueTextView.setText(italian ? detail.getItalianPlot() : detail.getPlot());
 

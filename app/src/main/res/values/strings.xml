@@ -9,7 +9,9 @@
     <string name="already_watched_text">Already watched</string>
     <string name="watch_text">I\'ll watch it</string>
     <string name="welcome_text">Welcome back!</string>
-    <string name="movie_info_text">Channel: %1$s (%2$s) - Time: %3$s</string>
+    <string name="channel_text">Channel: %1$s - %2$s</string>
+    <string name="time_text">Time: %1$s</string>
+    <string name="movie_info_text">Channel: %1$s - Time: %2$s</string>
     <string name="feedback_text">Did you watch \"%1$s\" last night?</string>
     <string name="poster_content_description">Poster</string>
     <string name="yes_text">Yes</string>

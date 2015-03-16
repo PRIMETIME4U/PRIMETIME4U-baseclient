@@ -287,7 +287,7 @@ public class ProposalFragment extends BaseFragment {
             // Set card info
             card.setTitle(italian ? proposal.getTitle() : proposal.getOriginalTitle());
             card.setDescription(italian ? proposal.getItalianPlot() : proposal.getSimplePlot());
-            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getChannelNumber(), proposal.getTime()));
+            card.setMovieInfoText(String.format(getResources().getString(R.string.movie_info_text), proposal.getChannel(), proposal.getTime()));
             card.setPoster(proposal.getPoster());
             card.setLeftButtonText(getResources().getString(R.string.already_watched_text));
             card.setRightButtonText(getResources().getString(R.string.watch_text));

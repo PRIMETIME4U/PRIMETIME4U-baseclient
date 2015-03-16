@@ -66,19 +66,11 @@
                             android:visibility="visible"
                             tools:ignore="RtlHardcoded" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/year_text_view"
-                            tools:text="(2004)"
-                            style="@style/PrimeTime.Body2"
-                            android:textColor="@color/black_button"
-                            android:textStyle="bold|italic" />
                     </LinearLayout>
 
 
                     <TextView
-                        android:id="@+id/movie_info_text_view"
+                        android:id="@+id/channel_text_view"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:paddingTop="@dimen/small_padding"
@@ -94,6 +86,19 @@
                         android:visibility="visible" />
 
                     <TextView
+                        tools:text="Movie info"
+                        android:id="@+id/time_text_view"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:paddingLeft="@dimen/big_padding"
+                        android:paddingRight="@dimen/big_padding"
+                        android:textColor="@color/accent"
+                        android:textSize="@dimen/caption_text"
+                        android:textStyle="bold"
+                        android:visibility="visible"
+                        android:layout_below="@+id/channel_text_view" />
+
+                    <TextView
                         android:id="@+id/time_genre_text_view"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
@@ -105,10 +110,10 @@
                         android:textSize="@dimen/subhead_text"
                         tools:text="Time - Genre | Genre"
                         android:textStyle="bold"
-                        android:layout_below="@+id/movie_info_text_view"
+                        android:visibility="visible"
+                        android:layout_below="@+id/time_text_view"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:visibility="visible" />
+                        android:layout_alignParentStart="true" />
 
                     <TextView
                         android:id="@+id/directors_text_view"
@@ -251,7 +256,7 @@
             android:id="@+id/detail_progress_bar"
             android:layout_gravity="center"
             android:visibility="visible" />
-        
+
     </FrameLayout>
 
 </LinearLayout>
