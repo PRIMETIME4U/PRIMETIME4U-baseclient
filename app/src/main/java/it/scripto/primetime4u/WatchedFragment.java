@@ -40,6 +40,7 @@ public class WatchedFragment extends RefreshFragment {
 
     private static final String WATCHED_TUTORIAL = "WATCHED_TUTORIAL";
     private static final String STATE_WATCHED_LIST = "WATCHED_LIST";
+    private static final String STATE_NEXT_PAGE = "NEXT_PAGE";
 
     private List<Movie> watchedList = new ArrayList<>();
     private ArrayList<WatchedCard> cardList = new ArrayList<>();
@@ -100,6 +101,8 @@ public class WatchedFragment extends RefreshFragment {
         if (savedInstanceState != null) {
             Log.i(TAG, "Restore watchedList");
             watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
+            Log.i(TAG, "Restore nextPage");
+            nextPage = savedInstanceState.getString(STATE_NEXT_PAGE);
             Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
             fillCardList();
             progressBar.setVisibility(View.INVISIBLE);
@@ -348,8 +351,10 @@ public class WatchedFragment extends RefreshFragment {
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         // Save proposal, date and taste list
+        Log.i(TAG, "Save watchedList");
         toSave.putParcelableArrayList(STATE_WATCHED_LIST, (ArrayList<? extends Parcelable>) watchedList);
-        Log.i(TAG, "Save proposalList");
+        Log.i(TAG, "Save nextPage");
+        toSave.putString(STATE_NEXT_PAGE, nextPage);
         super.onSaveInstanceState(toSave);
     }
 
