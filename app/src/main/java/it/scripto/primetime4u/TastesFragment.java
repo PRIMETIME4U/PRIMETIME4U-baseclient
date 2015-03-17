@@ -62,6 +62,13 @@ public class TastesFragment extends RefreshFragment {
     private MenuItem searchItem;
     private MaterialListView tastesMaterialListView;
 
+    ArrayList<String> nextPagesMovies = new ArrayList<String>();
+    ArrayList<String> nextPagesGenres = new ArrayList<String>();
+    ArrayList<String> nextPagesArtists = new ArrayList<String>();
+    ArrayList<ServerResponse.TasteResponse> responses = new ArrayList<ServerResponse.TasteResponse>();
+    ArrayList<ServerResponse.TasteResponseExtraMovies> responsesM = new ArrayList<ServerResponse.TasteResponseExtraMovies>();
+    ArrayList<ServerResponse.TasteResponseExtraArtists> responsesA = new ArrayList<ServerResponse.TasteResponseExtraArtists>();
+    ArrayList<ServerResponse.TasteResponseExtraGenres> responsesG = new ArrayList<ServerResponse.TasteResponseExtraGenres>();
     /**
      * Use this factory method to create a new instance of
      * this fragment.
@@ -162,6 +169,8 @@ public class TastesFragment extends RefreshFragment {
         clearAdapter();
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
+        // Usa la URL di claudio che ha più tastes
+        String urltest = Utils.SERVER_API + "tastes/pastorini.claudio@gmail.com/all";
         // Get tastes
         get(url);
     }
@@ -364,23 +373,65 @@ public class TastesFragment extends RefreshFragment {
     /**
      *
      */
-    private void parseResponse(ServerResponse.TasteResponse response) {
-        // Parse movies list
+    private void parseFirstResponseMovies(ServerResponse.TasteResponse response) {
+
+        // Parse movies list of "all" page
         for (Movie movie : response.data.tastes.movies) {
             tastesListMovie.add(movie);
         }
-        // Parse artists list
-        for (Artist artist : response.data.tastes.artists){
+        fillCardList();
+        clearData();
+        getOthersMovies();
+
+    }
+    private void parseFirstResponseArtists(ServerResponse.TasteResponse response) {
+        // Parse artists list of "all" page
+        for (Artist artist : response.data.tastes.artists) {
             tastesListArtist.add(artist);
         }
-        // Parse genres list
+        fillCardList();
+        clearData();
+        getOthersArtists();
+    }
+    private void parseFirstResponseGenres(ServerResponse.TasteResponse response){
+        // Parse genres list of "all" page
         for (Genre genre : response.data.tastes.genres){
             tastesListGenre.add(genre);
         }
-        
         fillCardList();
+        clearData();
+        getOthersGenres();
+
     }
 
+    private void parseResponseMovies(ServerResponse.TasteResponseExtraMovies response){
+        //Parses movies of extra pages
+        for (Movie movie : response.data.tastes) {
+            tastesListMovie.add(movie);
+        }
+        fillCardList();
+        clearData();
+        getOthersMovies();
+
+    }
+    private void parseResponseArtists(ServerResponse.TasteResponseExtraArtists response){
+        //Parses artists of extra pages
+        for (Artist artist : response.data.tastes) {
+            tastesListArtist.add(artist);
+        }
+        fillCardList();
+        clearData();
+        getOthersArtists();
+    }
+    private void parseResponseGenres(ServerResponse.TasteResponseExtraGenres response){
+        //Parses genres of extra pages
+        for (Genre genre : response.data.tastes) {
+            tastesListGenre.add(genre);
+        }
+        fillCardList();
+        clearData();
+        getOthersGenres();
+    }
     /**
      *
      */
@@ -496,14 +547,114 @@ public class TastesFragment extends RefreshFragment {
         materialListViewAdapter.addAll(cardList);
         tastesMaterialListView.smoothScrollToPosition(0);
     }
+    private void getOthersMovies(){
+        // Movies
+        if (nextPagesMovies.get(0)!=null){
 
+            String urlM = nextPagesMovies.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraMovies>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraMovies>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraMovies result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            responsesM.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesMovies.clear();
+                            nextPagesMovies.add(result.data.next_page);
+
+
+
+                            parseResponseMovies(result);
+
+
+                        }
+                    });
+        }
+
+    }
+    private void getOthersArtists(){
+        //Artists
+
+        if (nextPagesArtists.get(0)!=null){
+
+            String urlM = nextPagesArtists.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraArtists>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraArtists>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraArtists result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            responsesA.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesArtists.clear();
+                            nextPagesArtists.add(result.data.next_page);
+
+
+
+                            parseResponseArtists(result);
+
+
+                        }
+                    });
+        }
+    }
+    private void getOthersGenres(){
+
+        // Genres
+        if (nextPagesGenres.get(0)!=null){
+            String urlM = nextPagesGenres.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraGenres>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraGenres>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraGenres result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            responsesG.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesGenres.clear();
+                            nextPagesGenres.add(result.data.next_page);
+
+
+
+                            parseResponseGenres(result);
+
+
+                        }
+                    });
+        }
+    }
     /**
      *
      */
     private void get(String url) {
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
-        // Do connection
+        // Do connection for first page
         Ion.with(context)
                 .load(url)
                 .as(new TypeToken<ServerResponse.TasteResponse>() {
@@ -516,12 +667,34 @@ public class TastesFragment extends RefreshFragment {
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
+                        responses.add(result);
+                        // I should care about the other pages
+                        // A null value will block further connections
+                        nextPagesArtists.clear();
+                        nextPagesArtists.add(result.data.tastes.next_page_artists);
+
+
+                        nextPagesGenres.clear();
+                        nextPagesGenres.add(result.data.tastes.next_page_genres);
+
+
+                        nextPagesMovies.clear();
+                        nextPagesMovies.add(result.data.tastes.next_page_movies);
+
+
                         // Clear all data list
                         clearData();
-                        // Parse response
-                        parseResponse(result);
+                        // Parse response of "all-page", each parse will download extra pages
+                        for (ServerResponse.TasteResponse currentResp : responses){
+                            parseFirstResponseMovies(currentResp);
+                            parseFirstResponseArtists(currentResp);
+                            parseFirstResponseGenres(currentResp);
+
+                        }
+                        fillCardList();
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
+
                     }
                 });
     }
