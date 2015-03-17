@@ -2,17 +2,41 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="first_preferencescreen">
     <PreferenceCategory
-        android:title="@string/app_name"
+        android:title="@string/choose_tv_type"
         android:key="pref_key_storage_settings">
         <CheckBoxPreference
-            android:key="wifi enabled"
-            android:title="WiFi"/>
-        <PreferenceScreen
-            android:key="second_preferencescreen"
-            android:title="WiFi settings">
-            <CheckBoxPreference
-                android:key="prefer wifi"
-                android:title="Prefer WiFi"/>
-        </PreferenceScreen>
+            android:key="free_enabled"
+            android:title="Free"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="premium_enabled"
+            android:title="Mediaset Premium"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="sky_enabled"
+            android:title="Sky"
+            android:defaultValue="false"/>
     </PreferenceCategory>
-</PreferenceScreen> 
+    <PreferenceCategory
+        android:title="@string/notification"
+        android:key="pref_key_storage_settings">
+        <SwitchPreference
+            android:key="notification_enabled"
+            android:title="@string/notification"
+            android:defaultValue="true"/>
+        <it.scripto.primetime4u.utils.TimePreference
+            android:key="time_notification"
+            android:title="@string/notification_time"
+            android:defaultValue="64800000"
+            android:dependency="notification_enabled"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/more"
+        android:key="pref_key_storage_settings">
+        <CheckBoxPreference
+            android:key="repeat_choice_enable"
+            android:title="@string/repeat_choice"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

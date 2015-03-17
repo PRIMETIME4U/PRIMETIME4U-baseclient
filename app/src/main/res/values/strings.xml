@@ -58,5 +58,13 @@
     <string name="show_more_button">Show more</string>
     <string name="undefined">Undefined</string>
     <string name="dislike">You don\'t like \"%1$s\"</string>
-
+    <string name="choose_tv_type">Choose tv type</string>
+    <string name="repeat_choice">Propose already watched movie</string>
+    <string name="more">More</string>
+    <string name="notification">Notification</string>
+    <string name="notification_setting">Enable notification</string>
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="notification_time">Time of notification</string>
+    <string name="almost_one_tv_type">You have to set almost one Tv type!</string>
 </resources>

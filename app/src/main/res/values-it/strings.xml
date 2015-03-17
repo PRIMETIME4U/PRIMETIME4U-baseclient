@@ -57,4 +57,13 @@
     <string name="show_more_button">Mostra altri</string>
     <string name="undefined">Non specificato</string>
     <string name="dislike">Non ti piace \"%1$s\"</string>
+    <string name="choose_tv_type">Scegli i palinsesti</string>
+    <string name="repeat_choice">Proponi film già visti</string>
+    <string name="more">Altro</string>
+    <string name="notification">Notifiche</string>
+    <string name="notification_setting">Abilita notifiche</string>
+    <string name="set">Imposta</string>
+    <string name="cancel">Annulla</string>
+    <string name="notification_time">Orario di notifica</string>
+    <string name="almost_one_tv_type">Devi avere almeno un palinsesto impostato!</string>
 </resources>

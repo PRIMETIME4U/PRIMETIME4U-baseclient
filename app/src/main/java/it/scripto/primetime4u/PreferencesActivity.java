@@ -19,7 +19,6 @@ public class PreferencesActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.SettingsTheme);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.preferences_toolbar);
         setSupportActionBar(toolbar);
