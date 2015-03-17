@@ -169,7 +169,7 @@ public class TastesFragment extends RefreshFragment {
         clearAdapter();
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
-        // Usa la URL di claudio che ha più tastes
+        // Test URL di claudio che ha più tastes
         String urltest = Utils.SERVER_API + "tastes/pastorini.claudio@gmail.com/all";
         // Get tastes
         get(url);
@@ -433,7 +433,7 @@ public class TastesFragment extends RefreshFragment {
         getOthersGenres();
     }
     /**
-     *
+     * UNUSED: Parser of the response of the suggestions
      */
     private void parseSuggestResponse(ServerResponse.SuggestResponse response) {
 
@@ -460,7 +460,7 @@ public class TastesFragment extends RefreshFragment {
     }
     
     /**
-     *
+     * This method creates and draws the cards to be shown
      */
     private void fillCardList() {
         // Create movies cards
@@ -649,7 +649,7 @@ public class TastesFragment extends RefreshFragment {
         }
     }
     /**
-     *
+     * This method gets the first page of Tastes section
      */
     private void get(String url) {
         // Set progressbar

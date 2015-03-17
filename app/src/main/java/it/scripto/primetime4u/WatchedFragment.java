@@ -352,39 +352,45 @@ public class WatchedFragment extends RefreshFragment {
      */
     private void clearAdapter() {
         materialListViewAdapter.clear();
-        materialListViewAdapter.notifyDataSetChanged();
+
         // If I clear the list, I should care if tutorial card has not been removed
-        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        if (preferences!=null && !preferences.contains(WATCHED_TUTORIAL)) {
-            final WelcomeCard tutorialCard = new WelcomeCard(context);
-            tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
-            tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
+        Activity a = getActivity();
+        final SharedPreferences preferences;
+        if (a!=null) {
+            preferences = a.getPreferences(Context.MODE_PRIVATE);
 
-            tutorialCard.setFullWidthDivider(true);
-            tutorialCard.setDividerVisible(true);
-            tutorialCard.setDismissible(false);
+            if (preferences != null && !preferences.contains(WATCHED_TUTORIAL)) {
+                final WelcomeCard tutorialCard = new WelcomeCard(context);
+                tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
+                tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
 
-            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
-            tutorialCard.setRightButtonText(getString(R.string.got_it));
+                tutorialCard.setFullWidthDivider(true);
+                tutorialCard.setDividerVisible(true);
+                tutorialCard.setDismissible(false);
 
-            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    SharedPreferences.Editor editor = preferences.edit();
-                    materialListViewAdapter.remove(tutorialCard);
-                    editor.putBoolean(WATCHED_TUTORIAL, true);
-                    editor.apply();
-                }
-            });
-            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    materialListViewAdapter.remove(tutorialCard);
-                }
-            });
+                tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+                tutorialCard.setRightButtonText(getString(R.string.got_it));
 
-            materialListViewAdapter.add(tutorialCard);
+                tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                    @Override
+                    public void onButtonPressedListener(View view, Card card) {
+                        SharedPreferences.Editor editor = preferences.edit();
+                        materialListViewAdapter.remove(tutorialCard);
+                        editor.putBoolean(WATCHED_TUTORIAL, true);
+                        editor.apply();
+                    }
+                });
+                tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                    @Override
+                    public void onButtonPressedListener(View view, Card card) {
+                        materialListViewAdapter.remove(tutorialCard);
+                    }
+                });
+
+                materialListViewAdapter.add(tutorialCard);
+            }
         }
+        materialListViewAdapter.notifyDataSetChanged();
     }
 
     @Override

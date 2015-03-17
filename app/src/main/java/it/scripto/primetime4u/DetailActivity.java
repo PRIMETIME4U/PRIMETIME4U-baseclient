@@ -1,10 +1,18 @@
 package it.scripto.primetime4u;
 
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,10 +21,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mrengineer13.snackbar.SnackBar;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import it.scripto.primetime4u.model.Artist;
@@ -30,6 +41,7 @@ public class DetailActivity extends BaseActivity {
     private ProgressBar progressBar;
     private boolean italian;
     private Movie movie;
+    private SharedPreferences preferences;
 
     @Override
     protected String getTagLog() {
@@ -56,7 +68,8 @@ public class DetailActivity extends BaseActivity {
         progressBar = (ProgressBar) findViewById(R.id.detail_progress_bar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
-        // Get user_id
+        // Pref
+        preferences = getSharedPreferences(MainActivity.PREFERENCES,Context.MODE_PRIVATE);
 
         // Get if is italian or not
         italian = Locale.getDefault().getLanguage().equals("it");
@@ -150,7 +163,13 @@ public class DetailActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_detail, menu);
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            spanString.setSpan(new ForegroundColorSpan(Color.DKGRAY), 0, spanString.length(), 0); //fix the color to white
+            item.setTitle(spanString);
+        }
         return true;
     }
 
@@ -159,13 +178,47 @@ public class DetailActivity extends BaseActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        SharedPreferences preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // Get account
+        String account = preferences.getString(TutorialActivity.ACCOUNT, null);
+
+        SharedPreferences pref2 = getSharedPreferences(MainActivity.PREFERENCES,Context.MODE_PRIVATE);
+
+        switch (item.getItemId()) {
+            case R.id.details_dislike:
+
+                String url = url = Utils.SERVER_API+"untaste/"+account;
+                JsonObject json = new JsonObject();
+                json.addProperty("data",movie.getIdIMDB());
+                Ion.with(this)
+                        .load("POST", url)
+                        .setJsonObjectBody(json)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                if (e != null) {
+                                    Log.e(TAG, e.toString());
+                                    Toast.makeText(getBaseContext(),getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                String s= String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
+                Toast t = new Toast(getBaseContext());
+                t.setText(s);
+                t.setDuration(Toast.LENGTH_LONG);
+                t.show();
+
+                //TODO: add to preferences of proposal fragment in order to reshow the proposal
+
+                return true;
+            case R.id.details_already_watched:
+
+                //TODO: add to preferences of proposal fragment in order to reshow the proposal
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

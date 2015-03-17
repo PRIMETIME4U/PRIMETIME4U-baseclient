@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
     private String account;
     private boolean italian;
+    public static final String PREFERENCES="PRIMETIME4U";
 
     @Override
     protected String getTagLog() {
@@ -80,6 +81,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     public boolean isItalian() {
         return italian;
     }
+
 
     /**
      *

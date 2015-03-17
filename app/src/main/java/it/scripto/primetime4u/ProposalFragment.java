@@ -56,11 +56,12 @@ public class ProposalFragment extends BaseFragment {
     private static final String STATE_COUNT = "COUNT";
     private static final String STATE_ALREADY_WATCHED_TITLES = "WATCHED_LIST";
     public static final String EXTRA_MOVIE = "MOVIE";
+    public static final String PREFERENCES = "PREFERENCES";
 
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
     private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
-    private ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
+    public ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
 
     private ProposalListAdapter materialListViewAdapter;
 
@@ -461,7 +462,19 @@ public class ProposalFragment extends BaseFragment {
             materialListViewAdapter.increaseCount();
         }
     }
+    public void addAlreadyWatched(String title){
+        alreadyWatchedTitles.add(title);
+        editor = preferences.edit();
+        if (!preferences.contains("ALREADY_WATCHED_LIST")){
+            editor.putString("ALREADY_WATCHED_LIST", title);
+        } else {
+            String s = preferences.getString("ALREADY_WATCHED_LIST","");
+            s = s + "|" + title;
+            editor.putString("ALREADY_WATCHED_LIST",s);
+        }
+        editor.apply();
 
+    }
     /**
      *
      */
