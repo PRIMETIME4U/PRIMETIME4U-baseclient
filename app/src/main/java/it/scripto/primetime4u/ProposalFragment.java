@@ -119,7 +119,7 @@ public class ProposalFragment extends BaseFragment {
         italian = base.isItalian();
 
         // Get preferences
-        preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        preferences = getActivity().getSharedPreferences(TutorialActivity.PREFERENCES,Context.MODE_PRIVATE);
 
         // Create and set adapter
         materialListViewAdapter = new ProposalListAdapter(getActivity());
@@ -168,7 +168,7 @@ public class ProposalFragment extends BaseFragment {
             while(st.hasMoreTokens()){
                 String s2 = st.nextToken();
                 alreadyWatchedTitles.add(s2);
-                //System.out.println(s2);
+
 
             }
         }

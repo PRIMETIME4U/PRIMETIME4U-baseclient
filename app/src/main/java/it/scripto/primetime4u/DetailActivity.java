@@ -1,14 +1,12 @@
 package it.scripto.primetime4u;
 
 
-import android.app.Activity;
-import android.content.ComponentName;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -69,7 +67,7 @@ public class DetailActivity extends BaseActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
         // Pref
-        preferences = getSharedPreferences(MainActivity.PREFERENCES,Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(TutorialActivity.PREFERENCES,Context.MODE_PRIVATE);
 
         // Get if is italian or not
         italian = Locale.getDefault().getLanguage().equals("it");
@@ -179,11 +177,12 @@ public class DetailActivity extends BaseActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         SharedPreferences preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor;
 
         // Get account
         String account = preferences.getString(TutorialActivity.ACCOUNT, null);
 
-        SharedPreferences pref2 = getSharedPreferences(MainActivity.PREFERENCES,Context.MODE_PRIVATE);
+
 
         switch (item.getItemId()) {
             case R.id.details_dislike:
@@ -204,18 +203,36 @@ public class DetailActivity extends BaseActivity {
                                 }
                             }
                         });
-                String s= String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
+                String msg= String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
                 Toast t = new Toast(getBaseContext());
-                t.setText(s);
+                t.setText(msg);
                 t.setDuration(Toast.LENGTH_LONG);
                 t.show();
 
-                //TODO: add to preferences of proposal fragment in order to reshow the proposal
+                editor = preferences.edit();
+                if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                    editor.putString("ALREADY_WATCHED_LIST", movie.getTitle());
+                } else {
+                    String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                    s = s + "|" + movie.getTitle();
+                    editor.putString("ALREADY_WATCHED_LIST",s);
+                }
+                editor.apply();
+
 
                 return true;
             case R.id.details_already_watched:
+                editor = preferences.edit();
+                if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                    editor.putString("ALREADY_WATCHED_LIST", movie.getTitle());
+                } else {
+                    String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                    s = s + "|" + movie.getTitle();
+                    editor.putString("ALREADY_WATCHED_LIST",s);
+                }
+                editor.apply();
 
-                //TODO: add to preferences of proposal fragment in order to reshow the proposal
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
