@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.facebook.UiLifecycleHelper;
 
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +31,7 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
     private String account;
     private boolean italian;
+
 
 
     @Override
@@ -45,6 +47,8 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         SharedPreferences preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 

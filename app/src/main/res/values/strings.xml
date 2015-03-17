@@ -58,5 +58,7 @@
     <string name="show_more_button">Show more</string>
     <string name="undefined">Undefined</string>
     <string name="dislike">You don\'t like \"%1$s\"</string>
+    <string name="share">Share on FB</string>
+    <string name="facebook_app_id">1611938555692029</string>
 
 </resources>

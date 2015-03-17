@@ -19,9 +19,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.Session;
+
 import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.FacebookDialog;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -64,6 +68,7 @@ public class ProposalFragment extends BaseFragment {
     public ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
 
     private ProposalListAdapter materialListViewAdapter;
+    private UiLifecycleHelper uiHelper;
 
     private ProgressBar progressBar;
     private SharedPreferences preferences;
@@ -98,8 +103,28 @@ public class ProposalFragment extends BaseFragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        uiHelper.onActivityResult(requestCode, resultCode, data, new FacebookDialog.Callback() {
+            @Override
+            public void onError(FacebookDialog.PendingCall pendingCall, Exception error, Bundle data) {
+                Log.e("Activity", String.format("Error: %s", error.toString()));
+            }
+
+            @Override
+            public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
+                Log.i("Activity", "Success!");
+            }
+        });
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        uiHelper = new UiLifecycleHelper(this.getActivity(), null);
+        uiHelper.onCreate(savedInstanceState);
+
 
         fragmentView = view;
 
@@ -119,7 +144,7 @@ public class ProposalFragment extends BaseFragment {
         italian = base.isItalian();
 
         // Get preferences
-        preferences = getActivity().getSharedPreferences(TutorialActivity.PREFERENCES,Context.MODE_PRIVATE);
+        preferences = getActivity().getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 
         // Create and set adapter
         materialListViewAdapter = new ProposalListAdapter(getActivity());
@@ -206,6 +231,7 @@ public class ProposalFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        uiHelper.onResume();
         // Welcome Card for feedback
         if (preferences.contains(PENDING_MOVIE) && movieIsFinished()) {
             final WelcomeCard welcomeCard = new WelcomeCard(context);
@@ -382,46 +408,52 @@ public class ProposalFragment extends BaseFragment {
             card.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    // Dislike it
-                    String url = Utils.SERVER_API+"untaste/"+account;
-                    // Prevent to reshow the movie card for today
-                    alreadyWatchedTitles.add(proposal.getTitle());
-                    materialListViewAdapter.remove(card);
-                    editor = preferences.edit();
-                    if (!preferences.contains("ALREADY_WATCHED_LIST")){
-                        editor.putString("ALREADY_WATCHED_LIST", proposal.getTitle());
-                    } else {
-                        String s = preferences.getString("ALREADY_WATCHED_LIST","");
-                        s = s + "|" + proposal.getTitle();
-                        editor.putString("ALREADY_WATCHED_LIST",s);
+                    switch (item.getItemId()) {
+                        case R.id.action_untaste:
+                            // Dislike it
+                            String url = Utils.SERVER_API + "untaste/" + account;
+                            // Prevent to reshow the movie card for today
+                            alreadyWatchedTitles.add(proposal.getTitle());
+                            materialListViewAdapter.remove(card);
+                            editor = preferences.edit();
+                            if (!preferences.contains("ALREADY_WATCHED_LIST")) {
+                                editor.putString("ALREADY_WATCHED_LIST", proposal.getTitle());
+                            } else {
+                                String s = preferences.getString("ALREADY_WATCHED_LIST", "");
+                                s = s + "|" + proposal.getTitle();
+                                editor.putString("ALREADY_WATCHED_LIST", s);
+                            }
+                            editor.apply();
+                            JsonObject json = new JsonObject();
+                            json.addProperty("data", proposal.getIdIMDB());
+                            Ion.with(getActivity())
+                                    .load("POST", url)
+                                    .setJsonObjectBody(json)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if (e != null) {
+                                                Log.e(TAG, e.toString());
+                                                Toast.makeText(context, getString(R.string.generic_error), Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+                            // Create SnackBar
+                            new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
+                                    //                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
+                                    //                                @Override
+                                    //                                public void onMessageClick(Parcelable parcelable) {
+                                    //
+                                    //                                }
+                                    //                            })
+                                    //                            .withActionMessageId(R.string.undo)
+                                    .withMessage(String.format(getResources().getString(R.string.dislike), italian ? proposal.getTitle() : proposal.getOriginalTitle()))
+                                    .show();
+
+                        case R.id.share_facebook:
+                            //TODO: add facebook share code here
                     }
-                    editor.apply();
-                    JsonObject json = new JsonObject();
-                    json.addProperty("data",proposal.getIdIMDB());
-                    Ion.with(getActivity())
-                            .load("POST", url)
-                            .setJsonObjectBody(json)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    if (e != null) {
-                                        Log.e(TAG, e.toString());
-                                        Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-                    // Create SnackBar
-                    new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
-//                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
-//                                @Override
-//                                public void onMessageClick(Parcelable parcelable) {
-//
-//                                }
-//                            })
-//                            .withActionMessageId(R.string.undo)
-                            .withMessage(String.format(getResources().getString(R.string.dislike), italian ? proposal.getTitle() : proposal.getOriginalTitle()))
-                            .show();
                     return true;
                 }
             });
@@ -462,19 +494,7 @@ public class ProposalFragment extends BaseFragment {
             materialListViewAdapter.increaseCount();
         }
     }
-    public void addAlreadyWatched(String title){
-        alreadyWatchedTitles.add(title);
-        editor = preferences.edit();
-        if (!preferences.contains("ALREADY_WATCHED_LIST")){
-            editor.putString("ALREADY_WATCHED_LIST", title);
-        } else {
-            String s = preferences.getString("ALREADY_WATCHED_LIST","");
-            s = s + "|" + title;
-            editor.putString("ALREADY_WATCHED_LIST",s);
-        }
-        editor.apply();
 
-    }
     /**
      *
      */
@@ -576,6 +596,19 @@ public class ProposalFragment extends BaseFragment {
         toSave.putStringArrayList(STATE_ALREADY_WATCHED_TITLES, alreadyWatchedTitles);
         toSave.putInt(STATE_COUNT, materialListViewAdapter.getCount());
         Log.i(TAG, "Save proposalList and already watched");
+        uiHelper.onSaveInstanceState(toSave);
         super.onSaveInstanceState(toSave);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        uiHelper.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        uiHelper.onDestroy();
     }
 }
