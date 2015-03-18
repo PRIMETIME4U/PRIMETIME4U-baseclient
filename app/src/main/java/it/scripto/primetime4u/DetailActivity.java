@@ -204,10 +204,7 @@ public class DetailActivity extends BaseActivity {
                             }
                         });
                 String msg= String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
-                Toast t = new Toast(getBaseContext());
-                t.setText(msg);
-                t.setDuration(Toast.LENGTH_LONG);
-                t.show();
+                Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
 
                 editor = preferences.edit();
                 if (!preferences.contains("ALREADY_WATCHED_LIST")){
