@@ -25,6 +25,9 @@ import com.dexafree.materialList.cards.model.Card;
 import com.dexafree.materialList.controller.OnButtonPressListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphObject;
+import com.facebook.model.OpenGraphAction;
+import com.facebook.model.OpenGraphObject;
 import com.facebook.widget.FacebookDialog;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonObject;
@@ -115,6 +118,9 @@ public class ProposalFragment extends BaseFragment {
             @Override
             public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
                 Log.i("Activity", "Success!");
+                boolean didCancel = FacebookDialog.getNativeDialogDidComplete(data);
+                String didCancelS = Boolean.toString(didCancel);
+                Log.i("ProposalFragment",didCancelS);
             }
         });
     }
@@ -452,7 +458,44 @@ public class ProposalFragment extends BaseFragment {
                                     .show();
 
                         case R.id.share_facebook:
-                            //TODO: add facebook share code here
+                            if (FacebookDialog.canPresentShareDialog(getActivity(),
+                                    FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+                                Toast.makeText(context,R.string.please_wait,Toast.LENGTH_LONG).show();
+                                /**I set up a Open Graph story, this is generated but not postable, idk why
+                                OpenGraphObject movieObj = OpenGraphObject.Factory.createForPost("video");
+                                movieObj.setProperty("title",proposal.getTitle());
+                                movieObj.setProperty("image",proposal.getPoster());
+                                movieObj.setProperty("description",R.string.suggested);
+
+
+                                OpenGraphAction action = GraphObject.Factory.create(OpenGraphAction.class);
+                                action.setProperty("video.wants_to_watch",movieObj);
+                                action.setType("video.wants_to_watch");
+                                // Publish the post using the Share Dialog
+                                FacebookDialog shareDialog = new FacebookDialog.OpenGraphActionDialogBuilder
+                                        (getActivity(),action,"video.wants_to_watch").build();
+                                 **/
+                                String suggested = getResources().getString(R.string.suggested);
+
+                                String link = "http://www.imdb.com/title/"+proposal.getIdIMDB();
+
+                                FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(getActivity())
+                                        .setLink(link) // a link, required
+                                        .setPicture(proposal.getPoster()) //link to a picture for facebook post
+                                        .setName(proposal.getTitle()) //name of the post, will show up in mobile posts
+                                        .setDescription(proposal.getChannel()+", "+proposal.getTime()+"\n"+proposal.getItalianPlot()+"\n"+suggested) //description of the post, will show up in mobile posts
+                                        .setCaption(suggested) //is the title setted up in web based facebook
+                                        .build();
+
+
+
+
+                                uiHelper.trackPendingDialogCall(shareDialog.present());
+
+                            } else {
+                                // FB App not installed
+                                Toast.makeText(context,R.string.facebook_not_installed,Toast.LENGTH_LONG).show();
+                            }
                     }
                     return true;
                 }

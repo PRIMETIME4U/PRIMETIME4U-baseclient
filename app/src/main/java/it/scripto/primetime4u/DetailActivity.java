@@ -187,7 +187,7 @@ public class DetailActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.details_dislike:
 
-                String url = url = Utils.SERVER_API+"untaste/"+account;
+                String url = Utils.SERVER_API+"untaste/"+account;
                 JsonObject json = new JsonObject();
                 json.addProperty("data",movie.getIdIMDB());
                 Ion.with(this)
@@ -229,10 +229,37 @@ public class DetailActivity extends BaseActivity {
                 }
                 editor.apply();
 
+                // Generate URL
+                String url2 = Utils.SERVER_API + "watched/" + account;
+                // Add watched movie, with a special date 01-01-1900 to recognize these movies
+                addWatched(url2, movie.getIdIMDB(), "01-01-1900");
+
+                Toast.makeText(this,R.string.watched_added,Toast.LENGTH_LONG).show();
 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void addWatched(String url, String id, String date) {
+        JsonObject json = new JsonObject();
+        json.addProperty("idIMDB", id);
+        json.addProperty("date", date);
+
+        Ion.with(this)
+                .load("POST", url)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(getBaseContext(), getString(R.string.generic_error), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
     }
 }

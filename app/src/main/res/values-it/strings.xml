@@ -58,4 +58,7 @@
     <string name="undefined">Non specificato</string>
     <string name="dislike">Non ti piace \"%1$s\"</string>
     <string name="share">Condividi su FB</string>
+    <string name="facebook_not_installed">Spiacente, l\'app di Facebook non è installata sul dispositivo</string>
+    <string name="suggested">suggerito dall\'app PRIMETIME4U</string>
+    <string name="please_wait">Attendi...</string>
 </resources>
