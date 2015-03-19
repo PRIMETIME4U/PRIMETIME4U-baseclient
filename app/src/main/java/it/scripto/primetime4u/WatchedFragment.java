@@ -43,7 +43,8 @@ public class WatchedFragment extends RefreshFragment {
     private static final String STATE_WATCHED_LIST = "WATCHED_LIST";
     private static final String STATE_NEXT_PAGE = "NEXT_PAGE";
 
-    private List<Movie> watchedList = new ArrayList<>();
+    private List<Movie> watchedList = new ArrayList<Movie>();
+    private List<Movie> toBeDrawn = new ArrayList<Movie>();
     private ArrayList<WatchedCard> cardList = new ArrayList<>();
     private String account;
     private MaterialListAdapter materialListViewAdapter;
@@ -132,26 +133,72 @@ public class WatchedFragment extends RefreshFragment {
             materialListViewAdapter.add(tutorialCard);
 
         }
+
         if (savedInstanceState != null) {
             Log.i(TAG, "Restore watchedList");
             watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
             Log.i(TAG, "Restore nextPage");
             nextPage = savedInstanceState.getString(STATE_NEXT_PAGE);
             Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
+            clearAdapter();
+            addTutorialCard();
+            toBeDrawn.clear();
+            toBeDrawn.addAll(watchedList);
             fillCardList();
             progressBar.setVisibility(View.INVISIBLE);
+
         } else {
+
             // Get watched
-            Log.i(TAG, "Get watchedList");
-            // Get data
+            Log.i(TAG, "Get complete watchedList");
+            // Clear data
             clearData();
+            toBeDrawn.clear();
+
             // Generate URL
             String url = Utils.SERVER_API + "watched/" + account;
             // Get watched
             get(url);
+
         }
 
         return view;
+    }
+
+    private void addTutorialCard(){
+        // Get preferences
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if (!preferences.contains(WATCHED_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(WATCHED_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+
+        }
     }
 
     /**
@@ -161,8 +208,11 @@ public class WatchedFragment extends RefreshFragment {
     public void refresh() {
         // Clear data
         clearData();
+        toBeDrawn.clear();
         // Clear adapter
         clearAdapter();
+        // Since I've cleared the adapter I have to recheck the tutorial card
+        addTutorialCard();
         // Generate URL
         String url = Utils.SERVER_API + "watched/" + account;
         // Get watched
@@ -170,12 +220,12 @@ public class WatchedFragment extends RefreshFragment {
     }
 
     /**
-     * draws cards of watched list
+     * draws cards of watched list from a get method
      */
     private void fillCardList() {
 
         for (final Movie watched : watchedList) {
-
+            Log.i(TAG,"I'm drawing: "+watched.getTitle());
             final WatchedCard watchedCard = new WatchedCard(context);
             final String id = watched.getIdIMDB();
 
@@ -206,7 +256,46 @@ public class WatchedFragment extends RefreshFragment {
         }
 
         materialListViewAdapter.addAll(cardList);
+        progressBar.setVisibility(View.INVISIBLE);
 
+
+    }
+    // reserved for >lollipop devices
+    private void fillCardListLolli(){
+
+        for (final Movie watched : toBeDrawn) {
+            Log.i(TAG,"I'm drawing: "+watched.getTitle());
+            final WatchedCard watchedCard = new WatchedCard(context);
+            final String id = watched.getIdIMDB();
+
+            if (!Locale.getDefault().getLanguage().equals("it")) {
+                watchedCard.setTitle(watched.getOriginalTitle());
+            } else {
+                watchedCard.setTitle(watched.getTitle());
+            }
+
+            watchedCard.setDate(watched.getDate());
+            watchedCard.setTaste(watched.isTaste());
+            watchedCard.setDismissible(false);
+            watchedCard.setPoster(watched.getPoster());
+            watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    if (watchedCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+                        addTaste(url, id);
+                    } else {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
+                        deleteTaste(url);
+                    }
+                }
+            });
+
+            cardList.add(watchedCard);
+        }
+        toBeDrawn.clear();
+        materialListViewAdapter.addAll(cardList);
+        progressBar.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
             Button footerButton = (Button) footerView.findViewById(R.id.button);
@@ -222,10 +311,6 @@ public class WatchedFragment extends RefreshFragment {
                     }
                 });
             }
-        }
-        else{
-            if (nextPage!=null)
-                get(Utils.SERVER_URL + nextPage);
         }
     }
     
@@ -248,12 +333,22 @@ public class WatchedFragment extends RefreshFragment {
                             Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
                             return;
                         }
-                        cardList.clear();
-                        clearAdapter();
+
                         nextPage = result.data.nextPage;
                         watchedList.addAll(result.data.watched);
-                        fillCardList();
-
+                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+                            // If < lollipop, download all and then draw
+                            if (nextPage == null) {
+                                fillCardList();
+                            } else {
+                                get(Utils.SERVER_URL + nextPage);
+                            }
+                        }
+                        else{
+                            // Download others only if i press on footer button, but draw these ones
+                            toBeDrawn.addAll(result.data.watched);
+                            fillCardListLolli();
+                        }
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                     }
@@ -272,8 +367,7 @@ public class WatchedFragment extends RefreshFragment {
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
-        // Clear adapter
-        clearAdapter();
+
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
        
@@ -290,11 +384,12 @@ public class WatchedFragment extends RefreshFragment {
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
                             Log.e(TAG, e.toString());
-                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.generic_error), Toast.LENGTH_LONG).show();
                             return;
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -316,8 +411,7 @@ public class WatchedFragment extends RefreshFragment {
      * deletes from user's taste list
      */
     private void deleteTaste(String url) {
-        // Clear adapter
-        clearAdapter();
+
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
         

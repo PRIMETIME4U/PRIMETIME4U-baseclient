@@ -514,7 +514,7 @@ public class TastesFragment extends RefreshFragment {
      */
     private void fillCardList() {
         // Create movies cards
-        // If REFRESH_NUMBER>1 I SHOULD CHECK CARDLIST FOR DUPLICATES
+
         for (final Movie taste : tastesListMovie) {
             final TasteCard movieCard = new TasteCard(context);
             

@@ -604,6 +604,7 @@ public class ProposalFragment extends BaseFragment {
         // Refresh data
         MainActivity base = (MainActivity) this.getActivity();
         base.onTasteChanged();
+        materialListViewAdapter.notifyDataSetChanged();
     }
 
     /**
