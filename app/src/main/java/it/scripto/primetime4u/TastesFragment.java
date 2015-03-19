@@ -68,12 +68,9 @@ public class TastesFragment extends RefreshFragment {
     ArrayList<String> nextPagesMovies = new ArrayList<String>();
     ArrayList<String> nextPagesGenres = new ArrayList<String>();
     ArrayList<String> nextPagesArtists = new ArrayList<String>();
-    ArrayList<ServerResponse.TasteResponse> responses = new ArrayList<ServerResponse.TasteResponse>();
-    ArrayList<ServerResponse.TasteResponseExtraMovies> responsesM = new ArrayList<ServerResponse.TasteResponseExtraMovies>();
-    ArrayList<ServerResponse.TasteResponseExtraArtists> responsesA = new ArrayList<ServerResponse.TasteResponseExtraArtists>();
-    ArrayList<ServerResponse.TasteResponseExtraGenres> responsesG = new ArrayList<ServerResponse.TasteResponseExtraGenres>();
 
-    private static boolean DRAW;
+
+
     /**
      * Use this factory method to create a new instance of
      * this fragment.
@@ -101,7 +98,7 @@ public class TastesFragment extends RefreshFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        DRAW = false;
+
         Log.i(TAG,"OnCreateView method has been called");
 
         setHasOptionsMenu(true);
@@ -127,8 +124,44 @@ public class TastesFragment extends RefreshFragment {
         materialListViewAdapter = new MaterialListAdapter(getActivity());
         tastesMaterialListView.setAdapter(materialListViewAdapter);
 
-        // Get data
-        refresh();
+        // Check for tutorial card
+        if (!preferences.contains(TASTES_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_tastes_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.tastes_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(TASTES_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
+
+
+        // Generate URL
+        String url = Utils.SERVER_API + "tastes/" + account + "/all";
+
+        // Get tastes
+        get(url);
         
 
         return view;
@@ -136,7 +169,7 @@ public class TastesFragment extends RefreshFragment {
 
     @Override
     public void refresh() {
-        DRAW=false;
+
         Log.i(TAG,"Refresh method has been called");
         // Clear data
         clearData();
@@ -152,7 +185,7 @@ public class TastesFragment extends RefreshFragment {
         // Get preferences
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        // Tutorial card if is the first time
+        // Since we have cleared the adapter, we have to recheck for the tutorial card
         if (!preferences.contains(TASTES_TUTORIAL)) {
             final WelcomeCard tutorialCard = new WelcomeCard(context);
             tutorialCard.setTitle(getResources().getString(R.string.welcome_tastes_tutorial));
@@ -186,8 +219,7 @@ public class TastesFragment extends RefreshFragment {
 
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
-        // Test URL di claudio che ha più tastes
-        String urltest = Utils.SERVER_API + "tastes/pastorini.claudio@gmail.com/all";
+
         // Get tastes
         get(url);
 
@@ -291,6 +323,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         return false;
                     }
+
                 });
                 return true;
             default:
@@ -347,8 +380,7 @@ public class TastesFragment extends RefreshFragment {
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
-        // Clear adapter
-        clearAdapter();
+
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
 
@@ -371,8 +403,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
-                        // Reclear adapter
-                        clearAdapter();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -391,42 +422,34 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     *
+     * Parses FIRST response, from /tastes/all
      */
-    private void parseFirstResponseMovies(ServerResponse.TasteResponse response) {
+    private void parseFirstResponse(ServerResponse.TasteResponse response) {
 
         // Parse movies list of "all" page
         for (Movie movie : response.data.tastes.movies) {
             if (!tastesListMovie.contains(movie))
                 tastesListMovie.add(movie);
         }
-        fillCardList();
-        clearData();
-        getOthersMovies();
-
-    }
-    private void parseFirstResponseArtists(ServerResponse.TasteResponse response) {
-        // Parse artists list of "all" page
         for (Artist artist : response.data.tastes.artists) {
             if (!tastesListArtist.contains(artist))
                 tastesListArtist.add(artist);
         }
-        fillCardList();
-        clearData();
-        getOthersArtists();
-
-    }
-    private void parseFirstResponseGenres(ServerResponse.TasteResponse response){
-        // Parse genres list of "all" page
         for (Genre genre : response.data.tastes.genres){
             if (!tastesListGenre.contains(genre))
                 tastesListGenre.add(genre);
         }
+        // First response, I draw them
         fillCardList();
+        // Then I clear the lists (NOT the adapter)
         clearData();
+
+        getOthersMovies();
+        getOthersArtists();
         getOthersGenres();
 
     }
+
 
     private void parseResponseMovies(ServerResponse.TasteResponseExtraMovies response){
         //Parses movies of extra pages
@@ -590,7 +613,7 @@ public class TastesFragment extends RefreshFragment {
         arr.addAll(hs);
     }
     private void getOthersMovies(){
-        clearData();
+
         // Movies
         if (nextPagesMovies.get(0)!=null){
 
@@ -607,7 +630,7 @@ public class TastesFragment extends RefreshFragment {
                                 Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            responsesM.add(result);
+                            //responsesM.add(result);
                             // I should care about the other pages
 
 
@@ -627,7 +650,7 @@ public class TastesFragment extends RefreshFragment {
     }
     private void getOthersArtists(){
         //Artists
-        clearData();
+
         if (nextPagesArtists.get(0)!=null){
 
             String urlM = nextPagesArtists.get(0);
@@ -643,7 +666,7 @@ public class TastesFragment extends RefreshFragment {
                                 Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            responsesA.add(result);
+                            //responsesA.add(result);
                             // I should care about the other pages
 
 
@@ -661,7 +684,7 @@ public class TastesFragment extends RefreshFragment {
 
     }
     private void getOthersGenres(){
-        clearData();
+
         // Genres
         if (nextPagesGenres.get(0)!=null){
             String urlM = nextPagesGenres.get(0);
@@ -677,7 +700,7 @@ public class TastesFragment extends RefreshFragment {
                                 Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            responsesG.add(result);
+                            //responsesG.add(result);
                             // I should care about the other pages
 
 
@@ -713,7 +736,7 @@ public class TastesFragment extends RefreshFragment {
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
-                        responses.add(result);
+                        //responses.add(result);
                         // I should care about the other pages
                         // A null value will block further connections
                         nextPagesArtists.clear();
@@ -730,14 +753,9 @@ public class TastesFragment extends RefreshFragment {
 
                         // Clear all data list
                         clearData();
+
                         // Parse response of "all-page", each parse will download and parse extra pages
-                        for (ServerResponse.TasteResponse currentResp : responses){
-                            parseFirstResponseMovies(currentResp);
-                            parseFirstResponseArtists(currentResp);
-                            parseFirstResponseGenres(currentResp);
-
-                        }
-
+                        parseFirstResponse(result);
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
 
@@ -746,7 +764,7 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     *
+     * Lists of tastes and cards will be cleared with this method
      */
     private void clearData() {
         tastesListArtist.clear();
@@ -756,11 +774,9 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     *
+     * POST req to server in order to delete a taste
      */
     private void deleteTaste(String url) {
-        // Clear adapter
-        clearAdapter();
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
         // Do connection
@@ -777,8 +793,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
-                        // Re-clear the adapter
-                        clearAdapter();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
