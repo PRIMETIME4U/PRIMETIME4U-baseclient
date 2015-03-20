@@ -3,13 +3,11 @@
 *The only app that allows you to plop down to the couch and simply enjoy a movie.*
 
 ### What is it?
-PRIMETIME4U is an app that simply helps you choosing your movie for your evening. It collects your tastes and finds for you the best movies of the evening.
+PRIMETIME4U is an app that simply helps you choosing your movie for your evening. It collects your tastes and finds for you the best movies of the evening. (read wiki for more info9
 
-[PRIMETIME4U Site](http://hale-kite-786.appspot.com/)
+[PRIMETIME4U Wiki](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/wiki)
 
 [PRIMETIME4U Server](https://github.com/PRIMETIME4U/PRIMETIME4U-server)
-
-[PRIMETIME4U github link to .apk (open as RAW)](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/blob/master/app/app-debug.apk)
 
 [DIRECT DOWNLOAD LINK .apk](https://raw.githubusercontent.com/PRIMETIME4U/PRIMETIME4U-baseclient/master/app/app-debug.apk)
 
