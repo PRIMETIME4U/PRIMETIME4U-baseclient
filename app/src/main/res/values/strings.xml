@@ -63,5 +63,6 @@
     <string name="facebook_not_installed">Sorry, you should install Facebook app</string>
     <string name="suggested">Suggested by PRIMETIME4U</string>
     <string name="please_wait">Please wait...</string>
+    <string name="list_is_complete">All results are shown</string>
 
 </resources>

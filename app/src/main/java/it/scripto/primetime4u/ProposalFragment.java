@@ -154,6 +154,37 @@ public class ProposalFragment extends BaseFragment {
 
         // Create and set adapter
         materialListViewAdapter = new ProposalListAdapter(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+            Button footerButton = (Button) footerView.findViewById(R.id.button);
+
+            //if (materialListViewAdapter.getCount() != materialListViewAdapter.getSize()) {
+                proposalMaterialListView.addFooterView(footerView);
+                Log.i(TAG, "Footer button has been added");
+                footerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        materialListViewAdapter.increaseCount();
+                        if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
+                            proposalMaterialListView.removeFooterView(footerView);
+                            new SnackBar.Builder(getActivity().getApplicationContext(), fragmentView)
+//                            .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                @Override
+//                                public void onMessageClick(Parcelable parcelable) {
+//
+//                                }
+//                            })
+//                            .withActionMessageId(R.string.undo)
+                                    .withMessageId(R.string.list_is_complete)
+                                    .show();
+                        }
+                    }
+                });
+            //}
+        }
+        else{
+            materialListViewAdapter.increaseCount();
+        }
         proposalMaterialListView.setAdapter(materialListViewAdapter);
         //proposalMaterialListView.setEmptyView(view.findViewById(R.id.no_proposal_text_view));
 
@@ -515,27 +546,7 @@ public class ProposalFragment extends BaseFragment {
 
         materialListViewAdapter.addAll(cardList);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
-            Button footerButton = (Button) footerView.findViewById(R.id.button);
 
-            if (materialListViewAdapter.getCount() != materialListViewAdapter.getSize()) {
-                proposalMaterialListView.addFooterView(footerView);
-                Log.i(TAG, "Footer button has been added");
-                footerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        materialListViewAdapter.increaseCount();
-                        if (materialListViewAdapter.getCount() == materialListViewAdapter.getSize()) {
-                            proposalMaterialListView.removeFooterView(footerView);
-                        }
-                    }
-                });
-            }
-        }
-        else{
-            materialListViewAdapter.increaseCount();
-        }
     }
 
     /**

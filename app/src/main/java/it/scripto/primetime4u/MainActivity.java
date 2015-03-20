@@ -98,7 +98,9 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
                 try {
                     RefreshFragment refreshFragment = (RefreshFragment) fragment;
                     if (refreshFragment != null){
-                         refreshFragment.refresh();
+                        if (!(refreshFragment instanceof WatchedFragment))
+                            //because i refresh watched in a different way
+                            refreshFragment.refresh();
                     }
                 } catch (ClassCastException ignored) {
                 }

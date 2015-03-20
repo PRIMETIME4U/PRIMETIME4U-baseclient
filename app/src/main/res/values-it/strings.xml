@@ -54,11 +54,12 @@
     <string name="about">Info sviluppatori</string>
     <string name="proposal_menu">Menù</string>
     <string name="untaste">Non mi piace</string>
-    <string name="show_more_button">Mostra altri</string>
+    <string name="show_more_button">MOSTRA ALTRO</string>
     <string name="undefined">Non specificato</string>
     <string name="dislike">Non ti piace \"%1$s\"</string>
     <string name="share">Condividi su FB</string>
     <string name="facebook_not_installed">Spiacente, l\'app di Facebook non è installata sul dispositivo</string>
     <string name="suggested">suggerito dall\'app PRIMETIME4U</string>
     <string name="please_wait">Attendi...</string>
+    <string name="list_is_complete">Nessun altro risultato</string>
 </resources>

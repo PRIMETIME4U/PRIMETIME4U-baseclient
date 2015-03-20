@@ -98,6 +98,35 @@ public class WatchedFragment extends RefreshFragment {
 
         // Create and set adapter
         materialListViewAdapter = new MaterialListAdapter(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+            Button footerButton = (Button) footerView.findViewById(R.id.button);
+
+            //if (nextPage != null) {
+                Log.i(TAG, String.format("Size: %d", watchedList.size()));
+                watchedMaterialListView.addFooterView(footerView);
+                footerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (nextPage!=null)
+                            get(Utils.SERVER_URL + nextPage);
+                        else {
+                            watchedMaterialListView.removeFooterView(footerView);
+                            new SnackBar.Builder(getActivity().getApplicationContext(), view)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
+                                    .withMessageId(R.string.list_is_complete)
+                                    .show();
+                        }
+                    }
+                });
+            //}
+        }
         watchedMaterialListView.setAdapter(materialListViewAdapter);
 
 
@@ -211,57 +240,19 @@ public class WatchedFragment extends RefreshFragment {
         toBeDrawn.clear();
         // Clear adapter
         clearAdapter();
+
         // Since I've cleared the adapter I have to recheck the tutorial card
         addTutorialCard();
         // Generate URL
         String url = Utils.SERVER_API + "watched/" + account;
         // Get watched
         get(url);
-    }
-
-    /**
-     * draws cards of watched list from a get method
-     */
-    private void fillCardList() {
-
-        for (final Movie watched : watchedList) {
-            Log.i(TAG,"I'm drawing: "+watched.getTitle());
-            final WatchedCard watchedCard = new WatchedCard(context);
-            final String id = watched.getIdIMDB();
-
-            if (!Locale.getDefault().getLanguage().equals("it")) {
-                watchedCard.setTitle(watched.getOriginalTitle());
-            } else {
-                watchedCard.setTitle(watched.getTitle());
-            }
-            
-            watchedCard.setDate(watched.getDate());
-            watchedCard.setTaste(watched.isTaste());
-            watchedCard.setDismissible(false);
-            watchedCard.setPoster(watched.getPoster());
-            watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    if (watchedCard.getTaste()) {
-                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
-                        addTaste(url, id);
-                    } else {
-                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
-                        deleteTaste(url);
-                    }
-                }
-            });
-
-            cardList.add(watchedCard);
-        }
-
-        materialListViewAdapter.addAll(cardList);
-        progressBar.setVisibility(View.INVISIBLE);
 
 
     }
-    // reserved for >lollipop devices
-    private void fillCardListLolli(){
+
+    // Draws the list of cards
+    private void fillCardList(){
 
         for (final Movie watched : toBeDrawn) {
             Log.i(TAG,"I'm drawing: "+watched.getTitle());
@@ -284,6 +275,9 @@ public class WatchedFragment extends RefreshFragment {
                     if (watchedCard.getTaste()) {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie";
                         addTaste(url, id);
+                        //Small bug, when I came back to watched after a like or a dislike
+                        //due to the recovering of savedInstanceState, i have old "like/dislike" information
+                        //since the recover from savedInstanceState does not do a "get"
                     } else {
                         String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
                         deleteTaste(url);
@@ -295,23 +289,9 @@ public class WatchedFragment extends RefreshFragment {
         }
         toBeDrawn.clear();
         materialListViewAdapter.addAll(cardList);
+        cardList.clear();
         progressBar.setVisibility(View.INVISIBLE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
-            Button footerButton = (Button) footerView.findViewById(R.id.button);
 
-            if (nextPage != null) {
-                Log.i(TAG, String.format("Size: %d", watchedList.size()));
-                watchedMaterialListView.addFooterView(footerView);
-                footerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        get(Utils.SERVER_URL + nextPage);
-                        watchedMaterialListView.removeFooterView(footerView);
-                    }
-                });
-            }
-        }
     }
     
     /**
@@ -336,19 +316,11 @@ public class WatchedFragment extends RefreshFragment {
 
                         nextPage = result.data.nextPage;
                         watchedList.addAll(result.data.watched);
-                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                            // If < lollipop, download all and then draw
-                            if (nextPage == null) {
-                                fillCardList();
-                            } else {
-                                get(Utils.SERVER_URL + nextPage);
-                            }
-                        }
-                        else{
-                            // Download others only if i press on footer button, but draw these ones
-                            toBeDrawn.addAll(result.data.watched);
-                            fillCardListLolli();
-                        }
+
+                        // Download others only if i press on footer button, but draw these ones
+                        toBeDrawn.addAll(result.data.watched);
+                        fillCardList();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                     }
@@ -389,7 +361,7 @@ public class WatchedFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
-
+                        materialListViewAdapter.notifyDataSetChanged();
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -397,7 +369,7 @@ public class WatchedFragment extends RefreshFragment {
 //                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                    @Override
 //                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
+//
 //                                    }
 //                                })
 //                                .withActionMessageId(R.string.undo)
@@ -429,6 +401,7 @@ public class WatchedFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+                        materialListViewAdapter.notifyDataSetChanged();
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -436,7 +409,7 @@ public class WatchedFragment extends RefreshFragment {
 //                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                    @Override
 //                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
+//
 //                                    }
 //                                })
 //                                .withActionMessageId(R.string.undo)
