@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.github.machinarius.preferencefragment.PreferenceFragment;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import com.google.gson.JsonArray;

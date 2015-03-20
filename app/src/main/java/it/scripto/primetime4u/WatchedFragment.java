@@ -389,11 +389,13 @@ public class WatchedFragment extends RefreshFragment {
 
     @Override
     public void onSaveInstanceState(Bundle toSave) {
-        // Save proposal, date and taste list
-        Log.i(TAG, "Save watchedList");
-        toSave.putParcelableArrayList(STATE_WATCHED_LIST, (ArrayList<? extends Parcelable>) watchedList);
-        Log.i(TAG, "Save nextPage");
-        toSave.putString(STATE_NEXT_PAGE, nextPage);
+        if (watchedList != null) {
+            // Save proposal, date and taste list
+            Log.i(TAG, "Save watchedList");
+            toSave.putParcelableArrayList(STATE_WATCHED_LIST, (ArrayList<? extends Parcelable>) watchedList);
+            Log.i(TAG, "Save nextPage");
+            toSave.putString(STATE_NEXT_PAGE, nextPage);
+        }
         super.onSaveInstanceState(toSave);
     }
 

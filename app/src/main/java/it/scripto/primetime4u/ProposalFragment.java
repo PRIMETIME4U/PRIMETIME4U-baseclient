@@ -557,12 +557,14 @@ public class ProposalFragment extends BaseFragment {
 
     @Override
     public void onSaveInstanceState(Bundle toSave) {
-        // Save proposal list
-        toSave.putParcelableArrayList(STATE_PROPOSAL_LIST, (ArrayList<? extends Parcelable>) proposalList);
-        // Save already watched list
-        toSave.putStringArrayList(STATE_ALREADY_WATCHED_TITLES, alreadyWatchedTitles);
-        toSave.putInt(STATE_COUNT, materialListViewAdapter.getCount());
-        Log.i(TAG, "Save proposalList and already watched");
+        if (proposalList != null) {
+            // Save proposal list
+            toSave.putParcelableArrayList(STATE_PROPOSAL_LIST, (ArrayList<? extends Parcelable>) proposalList);
+            // Save already watched list
+            toSave.putStringArrayList(STATE_ALREADY_WATCHED_TITLES, alreadyWatchedTitles);
+            toSave.putInt(STATE_COUNT, materialListViewAdapter.getCount());
+            Log.i(TAG, "Save proposalList and already watched");
+        }
         super.onSaveInstanceState(toSave);
     }
 }
