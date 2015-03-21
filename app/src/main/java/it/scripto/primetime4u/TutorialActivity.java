@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
@@ -22,9 +23,14 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+
+import java.io.IOException;
 
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
@@ -36,7 +42,11 @@ public class TutorialActivity extends BaseActivity {
     public static final int REQUEST_CODE_EMAIL = 1;
     public static final String PREFERENCES = "PRIMETIME4U";
     public static final String ACCOUNT = "ACCOUNT";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 90000;
     private SharedPreferences preferences;
+    private String privateKey;
+    private GoogleCloudMessaging gcm;
+    private String accountName;
 
     @Override
     protected String getTagLog() {
@@ -53,9 +63,10 @@ public class TutorialActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        privateKey = preferences.getString("privateKey", "");
 
         if (preferences.contains(ACCOUNT) && !preferences.getString(ACCOUNT,"").equals("invalidUser")){
-            goToMain();    
+            goToMain();
         } else {
             final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
             CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
@@ -79,8 +90,6 @@ public class TutorialActivity extends BaseActivity {
                     Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
                     if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
                         goToMain();
-                    } else {
-                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
                     }
                 }
             });
@@ -137,42 +146,101 @@ public class TutorialActivity extends BaseActivity {
         }
     }
 
+    // You need to do the Play Services APK check here too.
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkPlayServices();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EMAIL && resultCode == RESULT_OK) {
-            final String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            
-            // Generate URL
-            String url = Utils.SERVER_API + "subscribe/";
+            accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 
-            // TODO: generify request
-            JsonObject json = new JsonObject();
-            json.addProperty("userId", accountName);
-            json.addProperty("userName", "Utente");
-            json.addProperty("userBirthYear", "1990");
-            json.addProperty("userGender", "M");
+            if(privateKey.equals("")) {
+                if(checkPlayServices()) {
+                    gcm = GoogleCloudMessaging.getInstance(this);
+                    gcmRegistration();
+                }
+            }else{
+                Log.i(TAG, "PrivateKey già presente");
+            }
 
-            Ion.with(getApplicationContext())
-                    .load("POST", url)
-                    .setJsonObjectBody(json)
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            SharedPreferences.Editor editor = preferences.edit();
-                            if (preferences.contains("ACCOUNT")){
-                                editor.remove("ACCOUNT");
-                            }
-                            editor.putString(ACCOUNT, accountName);
-                            editor.apply();
-                        }
-                    });
+
         } else {
             Toast.makeText(this, "Seleziona un account valido", Toast.LENGTH_LONG).show();
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(ACCOUNT, "invalidUser");
             editor.apply();
         }
+    }
+
+    public void gcmRegistration() {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    if(gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(TutorialActivity.this);
+                    }
+                    String gcmKey = gcm.register(Utils.GCM_SENDER_ID);
+                    Log.i(TAG, gcmKey);
+
+                    return gcmKey;
+                }catch(IOException e) {
+                    Log.e(TAG, String.valueOf(e));
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                if(result != null){
+                    privateKey = result;
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("privateKey", result);
+                    editor.commit();
+                    register();
+                }else{
+                    gcmRegistration();
+                }
+
+            }
+
+        }.execute(null, null, null);
+    }
+
+    private void register() {
+        // Generate URL
+        String url = Utils.SERVER_API + "subscribe/";
+
+        // TODO: generify request
+        JsonObject json = new JsonObject();
+        json.addProperty("userId", accountName);
+        json.addProperty("userName", "Utente");
+        json.addProperty("privateKey", privateKey);
+        json.addProperty("userBirthYear", "1990");
+        json.addProperty("userGender", "M");
+
+        Log.i(TAG, json.toString());
+
+        Ion.with(getApplicationContext())
+                .load("POST", url)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        SharedPreferences.Editor editor = preferences.edit();
+                        if (preferences.contains("ACCOUNT")){
+                            editor.remove("ACCOUNT");
+                        }
+                        editor.putString(ACCOUNT, accountName);
+                        editor.apply();
+                    }
+                });
     }
 
     private boolean verifyConnection(){
@@ -219,6 +287,26 @@ public class TutorialActivity extends BaseActivity {
             }
         });
         alertDialog.show();
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
     private class TutorialAdapter extends FragmentPagerAdapter {
