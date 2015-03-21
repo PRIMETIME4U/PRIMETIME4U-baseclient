@@ -82,7 +82,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 list.add(new JsonPrimitive("sky"));
             }
 
-            json.addProperty("tvType", String.valueOf(list));
+            json.add("tvType", list);
 
             SharedPreferences preferences = this.getActivity().getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
             String account = preferences.getString(TutorialActivity.ACCOUNT, null);
