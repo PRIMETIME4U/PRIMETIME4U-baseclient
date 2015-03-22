@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 
 import it.scripto.primetime4u.utils.Utils;
 
-public class PreferencesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class PreferencesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private Context context;
     private Map<String, ?> pref;
     private static final String TAG = "PreferencesFragment";
@@ -90,6 +92,8 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             String url = Utils.SERVER_API + "settings/" + account;
 
             Log.i(TAG, String.valueOf(json));
+
+            Log.i(TAG, "Faccio chiamata");
 
             Ion.with(getActivity().getApplicationContext())
                     .load("POST", url)

@@ -28,8 +28,6 @@ import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,7 +57,6 @@ public class ProposalFragment extends BaseFragment {
 
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
-    private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
     private ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
 
     private ProposalListAdapter materialListViewAdapter;
@@ -468,6 +465,7 @@ public class ProposalFragment extends BaseFragment {
     private void get(String url) {
         Ion.with(context)
                 .load(url)
+                .setTimeout(90000)
                 .as(new TypeToken<ServerResponse.ProposalResponse>() {
                 })
                 .setCallback(new FutureCallback<ServerResponse.ProposalResponse>() {
