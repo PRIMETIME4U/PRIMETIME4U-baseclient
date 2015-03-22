@@ -5,9 +5,13 @@
     tools:context=".DetailActivity">
     
     <item 
-        android:id="@+id/action_settings" 
-        android:title="@string/action_settings"
+        android:id="@+id/details_dislike"
+        android:title="@string/untaste"
         android:orderInCategory="100" 
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/details_already_watched"
+        android:title="@string/already_watched_text"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

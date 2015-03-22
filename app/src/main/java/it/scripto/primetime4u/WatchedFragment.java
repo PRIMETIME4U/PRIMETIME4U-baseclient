@@ -43,7 +43,8 @@ public class WatchedFragment extends RefreshFragment {
     private static final String STATE_WATCHED_LIST = "WATCHED_LIST";
     private static final String STATE_NEXT_PAGE = "NEXT_PAGE";
 
-    private List<Movie> watchedList = new ArrayList<>();
+    private List<Movie> watchedList = new ArrayList<Movie>();
+    private List<Movie> toBeDrawn = new ArrayList<Movie>();
     private ArrayList<WatchedCard> cardList = new ArrayList<>();
     private String account;
     private MaterialListAdapter materialListViewAdapter;
@@ -97,6 +98,35 @@ public class WatchedFragment extends RefreshFragment {
 
         // Create and set adapter
         materialListViewAdapter = new MaterialListAdapter(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
+            Button footerButton = (Button) footerView.findViewById(R.id.button);
+
+            //if (nextPage != null) {
+                Log.i(TAG, String.format("Size: %d", watchedList.size()));
+                watchedMaterialListView.addFooterView(footerView);
+                footerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (nextPage!=null)
+                            get(Utils.SERVER_URL + nextPage);
+                        else {
+                            watchedMaterialListView.removeFooterView(footerView);
+                            new SnackBar.Builder(getActivity().getApplicationContext(), view)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
+                                    .withMessageId(R.string.list_is_complete)
+                                    .show();
+                        }
+                    }
+                });
+            //}
+        }
         watchedMaterialListView.setAdapter(materialListViewAdapter);
 
 
@@ -130,232 +160,44 @@ public class WatchedFragment extends RefreshFragment {
             });
 
             materialListViewAdapter.add(tutorialCard);
+
         }
+
         if (savedInstanceState != null) {
             Log.i(TAG, "Restore watchedList");
             watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
             Log.i(TAG, "Restore nextPage");
             nextPage = savedInstanceState.getString(STATE_NEXT_PAGE);
             Log.i(TAG, String.format("Size saved: %d", watchedList.size()));
+            clearAdapter();
+            addTutorialCard();
+            toBeDrawn.clear();
+            toBeDrawn.addAll(watchedList);
             fillCardList();
             progressBar.setVisibility(View.INVISIBLE);
+
         } else {
+
             // Get watched
-            Log.i(TAG, "Get watchedList");
-            // Get data
-            refresh();
+            Log.i(TAG, "Get complete watchedList");
+            // Clear data
+            clearData();
+            toBeDrawn.clear();
+
+            // Generate URL
+            String url = Utils.SERVER_API + "watched/" + account;
+            // Get watched
+            get(url);
+
         }
 
         return view;
     }
 
-    /**
-     *  
-     */
-    @Override
-    public void refresh() {
-        // Clear data
-        clearData();
-        // Clear adapter
-        clearAdapter();
-        // Generate URL
-        String url = Utils.SERVER_API + "watched/" + account;
-        // Get watched
-        get(url);
-    }
-
-    /**
-     * draws cards of watched list
-     */
-    private void fillCardList() {
-
-        for (final Movie watched : watchedList) {
-
-            final WatchedCard watchedCard = new WatchedCard(context);
-            final String id = watched.getIdIMDB();
-
-            if (!Locale.getDefault().getLanguage().equals("it")) {
-                watchedCard.setTitle(watched.getOriginalTitle());
-            } else {
-                watchedCard.setTitle(watched.getTitle());
-            }
-            
-            watchedCard.setDate(watched.getDate());
-            watchedCard.setTaste(watched.isTaste());
-            watchedCard.setDismissible(false);
-            watchedCard.setPoster(watched.getPoster());
-            watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
-                @Override
-                public void onButtonPressedListener(View view, Card card) {
-                    if (watchedCard.getTaste()) {
-                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
-                        addTaste(url, id);
-                    } else {
-                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
-                        deleteTaste(url);
-                    }
-                }
-            });
-
-            cardList.add(watchedCard);
-        }
-
-        materialListViewAdapter.addAll(cardList);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
-            Button footerButton = (Button) footerView.findViewById(R.id.button);
-
-            if (nextPage != null) {
-                Log.i(TAG, String.format("Size: %d", watchedList.size()));
-                watchedMaterialListView.addFooterView(footerView);
-                footerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        get(Utils.SERVER_URL + nextPage);
-                        watchedMaterialListView.removeFooterView(footerView);
-                    }
-                });
-            }
-        }
-        else{
-            if (nextPage!=null)
-                get(Utils.SERVER_URL + nextPage);
-        }
-    }
-    
-    /**
-     * gets "watched" list and parses the response
-     */
-    private void get(String url) {
-        // Set progressbar
-        progressBar.setVisibility(View.VISIBLE);
-        // Do connection
-        Ion.with(context)
-                .load(url)
-                .as(new TypeToken<ServerResponse.WatchedResponse>() {
-                })
-                .setCallback(new FutureCallback<ServerResponse.WatchedResponse>() {
-                    @Override
-                    public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
-                        if (e != null) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        cardList.clear();
-                        clearAdapter();
-                        nextPage = result.data.nextPage;
-                        watchedList.addAll(result.data.watched);
-                        fillCardList();
-
-                        // Unset progressbar
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
-    }
-    
-    /**
-     *
-     */
-    private void clearData() {
-        watchedList.clear();
-        cardList.clear();
-    }
-
-    /**
-     * adds taste to user's taste list
-     */
-    private void addTaste(String url, final String id) {
-        // Clear adapter
-        clearAdapter();
-        // Set progressbar
-        progressBar.setVisibility(View.VISIBLE);
-       
-        // Create JSON object
-        JsonObject json = new JsonObject();
-        json.addProperty("data", id);
-        // Do connection
-        Ion.with(getActivity())
-                .load("POST", url)
-                .setJsonObjectBody(json)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        // Refresh tastes
-                        onTasteChangeListener.onTasteChanged();
-                        // Unset progressbar
-                        progressBar.setVisibility(View.INVISIBLE);
-                        // Create snackbar
-                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
-//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-//                                    @Override
-//                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
-//                                    }
-//                                })
-//                                .withActionMessageId(R.string.undo)
-                                .withMessageId(R.string.taste_added)
-                                .show();
-                    }
-                });
-    }
-
-    /**
-     * deletes from user's taste list
-     */
-    private void deleteTaste(String url) {
-        // Clear adapter
-        clearAdapter();
-        // Set progressbar
-        progressBar.setVisibility(View.VISIBLE);
-        
-        // Do connection
-        Ion.with(context)
-                .load("DELETE", url)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null) {
-                            Log.e(TAG, e.toString());
-                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        // Refresh tastes
-                        onTasteChangeListener.onTasteChanged();
-                        // Unset progressbar
-                        progressBar.setVisibility(View.INVISIBLE);
-                        // Create snackbar
-                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
-//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
-//                                    @Override
-//                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
-//                                    }
-//                                })
-//                                .withActionMessageId(R.string.undo)
-                                .withMessageId(R.string.taste_deleted)
-                                .show();
-                    }
-                });
-    }
-
-    /**
-     * 
-     */
-    private void clearAdapter() {
-        materialListViewAdapter.clear();
-        materialListViewAdapter.notifyDataSetChanged();
-        // If I clear the list, I should care if tutorial card has not been removed
+    private void addTutorialCard(){
+        // Get preferences
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        if (preferences!=null && !preferences.contains(WATCHED_TUTORIAL)) {
+        if (!preferences.contains(WATCHED_TUTORIAL)) {
             final WelcomeCard tutorialCard = new WelcomeCard(context);
             tutorialCard.setTitle(getResources().getString(R.string.welcome_watched_tutorial));
             tutorialCard.setDescription(getResources().getString(R.string.watched_tutorial));
@@ -384,7 +226,205 @@ public class WatchedFragment extends RefreshFragment {
             });
 
             materialListViewAdapter.add(tutorialCard);
+
         }
+    }
+
+    /**
+     *  
+     */
+    @Override
+    public void refresh() {
+        // Clear data
+        clearData();
+        toBeDrawn.clear();
+        // Clear adapter
+        clearAdapter();
+
+        // Since I've cleared the adapter I have to recheck the tutorial card
+        addTutorialCard();
+        // Generate URL
+        String url = Utils.SERVER_API + "watched/" + account;
+        // Get watched
+        get(url);
+
+
+    }
+
+    // Draws the list of cards
+    private void fillCardList(){
+
+        for (final Movie watched : toBeDrawn) {
+            Log.i(TAG,"I'm drawing: "+watched.getTitle());
+            final WatchedCard watchedCard = new WatchedCard(context);
+            final String id = watched.getIdIMDB();
+
+            if (!Locale.getDefault().getLanguage().equals("it")) {
+                watchedCard.setTitle(watched.getOriginalTitle());
+            } else {
+                watchedCard.setTitle(watched.getTitle());
+            }
+
+            watchedCard.setDate(watched.getDate());
+            watchedCard.setTaste(watched.isTaste());
+            watchedCard.setDismissible(false);
+            watchedCard.setPoster(watched.getPoster());
+            watchedCard.setOnTasteButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    if (watchedCard.getTaste()) {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie";
+                        addTaste(url, id);
+                        //Small bug, when I came back to watched after a like or a dislike
+                        //due to the recovering of savedInstanceState, i have old "like/dislike" information
+                        //since the recover from savedInstanceState does not do a "get"
+                    } else {
+                        String url = Utils.SERVER_API + "tastes/" + account + "/movie/" + id;
+                        deleteTaste(url);
+                    }
+                }
+            });
+
+            cardList.add(watchedCard);
+        }
+        toBeDrawn.clear();
+        materialListViewAdapter.addAll(cardList);
+        cardList.clear();
+        progressBar.setVisibility(View.INVISIBLE);
+
+    }
+    
+    /**
+     * gets "watched" list and parses the response
+     */
+    private void get(String url) {
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        // Do connection
+        Ion.with(context)
+                .load(url)
+                .as(new TypeToken<ServerResponse.WatchedResponse>() {
+                })
+                .setCallback(new FutureCallback<ServerResponse.WatchedResponse>() {
+                    @Override
+                    public void onCompleted(Exception e, ServerResponse.WatchedResponse result) {
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(context,getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        nextPage = result.data.nextPage;
+                        watchedList.addAll(result.data.watched);
+
+                        // Download others only if i press on footer button, but draw these ones
+                        toBeDrawn.addAll(result.data.watched);
+                        fillCardList();
+
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+    }
+    
+    /**
+     *
+     */
+    private void clearData() {
+        watchedList.clear();
+        cardList.clear();
+    }
+
+    /**
+     * adds taste to user's taste list
+     */
+    private void addTaste(String url, final String id) {
+
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+       
+        // Create JSON object
+        JsonObject json = new JsonObject();
+        json.addProperty("data", id);
+        // Do connection
+        Ion.with(getActivity())
+                .load("POST", url)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(context, getString(R.string.generic_error), Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        // Refresh tastes
+                        onTasteChangeListener.onTasteChanged();
+                        materialListViewAdapter.notifyDataSetChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_added)
+                                .show();
+                    }
+                });
+    }
+
+    /**
+     * deletes from user's taste list
+     */
+    private void deleteTaste(String url) {
+
+        // Set progressbar
+        progressBar.setVisibility(View.VISIBLE);
+        
+        // Do connection
+        Ion.with(context)
+                .load("DELETE", url)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e(TAG, e.toString());
+                            Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        // Refresh tastes
+                        onTasteChangeListener.onTasteChanged();
+                        materialListViewAdapter.notifyDataSetChanged();
+                        // Unset progressbar
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // Create snackbar
+                        new SnackBar.Builder(getActivity().getApplicationContext(), view)
+//                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
+//                                    @Override
+//                                    public void onMessageClick(Parcelable parcelable) {
+//
+//                                    }
+//                                })
+//                                .withActionMessageId(R.string.undo)
+                                .withMessageId(R.string.taste_deleted)
+                                .show();
+                    }
+                });
+    }
+
+    /**
+     * 
+     */
+    private void clearAdapter() {
+        materialListViewAdapter.clear();
+        materialListViewAdapter.notifyDataSetChanged();
     }
 
     @Override

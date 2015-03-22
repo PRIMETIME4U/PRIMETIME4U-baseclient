@@ -31,4 +31,13 @@ public class Artist extends Taste {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof Artist){
+            Artist param = (Artist) o;
+            return ((param.getIdIMDB().equals(this.getIdIMDB())));
+        }
+        return false;
+    }
 }

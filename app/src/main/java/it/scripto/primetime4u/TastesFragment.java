@@ -29,6 +29,7 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -55,12 +56,20 @@ public class TastesFragment extends RefreshFragment {
     private ArrayList<TasteCard> cardList = new ArrayList<>();
     private HashMap<String,String> dictionary = new HashMap<>();
     private String account;
+
+    private HashMap<String,Integer> alreadyAdded = new HashMap<String,Integer>();
     private MaterialListAdapter materialListViewAdapter;
 
     private onTasteChangeListener onTasteChangeListener;
     private ProgressBar progressBar;
     private MenuItem searchItem;
     private MaterialListView tastesMaterialListView;
+
+    ArrayList<String> nextPagesMovies = new ArrayList<String>();
+    ArrayList<String> nextPagesGenres = new ArrayList<String>();
+    ArrayList<String> nextPagesArtists = new ArrayList<String>();
+
+
 
     /**
      * Use this factory method to create a new instance of
@@ -90,6 +99,8 @@ public class TastesFragment extends RefreshFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        Log.i(TAG,"OnCreateView method has been called");
+
         setHasOptionsMenu(true);
 
         //setting up dictionary for genres search
@@ -113,13 +124,7 @@ public class TastesFragment extends RefreshFragment {
         materialListViewAdapter = new MaterialListAdapter(getActivity());
         tastesMaterialListView.setAdapter(materialListViewAdapter);
 
-        // Get data
-        refresh();
-        
-        //
-        //tastesMaterialListView.setEmptyView(view.findViewById(R.id.no_taste_text_view));
-
-        // Tutorial card if is the first time
+        // Check for tutorial card
         if (!preferences.contains(TASTES_TUTORIAL)) {
             final WelcomeCard tutorialCard = new WelcomeCard(context);
             tutorialCard.setTitle(getResources().getString(R.string.welcome_tastes_tutorial));
@@ -150,20 +155,74 @@ public class TastesFragment extends RefreshFragment {
 
             materialListViewAdapter.add(tutorialCard);
         }
+
+
+        // Generate URL
+        String url = Utils.SERVER_API + "tastes/" + account + "/all";
+
+        // Get tastes
+        get(url);
         
+
         return view;
     }
 
     @Override
     public void refresh() {
+
+        Log.i(TAG,"Refresh method has been called");
         // Clear data
         clearData();
         // Clear adapter
         clearAdapter();
+        // Create and set adapter
+        // Setting up material list
+
+        tastesMaterialListView = (MaterialListView) view.findViewById(R.id.tastes_material_list_view);
+        materialListViewAdapter = new MaterialListAdapter(getActivity());
+        tastesMaterialListView.setAdapter(materialListViewAdapter);
+
+        // Get preferences
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        // Since we have cleared the adapter, we have to recheck for the tutorial card
+        if (!preferences.contains(TASTES_TUTORIAL)) {
+            final WelcomeCard tutorialCard = new WelcomeCard(context);
+            tutorialCard.setTitle(getResources().getString(R.string.welcome_tastes_tutorial));
+            tutorialCard.setDescription(getResources().getString(R.string.tastes_tutorial));
+
+            tutorialCard.setFullWidthDivider(true);
+            tutorialCard.setDividerVisible(true);
+            tutorialCard.setDismissible(false);
+
+            tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
+            tutorialCard.setRightButtonText(getString(R.string.got_it));
+
+            tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    materialListViewAdapter.remove(tutorialCard);
+                    editor.putBoolean(TASTES_TUTORIAL, true);
+                    editor.apply();
+                }
+            });
+            tutorialCard.setOnRightButtonPressedListener(new OnButtonPressListener() {
+                @Override
+                public void onButtonPressedListener(View view, Card card) {
+                    materialListViewAdapter.remove(tutorialCard);
+                }
+            });
+
+            materialListViewAdapter.add(tutorialCard);
+        }
+
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
+
         // Get tastes
         get(url);
+
     }
 
     private void setUpDictionary(){
@@ -264,6 +323,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         return false;
                     }
+
                 });
                 return true;
             default:
@@ -320,8 +380,7 @@ public class TastesFragment extends RefreshFragment {
      * adds taste to user's taste list
      */
     private void addTaste(String url, final String id) {
-        // Clear adapter
-        clearAdapter();
+
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
 
@@ -344,6 +403,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -362,27 +422,68 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     *
+     * Parses FIRST response, from /tastes/all
      */
-    private void parseResponse(ServerResponse.TasteResponse response) {
-        // Parse movies list
+    private void parseFirstResponse(ServerResponse.TasteResponse response) {
+
+        // Parse movies list of "all" page
         for (Movie movie : response.data.tastes.movies) {
-            tastesListMovie.add(movie);
+            if (!tastesListMovie.contains(movie))
+                tastesListMovie.add(movie);
         }
-        // Parse artists list
-        for (Artist artist : response.data.tastes.artists){
-            tastesListArtist.add(artist);
+        for (Artist artist : response.data.tastes.artists) {
+            if (!tastesListArtist.contains(artist))
+                tastesListArtist.add(artist);
         }
-        // Parse genres list
         for (Genre genre : response.data.tastes.genres){
-            tastesListGenre.add(genre);
+            if (!tastesListGenre.contains(genre))
+                tastesListGenre.add(genre);
         }
-        
+        // First response, I draw them
         fillCardList();
+        // Then I clear the lists (NOT the adapter)
+        clearData();
+
+        getOthersMovies();
+        getOthersArtists();
+        getOthersGenres();
+
     }
 
+
+    private void parseResponseMovies(ServerResponse.TasteResponseExtraMovies response){
+        //Parses movies of extra pages
+        for (Movie movie : response.data.tastes) {
+            if (!tastesListMovie.contains(movie))
+                tastesListMovie.add(movie);
+        }
+        fillCardList();
+        clearData();
+        getOthersMovies();
+
+    }
+    private void parseResponseArtists(ServerResponse.TasteResponseExtraArtists response){
+        //Parses artists of extra pages
+        for (Artist artist : response.data.tastes) {
+            if (!tastesListArtist.contains(artist))
+                tastesListArtist.add(artist);
+        }
+        fillCardList();
+        clearData();
+        getOthersArtists();
+    }
+    private void parseResponseGenres(ServerResponse.TasteResponseExtraGenres response){
+        //Parses genres of extra pages
+        for (Genre genre : response.data.tastes) {
+            if (!tastesListGenre.contains(genre))
+                tastesListGenre.add(genre);
+        }
+        fillCardList();
+        clearData();
+        getOthersGenres();
+    }
     /**
-     *
+     * UNUSED: Parser of the response of the suggestions
      */
     private void parseSuggestResponse(ServerResponse.SuggestResponse response) {
 
@@ -409,10 +510,11 @@ public class TastesFragment extends RefreshFragment {
     }
     
     /**
-     *
+     * This method creates and draws the cards to be shown
      */
     private void fillCardList() {
         // Create movies cards
+
         for (final Movie taste : tastesListMovie) {
             final TasteCard movieCard = new TasteCard(context);
             
@@ -421,6 +523,8 @@ public class TastesFragment extends RefreshFragment {
             } else {
                 movieCard.setTitle(taste.getTitle());
             }
+
+            Log.i(TAG,"I'm drawing: "+movieCard.getTitle());
 
             movieCard.setTaste(taste.isTaste());
             movieCard.setDismissible(false);
@@ -441,11 +545,14 @@ public class TastesFragment extends RefreshFragment {
             });
 
             cardList.add(movieCard);
+
+
+
         }
         // Create artists cards
         for (final Artist taste : tastesListArtist) {
             final TasteCard artistCard = new TasteCard(context);
-            
+
             artistCard.setTitle(taste.getName());
             artistCard.setTaste(taste.isTaste());
             artistCard.setDismissible(false);
@@ -466,6 +573,7 @@ public class TastesFragment extends RefreshFragment {
             });
 
             cardList.add(artistCard);
+
         }
 
         // Create genres cards
@@ -491,19 +599,131 @@ public class TastesFragment extends RefreshFragment {
             });
 
             cardList.add(genreCard);
-        }
 
+        }
+        //Before doing addAll, I should check for duplicates
+        removeDuplicates(cardList);
         materialListViewAdapter.addAll(cardList);
         tastesMaterialListView.smoothScrollToPosition(0);
     }
+    private void removeDuplicates(ArrayList<TasteCard> arr) {
+        LinkedHashSet<TasteCard> hs = new LinkedHashSet<>();
+        hs.addAll(arr);
+        arr.clear();
+        arr.addAll(hs);
+    }
+    private void getOthersMovies(){
 
+        // Movies
+        if (nextPagesMovies.get(0)!=null){
+
+            String urlM = nextPagesMovies.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraMovies>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraMovies>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraMovies result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            //responsesM.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesMovies.clear();
+                            nextPagesMovies.add(result.data.next_page);
+
+
+
+                            parseResponseMovies(result);
+
+
+                        }
+                    });
+        }
+
+
+    }
+    private void getOthersArtists(){
+        //Artists
+
+        if (nextPagesArtists.get(0)!=null){
+
+            String urlM = nextPagesArtists.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraArtists>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraArtists>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraArtists result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            //responsesA.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesArtists.clear();
+                            nextPagesArtists.add(result.data.next_page);
+
+
+
+                            parseResponseArtists(result);
+
+
+                        }
+                    });
+        }
+
+    }
+    private void getOthersGenres(){
+
+        // Genres
+        if (nextPagesGenres.get(0)!=null){
+            String urlM = nextPagesGenres.get(0);
+            Ion.with(context)
+                    .load(Utils.SERVER_URL2+urlM)
+                    .as(new TypeToken<ServerResponse.TasteResponseExtraGenres>() {
+                    })
+                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraGenres>() {
+                        @Override
+                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraGenres result) {
+                            if (e != null) {
+                                Log.e(TAG, e.toString());
+                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            //responsesG.add(result);
+                            // I should care about the other pages
+
+
+                            nextPagesGenres.clear();
+                            nextPagesGenres.add(result.data.next_page);
+
+
+
+                            parseResponseGenres(result);
+
+
+                        }
+                    });
+        }
+
+    }
     /**
-     *
+     * This method gets the first page of Tastes section
      */
     private void get(String url) {
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
-        // Do connection
+        // Do connection for first page
         Ion.with(context)
                 .load(url)
                 .as(new TypeToken<ServerResponse.TasteResponse>() {
@@ -516,18 +736,35 @@ public class TastesFragment extends RefreshFragment {
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
+                        //responses.add(result);
+                        // I should care about the other pages
+                        // A null value will block further connections
+                        nextPagesArtists.clear();
+                        nextPagesArtists.add(result.data.tastes.next_page_artists);
+
+
+                        nextPagesGenres.clear();
+                        nextPagesGenres.add(result.data.tastes.next_page_genres);
+
+
+                        nextPagesMovies.clear();
+                        nextPagesMovies.add(result.data.tastes.next_page_movies);
+
+
                         // Clear all data list
                         clearData();
-                        // Parse response
-                        parseResponse(result);
+
+                        // Parse response of "all-page", each parse will download and parse extra pages
+                        parseFirstResponse(result);
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
+
                     }
                 });
     }
 
     /**
-     *
+     * Lists of tastes and cards will be cleared with this method
      */
     private void clearData() {
         tastesListArtist.clear();
@@ -537,11 +774,9 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     *
+     * POST req to server in order to delete a taste
      */
     private void deleteTaste(String url) {
-        // Clear adapter
-        clearAdapter();
         // Set progressbar
         progressBar.setVisibility(View.VISIBLE);
         // Do connection
@@ -558,6 +793,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
+
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         // Create snackbar
@@ -578,6 +814,7 @@ public class TastesFragment extends RefreshFragment {
     private void clearAdapter() {
         materialListViewAdapter.clear();
         materialListViewAdapter.notifyDataSetChanged();
+
     }
 
     @Override

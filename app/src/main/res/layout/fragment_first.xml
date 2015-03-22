@@ -37,5 +37,7 @@
             android:layout_gravity="center_horizontal"
             style="@style/PrimeTime.Title"
             android:gravity="center" />
+
+
     </LinearLayout>
 </FrameLayout>

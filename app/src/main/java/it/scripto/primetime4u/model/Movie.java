@@ -264,4 +264,13 @@ public class Movie extends Taste implements Parcelable {
             return new Movie[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof Movie){
+            Movie param = (Movie) o;
+            return ((param.getIdIMDB().equals(this.getIdIMDB())));
+        }
+        return false;
+    }
 }

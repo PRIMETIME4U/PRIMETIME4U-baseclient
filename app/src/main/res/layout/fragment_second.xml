@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="it.scripto.primetime4u.SecondFragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+
+
+        android:padding="@dimen/big_padding"
+        android:layout_gravity="left|top"
+        android:weightSum="1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton"
+            android:src="@drawable/ic_launcher"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal"
+            style="@style/PrimeTime.Display1"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingBottom="@dimen/small_padding" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/just_to_start"
+            android:layout_gravity="center_horizontal"
+            style="@style/PrimeTime.Title"
+            android:gravity="center" />
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="246dp"
+            android:layout_marginTop="@dimen/small_padding">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/taste_progress_bar"
+                android:layout_gravity="center" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_scifi"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_scifi" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_adventure"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_adventure" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_romantic"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_romantic" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_action"
+                android:layout_marginTop="@dimen/small_padding"
+                android:id="@+id/genre_action"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                 />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:text="@string/genre_comedy"
+                android:id="@+id/genre_comedy"
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_horror"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_horror" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_thriller"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_thriller" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_western"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_western" />
+
+            <TextView
+                style="@style/PrimeTime.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_war"
+                android:layout_margin="@dimen/small_padding"
+                android:layout_marginTop="@dimen/small_padding"
+                android:layout_marginBottom="@dimen/small_padding"
+                android:id="@+id/genre_war" />
+            </LinearLayout>
+            </ScrollView>
+
+    </LinearLayout>
+
+</FrameLayout>
