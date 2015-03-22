@@ -62,4 +62,17 @@
     <string name="suggested">suggerito dall\'app PRIMETIME4U</string>
     <string name="please_wait">Attendi...</string>
     <string name="list_is_complete">Nessun altro risultato</string>
+    <string name="next_button">AVANTI</string>
+    <string name="just_to_start">Bevenuto in PRIMETIME4U, siccome è il tuo primo utilizzo, per una migliore esperienza d\'uso, indicaci qualche genere di film che preferisci. Potrai aggiungerne altri manualmente durante l\'utilizzo dell\'app</string>
+    <string name="genre_action">Azione</string>
+    <string name="genre_adventure">Avventura</string>
+    <string name="genre_comedy">Commedie</string>
+    <string name="genre_drama">Drammatici</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_romantic">Romantici</string>
+    <string name="genre_scifi">Fantascienza</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_western">Western</string>
+    <string name="genre_war">Guerra</string>
+    <string name="you_like">Genere aggiunto: </string>
 </resources>

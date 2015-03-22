@@ -37,6 +37,7 @@ public class TutorialActivity extends BaseActivity {
     public static final String PREFERENCES = "PRIMETIME4U";
     public static final String ACCOUNT = "ACCOUNT";
     private SharedPreferences preferences;
+    private String account;
 
     @Override
     protected String getTagLog() {
@@ -57,33 +58,9 @@ public class TutorialActivity extends BaseActivity {
         if (preferences.contains(ACCOUNT) && !preferences.getString(ACCOUNT,"").equals("invalidUser")){
             goToMain();    
         } else {
-            final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
-            CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
-            final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
-            tutorialViewPager.setAdapter(tutorialAdapter);
-            defaultIndicator.setViewPager(tutorialViewPager);
 
-            TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
-            TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
 
-            skipTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goToMain();
-                }
-            });
 
-            nextTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
-                    if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
-                        goToMain();
-                    } else {
-                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
-                    }
-                }
-            });
 
             if (verifyConnection()) {
                 try {
@@ -164,7 +141,36 @@ public class TutorialActivity extends BaseActivity {
                                 editor.remove("ACCOUNT");
                             }
                             editor.putString(ACCOUNT, accountName);
+                            setAccount(accountName);
                             editor.apply();
+                            final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
+                            final CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
+                            final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
+                            tutorialViewPager.setAdapter(tutorialAdapter);
+                            defaultIndicator.setViewPager(tutorialViewPager);
+
+                            TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
+                            TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
+
+                            skipTextView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    goToMain();
+                                }
+                            });
+
+                            nextTextView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
+                                    if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
+                                        goToMain();
+                                    } else {
+                                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
+                                    }
+                                }
+                            });
+
                         }
                     });
         } else {
@@ -221,9 +227,17 @@ public class TutorialActivity extends BaseActivity {
         alertDialog.show();
     }
 
+    public String getAccount(){
+        return account;
+    }
+
+    public void setAccount(String s){
+        this.account=s;
+    }
+
     private class TutorialAdapter extends FragmentPagerAdapter {
 
-        private int pagerCount = 1;
+        private int pagerCount = 2;
 
         public TutorialAdapter(FragmentManager fm) {
             super(fm);
@@ -240,6 +254,8 @@ public class TutorialActivity extends BaseActivity {
             switch (position) {
                 case 0:
                     return FirstFragment.newInstance();
+                case 1:
+                    return SecondFragment.newInstance();
                 default:
                     break;
             }

@@ -28,6 +28,7 @@
     <string name="plot">Plot:</string>
     <string name="action_search">Taste Search</string>
     <string name="skip_button">SKIP</string>
+    <string name="next_button">NEXT</string>
     <string name="app_slogan">The only app that allows you to plop down to the couch and simply enjoy a movie</string>
     <string name="no_proposal">There are no proposal for you</string>
     <string name="no_taste">There are no tastes yet</string>
@@ -41,7 +42,7 @@
     <string name="tastes_tutorial">Search your favorite movies, artists and genres and add to your tastes</string>
     <string name="welcome_watched_tutorial">Welcome into Watched section</string>
     <string name="welcome_proposal_tutorial">Welcome into Proposal section</string>
-    <string name="watched_tutorial">In this section we collect for you all movies that you watch</string>
+    <string name="watched_tutorial">In this section we collect all your watched movies</string>
     <string name="proposal_tutorial">Here you can find all movie proposal evaluated just for you</string>
     <string name="will_watch">You\'ll watch \"%1$s\"</string>
     <string name="watched_added">Movie added into watched list</string>
@@ -64,5 +65,16 @@
     <string name="suggested">Suggested by PRIMETIME4U</string>
     <string name="please_wait">Please wait...</string>
     <string name="list_is_complete">All results are shown</string>
-
+    <string name="just_to_start">Please, before starting using the app, tell us some of your favourite movie genres between these. You can manually add others during usage of the app</string>
+    <string name="genre_action">Action</string>
+    <string name="genre_drama">Drama</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_comedy">Comedy</string>
+    <string name="genre_romantic">Romance</string>
+    <string name="genre_scifi">Sci-Fi</string>
+    <string name="genre_adventure">Adventure</string>
+    <string name="genre_western">Western</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_war">War</string>
+    <string name="you_like">Genre added: </string>
 </resources>
