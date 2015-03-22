@@ -71,7 +71,7 @@
     <string name="facebook_app_id">1611938555692029</string>
     <string name="facebook_not_installed">Sorry, you should install Facebook app</string>
     <string name="suggested">Suggested by PRIMETIME4U</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="please_wait">Please wait…</string>
     <string name="list_is_complete">All results are shown</string>
     <string name="just_to_start">Please, before starting using the app, tell us some of your favourite movie genres between these. You can manually add others during usage of the app</string>
     <string name="genre_action">Action</string>
@@ -85,4 +85,5 @@
     <string name="genre_thriller">Thriller</string>
     <string name="genre_war">War</string>
     <string name="you_like">Genre added: </string>
+    <string name="next_button">NEXT</string>
 </resources>

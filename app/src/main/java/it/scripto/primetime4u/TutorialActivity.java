@@ -146,51 +146,6 @@ public class TutorialActivity extends BaseActivity {
                 Log.i(TAG, "PrivateKey già presente");
             }
 
-            Ion.with(getApplicationContext())
-                    .load("POST", url)
-                    .setJsonObjectBody(json)
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            SharedPreferences.Editor editor = preferences.edit();
-                            if (preferences.contains("ACCOUNT")){
-                                editor.remove("ACCOUNT");
-                            }
-                            editor.putString(ACCOUNT, accountName);
-                            setAccount(accountName);
-                            editor.apply();
-                            final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
-                            final CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
-                            final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
-                            tutorialViewPager.setAdapter(tutorialAdapter);
-                            defaultIndicator.setViewPager(tutorialViewPager);
-
-                            TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
-                            TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
-
-                            skipTextView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    goToMain();
-                                }
-                            });
-
-                            nextTextView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
-                                    if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
-                                        goToMain();
-                                    } else {
-                                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-
         } else {
             Toast.makeText(this, "Seleziona un account valido", Toast.LENGTH_LONG).show();
             SharedPreferences.Editor editor = preferences.edit();
@@ -261,7 +216,35 @@ public class TutorialActivity extends BaseActivity {
                             editor.remove("ACCOUNT");
                         }
                         editor.putString(ACCOUNT, accountName);
+                        setAccount(accountName);
                         editor.apply();
+                        final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
+                        final CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
+                        final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
+                        tutorialViewPager.setAdapter(tutorialAdapter);
+                        defaultIndicator.setViewPager(tutorialViewPager);
+
+                        TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
+                        TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
+
+                        skipTextView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                goToMain();
+                            }
+                        });
+
+                        nextTextView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
+                                if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
+                                    goToMain();
+                                } else {
+                                    tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
+                                }
+                            }
+                        });
                     }
                 });
     }
@@ -295,7 +278,7 @@ public class TutorialActivity extends BaseActivity {
 
         // bottone impostazioni
         alertDialog.setPositiveButton("Impostazioni", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog,int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
                 startActivity(intent);
                 finish();
