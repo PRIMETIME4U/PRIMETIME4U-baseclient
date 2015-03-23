@@ -65,10 +65,6 @@ public class TastesFragment extends RefreshFragment {
     private MenuItem searchItem;
     private MaterialListView tastesMaterialListView;
 
-    ArrayList<String> nextPagesMovies = new ArrayList<String>();
-    ArrayList<String> nextPagesGenres = new ArrayList<String>();
-    ArrayList<String> nextPagesArtists = new ArrayList<String>();
-
 
 
     /**
@@ -226,34 +222,38 @@ public class TastesFragment extends RefreshFragment {
     }
 
     private void setUpDictionary(){
-        dictionary.put("azione","Action");
-        dictionary.put("amore","Romance");
-        dictionary.put("commedia","Comedy");
-        dictionary.put("romantico","Romance");
-        dictionary.put("romantici","Romance");
-        dictionary.put("fantascienza","Sci-Fi");
-        dictionary.put("fantascenza","Sci-Fi"); //tengo conto anche degli utenti sgrammaticati :D
-        dictionary.put("fantascientifico","Sci-Fi");
-        dictionary.put("orrore","Horror");
-        dictionary.put("giallo","Crime");
-        dictionary.put("gialli","Crime");
-        dictionary.put("noir","Crime");
-        dictionary.put("noire","Crime");
-        dictionary.put("avventura","Adventure");
-        dictionary.put("guerra","War");
-        dictionary.put("documentario","Documentary");
-        dictionary.put("documentari","Documentary");
-        dictionary.put("biografia","Biography");
-        dictionary.put("biografico","Biography");
-        dictionary.put("fantasia","Fantasy");
-        dictionary.put("fantastico","Fantasy");
-        dictionary.put("biografici","Biography");
-        dictionary.put("drammatico","Drama");
-        dictionary.put("drammatici","Drama");
-        dictionary.put("animazione","Animation");
-        dictionary.put("cartoni","Animation");
-        dictionary.put("animati","Animation");
-        dictionary.put("west","Western");
+        /**
+         * don't care about capital letters, this dictionary is used to perform imdb searches, not adding the taste
+         */
+
+        dictionary.put("azione","action");
+        dictionary.put("amore","romance");
+        dictionary.put("commedia","comedy");
+        dictionary.put("romantico","romance");
+        dictionary.put("romantici","romance");
+        dictionary.put("fantascienza","sci-fi");
+        dictionary.put("fantascenza","sci-fi"); //tengo conto anche degli utenti sgrammaticati :D
+        dictionary.put("fantascientifico","sci-fi");
+        dictionary.put("orrore","horror");
+        dictionary.put("giallo","crime");
+        dictionary.put("gialli","crime");
+        dictionary.put("noir","crime");
+        dictionary.put("noire","crime");
+        dictionary.put("avventura","adventure");
+        dictionary.put("guerra","war");
+        dictionary.put("documentario","documentary");
+        dictionary.put("documentari","documentary");
+        dictionary.put("biografia","biography");
+        dictionary.put("biografico","biography");
+        dictionary.put("fantasia","fantasy");
+        dictionary.put("fantastico","fantasy");
+        dictionary.put("biografici","biography");
+        dictionary.put("drammatico","drama");
+        dictionary.put("drammatici","drama");
+        dictionary.put("animazione","animation");
+        dictionary.put("cartoni","animation");
+        dictionary.put("animati","animation");
+        dictionary.put("west","western");
 
 
     }
@@ -293,7 +293,7 @@ public class TastesFragment extends RefreshFragment {
                         }
                         
                         String url = Utils.SERVER_API + "search/" + account + "/" + sanitize(s, false);
-                        
+                        Log.i(TAG,"Imdb request of: " + s);
                         getSearch(url);
 
                         searchView.clearFocus();
@@ -448,7 +448,7 @@ public class TastesFragment extends RefreshFragment {
 
 
     /**
-     * UNUSED: Parser of the response of the suggestions
+     * Parser of the response of the suggestions
      */
     private void parseSuggestResponse(ServerResponse.SuggestResponse response) {
 
