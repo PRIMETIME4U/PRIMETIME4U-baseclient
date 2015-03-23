@@ -70,42 +70,8 @@ public class TutorialActivity extends BaseActivity {
             goToMain();    
         } else {
 
-            final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
-            final CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
-            final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
-            tutorialViewPager.setAdapter(tutorialAdapter);
-            defaultIndicator.setViewPager(tutorialViewPager);
 
-            TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
-            TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
 
-            skipTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goToMain();
-                }
-            });
-
-            nextTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
-                    if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
-                        goToMain();
-                    } else {
-                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
-                    }
-                }
-            });
-
-            if(privateKey.equals("")) {
-                if(checkPlayServices()) {
-                    gcm = GoogleCloudMessaging.getInstance(this);
-                    gcmRegistration();
-                }
-            }else{
-                Log.i(TAG, "PrivateKey già presente");
-            }
 
             if (verifyConnection()) {
                 try {
@@ -177,6 +143,42 @@ public class TutorialActivity extends BaseActivity {
             editor.putString(ACCOUNT, accountName);
             setAccount(accountName);
             editor.apply();
+            final ViewPager tutorialViewPager = (ViewPager) findViewById(R.id.viewpager_default);
+            final CircleIndicator defaultIndicator = (CircleIndicator) findViewById(R.id.indicator_default);
+            final TutorialAdapter tutorialAdapter = new TutorialAdapter(getSupportFragmentManager());
+            tutorialViewPager.setAdapter(tutorialAdapter);
+            defaultIndicator.setViewPager(tutorialViewPager);
+
+            TextView skipTextView = (TextView) findViewById(R.id.skip_text_view);
+            TextView nextTextView = (TextView) findViewById(R.id.next_text_view);
+
+            skipTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goToMain();
+                }
+            });
+
+            nextTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
+                    if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
+                        goToMain();
+                    } else {
+                        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
+                    }
+                }
+            });
+            if(privateKey.equals("")) {
+                if(checkPlayServices()) {
+                    gcm = GoogleCloudMessaging.getInstance(this);
+                    gcmRegistration();
+                }
+            }else{
+                Log.i(TAG, "PrivateKey già presente");
+            }
+
 
         } else {
             Toast.makeText(this, "Seleziona un account valido", Toast.LENGTH_LONG).show();

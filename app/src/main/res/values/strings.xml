@@ -80,6 +80,7 @@
     <string name="genre_comedy">Comedy</string>
     <string name="genre_romantic">Romance</string>
     <string name="genre_scifi">Sci-Fi</string>
+    <string name="genre_fantasy">Fantasy</string>
     <string name="genre_adventure">Adventure</string>
     <string name="genre_western">Western</string>
     <string name="genre_thriller">Thriller</string>

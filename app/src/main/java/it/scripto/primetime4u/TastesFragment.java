@@ -226,34 +226,34 @@ public class TastesFragment extends RefreshFragment {
     }
 
     private void setUpDictionary(){
-        dictionary.put("azione","action");
-        dictionary.put("amore","romance");
-        dictionary.put("commedia","comedy");
-        dictionary.put("romantico","romance");
-        dictionary.put("romantici","romance");
-        dictionary.put("fantascienza","sci-fi");
-        dictionary.put("fantascenza","sci-fi"); //tengo conto anche degli utenti sgrammaticati :D
-        dictionary.put("fantascientifico","sci-fi");
-        dictionary.put("orrore","horror");
-        dictionary.put("giallo","crime");
-        dictionary.put("gialli","crime");
-        dictionary.put("noir","crime");
-        dictionary.put("noire","crime");
-        dictionary.put("avventura","adventure");
-        dictionary.put("guerra","war");
-        dictionary.put("documentario","documentary");
-        dictionary.put("documentari","documentary");
-        dictionary.put("biografia","biography");
-        dictionary.put("biografico","biography");
-        dictionary.put("fantasia","fantasy");
-        dictionary.put("fantastico","fantasy");
-        dictionary.put("biografici","biography");
-        dictionary.put("drammatico","drama");
-        dictionary.put("drammatici","drama");
-        dictionary.put("animazione","animation");
-        dictionary.put("cartoni","animation");
-        dictionary.put("animati","animation");
-        dictionary.put("west","western");
+        dictionary.put("azione","Action");
+        dictionary.put("amore","Romance");
+        dictionary.put("commedia","Comedy");
+        dictionary.put("romantico","Romance");
+        dictionary.put("romantici","Romance");
+        dictionary.put("fantascienza","Sci-Fi");
+        dictionary.put("fantascenza","Sci-Fi"); //tengo conto anche degli utenti sgrammaticati :D
+        dictionary.put("fantascientifico","Sci-Fi");
+        dictionary.put("orrore","Horror");
+        dictionary.put("giallo","Crime");
+        dictionary.put("gialli","Crime");
+        dictionary.put("noir","Crime");
+        dictionary.put("noire","Crime");
+        dictionary.put("avventura","Adventure");
+        dictionary.put("guerra","War");
+        dictionary.put("documentario","Documentary");
+        dictionary.put("documentari","Documentary");
+        dictionary.put("biografia","Biography");
+        dictionary.put("biografico","Biography");
+        dictionary.put("fantasia","Fantasy");
+        dictionary.put("fantastico","Fantasy");
+        dictionary.put("biografici","Biography");
+        dictionary.put("drammatico","Drama");
+        dictionary.put("drammatici","Drama");
+        dictionary.put("animazione","Animation");
+        dictionary.put("cartoni","Animation");
+        dictionary.put("animati","Animation");
+        dictionary.put("west","Western");
 
 
     }
@@ -422,9 +422,9 @@ public class TastesFragment extends RefreshFragment {
     }
 
     /**
-     * Parses FIRST response, from /tastes/all
+     * Parses response, from /tastes/all
      */
-    private void parseFirstResponse(ServerResponse.TasteResponse response) {
+    private void parseResponse(ServerResponse.TasteResponse response) {
 
         // Parse movies list of "all" page
         for (Movie movie : response.data.tastes.movies) {
@@ -443,45 +443,10 @@ public class TastesFragment extends RefreshFragment {
         fillCardList();
         // Then I clear the lists (NOT the adapter)
         clearData();
-
-        getOthersMovies();
-        getOthersArtists();
-        getOthersGenres();
-
     }
 
 
-    private void parseResponseMovies(ServerResponse.TasteResponseExtraMovies response){
-        //Parses movies of extra pages
-        for (Movie movie : response.data.tastes) {
-            if (!tastesListMovie.contains(movie))
-                tastesListMovie.add(movie);
-        }
-        fillCardList();
-        clearData();
-        getOthersMovies();
 
-    }
-    private void parseResponseArtists(ServerResponse.TasteResponseExtraArtists response){
-        //Parses artists of extra pages
-        for (Artist artist : response.data.tastes) {
-            if (!tastesListArtist.contains(artist))
-                tastesListArtist.add(artist);
-        }
-        fillCardList();
-        clearData();
-        getOthersArtists();
-    }
-    private void parseResponseGenres(ServerResponse.TasteResponseExtraGenres response){
-        //Parses genres of extra pages
-        for (Genre genre : response.data.tastes) {
-            if (!tastesListGenre.contains(genre))
-                tastesListGenre.add(genre);
-        }
-        fillCardList();
-        clearData();
-        getOthersGenres();
-    }
     /**
      * UNUSED: Parser of the response of the suggestions
      */
@@ -601,124 +566,13 @@ public class TastesFragment extends RefreshFragment {
             cardList.add(genreCard);
 
         }
-        //Before doing addAll, I should check for duplicates
-        removeDuplicates(cardList);
         materialListViewAdapter.addAll(cardList);
         tastesMaterialListView.smoothScrollToPosition(0);
     }
-    private void removeDuplicates(ArrayList<TasteCard> arr) {
-        LinkedHashSet<TasteCard> hs = new LinkedHashSet<>();
-        hs.addAll(arr);
-        arr.clear();
-        arr.addAll(hs);
-    }
-    private void getOthersMovies(){
-
-        // Movies
-        if (nextPagesMovies.get(0)!=null){
-
-            String urlM = nextPagesMovies.get(0);
-            Ion.with(context)
-                    .load(Utils.SERVER_URL2+urlM)
-                    .as(new TypeToken<ServerResponse.TasteResponseExtraMovies>() {
-                    })
-                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraMovies>() {
-                        @Override
-                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraMovies result) {
-                            if (e != null) {
-                                Log.e(TAG, e.toString());
-                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                            //responsesM.add(result);
-                            // I should care about the other pages
 
 
-                            nextPagesMovies.clear();
-                            nextPagesMovies.add(result.data.next_page);
-
-
-
-                            parseResponseMovies(result);
-
-
-                        }
-                    });
-        }
-
-
-    }
-    private void getOthersArtists(){
-        //Artists
-
-        if (nextPagesArtists.get(0)!=null){
-
-            String urlM = nextPagesArtists.get(0);
-            Ion.with(context)
-                    .load(Utils.SERVER_URL2+urlM)
-                    .as(new TypeToken<ServerResponse.TasteResponseExtraArtists>() {
-                    })
-                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraArtists>() {
-                        @Override
-                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraArtists result) {
-                            if (e != null) {
-                                Log.e(TAG, e.toString());
-                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                            //responsesA.add(result);
-                            // I should care about the other pages
-
-
-                            nextPagesArtists.clear();
-                            nextPagesArtists.add(result.data.next_page);
-
-
-
-                            parseResponseArtists(result);
-
-
-                        }
-                    });
-        }
-
-    }
-    private void getOthersGenres(){
-
-        // Genres
-        if (nextPagesGenres.get(0)!=null){
-            String urlM = nextPagesGenres.get(0);
-            Ion.with(context)
-                    .load(Utils.SERVER_URL2+urlM)
-                    .as(new TypeToken<ServerResponse.TasteResponseExtraGenres>() {
-                    })
-                    .setCallback(new FutureCallback<ServerResponse.TasteResponseExtraGenres>() {
-                        @Override
-                        public void onCompleted(Exception e, ServerResponse.TasteResponseExtraGenres result) {
-                            if (e != null) {
-                                Log.e(TAG, e.toString());
-                                Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                            //responsesG.add(result);
-                            // I should care about the other pages
-
-
-                            nextPagesGenres.clear();
-                            nextPagesGenres.add(result.data.next_page);
-
-
-
-                            parseResponseGenres(result);
-
-
-                        }
-                    });
-        }
-
-    }
     /**
-     * This method gets the first page of Tastes section
+     * GET Tastes from server
      */
     private void get(String url) {
         // Set progressbar
@@ -736,26 +590,10 @@ public class TastesFragment extends RefreshFragment {
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
-                        //responses.add(result);
-                        // I should care about the other pages
-                        // A null value will block further connections
-                        nextPagesArtists.clear();
-                        nextPagesArtists.add(result.data.tastes.next_page_artists);
-
-
-                        nextPagesGenres.clear();
-                        nextPagesGenres.add(result.data.tastes.next_page_genres);
-
-
-                        nextPagesMovies.clear();
-                        nextPagesMovies.add(result.data.tastes.next_page_movies);
-
-
                         // Clear all data list
                         clearData();
-
                         // Parse response of "all-page", each parse will download and parse extra pages
-                        parseFirstResponse(result);
+                        parseResponse(result);
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
 
@@ -821,6 +659,7 @@ public class TastesFragment extends RefreshFragment {
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
         // TODO: save tastesListMovie in order to reuse after
+
     }
 
     @Override

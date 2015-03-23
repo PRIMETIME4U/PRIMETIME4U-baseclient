@@ -68,7 +68,7 @@ public class SecondFragment extends ColorFragment {
         action.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "action";
+                String toBeAdded = "Action";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 action.setVisibility(View.INVISIBLE);
@@ -78,7 +78,7 @@ public class SecondFragment extends ColorFragment {
         adventure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "adventure";
+                String toBeAdded = "Adventure";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 adventure.setVisibility(View.INVISIBLE);
@@ -88,17 +88,27 @@ public class SecondFragment extends ColorFragment {
         comedy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "comedy";
+                String toBeAdded = "Comedy";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 comedy.setVisibility(View.INVISIBLE);
+            }
+        });
+        final TextView fantasy = (TextView)  view.findViewById(R.id.genre_fantasy);
+        comedy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String toBeAdded = "Fantasy";
+                String url = Utils.SERVER_API + "tastes/" + account + "/genre";
+                addTaste(url, toBeAdded);
+                fantasy.setVisibility(View.INVISIBLE);
             }
         });
         final TextView romance = (TextView) view.findViewById(R.id.genre_romantic);
         romance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "romance";
+                String toBeAdded = "Romance";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 romance.setVisibility(View.INVISIBLE);
@@ -108,7 +118,7 @@ public class SecondFragment extends ColorFragment {
         scifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "scifi";
+                String toBeAdded = "Sci-Fi";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 scifi.setVisibility(View.INVISIBLE);
@@ -118,7 +128,7 @@ public class SecondFragment extends ColorFragment {
         horror.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "horror";
+                String toBeAdded = "Horror";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 horror.setVisibility(View.INVISIBLE);
@@ -128,7 +138,7 @@ public class SecondFragment extends ColorFragment {
         war.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "war";
+                String toBeAdded = "War";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 war.setVisibility(View.INVISIBLE);
@@ -138,7 +148,7 @@ public class SecondFragment extends ColorFragment {
         western.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "western";
+                String toBeAdded = "Western";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 western.setVisibility(View.INVISIBLE);
@@ -148,7 +158,7 @@ public class SecondFragment extends ColorFragment {
         thriller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String toBeAdded = "thriller";
+                String toBeAdded = "Thriller";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
                 thriller.setVisibility(View.INVISIBLE);

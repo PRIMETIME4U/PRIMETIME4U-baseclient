@@ -85,4 +85,5 @@
     <string name="notification_time">Orario di notifica</string>
     <string name="almost_one_tv_type">Devi avere almeno un palinsesto impostato!</string>
     <string name="facebook_app_id">1611938555692029</string>
+    <string name="genre_fantasy">Fantasy</string>
 </resources>

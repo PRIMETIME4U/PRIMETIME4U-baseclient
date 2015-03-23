@@ -79,6 +79,17 @@
                         style="@style/PrimeTime.Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/small_padding"
+                        android:layout_marginTop="@dimen/small_padding"
+                        android:layout_marginBottom="@dimen/small_padding"
+                        android:text="@string/genre_fantasy"
+                        android:id="@+id/genre_fantasy"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        style="@style/PrimeTime.Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/genre_horror"
                         android:layout_margin="@dimen/small_padding"
                         android:layout_marginTop="@dimen/small_padding"
