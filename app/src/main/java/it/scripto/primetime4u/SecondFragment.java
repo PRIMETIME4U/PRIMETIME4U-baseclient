@@ -48,7 +48,8 @@ public class SecondFragment extends ColorFragment {
 
     @Override
     protected int getColor() {
-        return (0xff000000 | random.nextInt(0x00ffffff));
+        return getResources().getColor(R.color.primary_dark);
+        //return (0xff000000 | random.nextInt(0x00ffffff));
     }
 
     @Override
