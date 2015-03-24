@@ -50,8 +50,6 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         SharedPreferences preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 
         // Get account

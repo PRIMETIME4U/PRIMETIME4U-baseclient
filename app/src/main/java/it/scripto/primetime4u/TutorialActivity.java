@@ -26,11 +26,16 @@ import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
@@ -234,12 +239,39 @@ public class TutorialActivity extends BaseActivity {
         json.addProperty("userBirthYear", "1990");
         json.addProperty("userGender", "M");
 
-        Log.i(TAG, "Risposta subscribe: " + json.toString());
-
         Ion.with(getApplicationContext())
                 .load("POST", url)
                 .setJsonObjectBody(json)
-                .asJsonObject();
+                .asJsonObject().setCallback(new FutureCallback<JsonObject>() {
+            @Override
+            public void onCompleted(Exception e, JsonObject result) {
+                Log.i(TAG, "Risposta subscribe: " + result.toString());
+
+                SharedPreferences preferences = getSharedPreferences("it.scripto.primetime4u_preferences", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("repeat_choice_enable", result.get("repeatChoice").getAsBoolean());
+                editor.putBoolean("notification_enabled", result.get("enableNotification").getAsBoolean());
+                editor.putLong("time_notification", result.get("timeNotification").getAsLong());
+                JsonArray tvTypeList = result.get("tvType").getAsJsonArray();
+                Gson converter = new Gson();
+                Type type = new TypeToken<List<String>>(){}.getType();
+                List<String> list = converter.fromJson(tvTypeList, type);
+                for (String tvType : list) {
+                    switch (tvType) {
+                        case "free":
+                            editor.putBoolean("free_enabled", true);
+                            break;
+                        case "premium":
+                            editor.putBoolean("premium_enabled", true);
+                            break;
+                        case "sky":
+                            editor.putBoolean("sky_enabled", true);
+                            break;
+                    }
+                }
+                editor.apply();
+            }
+        });
 
     }
 
