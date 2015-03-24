@@ -1,5 +1,7 @@
 ## PRIMETIME4U
 
+![](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/blob/master/app/src/main/res/drawable-xhdpi/ic_launcher.png)
+
 *The only app that allows you to plop down to the couch and simply enjoy a movie.*
 
 ### What is it?
