@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.github.machinarius.preferencefragment.PreferenceFragment;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import com.google.gson.JsonArray;
@@ -42,6 +43,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 };
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Log.i(TAG, context.getPackageName() + "_preferences");
         sharedPref.registerOnSharedPreferenceChangeListener(listener);
     }
 
@@ -91,7 +93,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
 
             String url = Utils.SERVER_API + "settings/" + account;
 
-            Log.i(TAG, String.valueOf(json));
+            Log.i(TAG, "Invio: " + String.valueOf(json));
 
             Log.i(TAG, "Faccio chiamata");
 
