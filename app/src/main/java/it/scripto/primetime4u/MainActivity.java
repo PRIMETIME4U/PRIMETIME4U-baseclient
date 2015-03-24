@@ -30,8 +30,11 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
     private String account;
     private boolean italian;
+    private boolean refresh;
 
+    public void setRefresh(boolean b) { refresh = b; }
 
+    public boolean getRefresh(){ return refresh; }
 
     @Override
     protected String getTagLog() {
@@ -56,6 +59,9 @@ public class MainActivity extends BaseActivity implements WatchedFragment.onTast
 
         // Get if is italian or not
         italian = Locale.getDefault().getLanguage().equals("it");
+
+        // Set the watched-refresh boolean guard to false
+        refresh = false;
 
         // Get and set toolbar as action bar
         Toolbar main_activity_toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
