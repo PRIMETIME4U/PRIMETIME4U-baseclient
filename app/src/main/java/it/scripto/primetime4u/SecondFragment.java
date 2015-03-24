@@ -56,10 +56,6 @@ public class SecondFragment extends ColorFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // Get user_id
-        TutorialActivity base = (TutorialActivity) this.getActivity();
-        account = base.getAccount();
-
         // Get progress bar
         progressBar = (ProgressBar) view.findViewById(R.id.taste_progress_bar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
@@ -68,6 +64,10 @@ public class SecondFragment extends ColorFragment {
         action.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Action";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -78,6 +78,10 @@ public class SecondFragment extends ColorFragment {
         adventure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Adventure";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -89,6 +93,10 @@ public class SecondFragment extends ColorFragment {
         comedy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Comedy";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -100,6 +108,10 @@ public class SecondFragment extends ColorFragment {
         fantasy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Fantasy";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -110,6 +122,10 @@ public class SecondFragment extends ColorFragment {
         romance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Romance";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -120,6 +136,10 @@ public class SecondFragment extends ColorFragment {
         scifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Sci-Fi";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -130,6 +150,10 @@ public class SecondFragment extends ColorFragment {
         horror.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Horror";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -140,6 +164,10 @@ public class SecondFragment extends ColorFragment {
         war.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "War";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -150,6 +178,10 @@ public class SecondFragment extends ColorFragment {
         western.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Western";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);
@@ -160,6 +192,10 @@ public class SecondFragment extends ColorFragment {
         thriller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get user_id
+                TutorialActivity base = (TutorialActivity) getActivity();
+                account = base.getAccount();
+
                 String toBeAdded = "Thriller";
                 String url = Utils.SERVER_API + "tastes/" + account + "/genre";
                 addTaste(url, toBeAdded);

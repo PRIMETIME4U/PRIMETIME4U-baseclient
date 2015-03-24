@@ -18,6 +18,7 @@
             android:defaultValue="false"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:layout="@layout/custom_layout_preference_category_material"
         android:title="@string/notification"
         android:key="pref_key_storage_settings">
         <SwitchPreference
@@ -31,6 +32,7 @@
             android:dependency="notification_enabled"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:layout="@layout/custom_layout_preference_category_material"
         android:title="@string/more"
         android:key="pref_key_storage_settings">
         <CheckBoxPreference
