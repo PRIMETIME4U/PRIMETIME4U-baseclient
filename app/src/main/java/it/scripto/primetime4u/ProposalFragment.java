@@ -67,7 +67,7 @@ public class ProposalFragment extends BaseFragment {
 
     private List<Movie> proposalList = new ArrayList<>();
     private ArrayList<Card> cardList = new ArrayList<>();
-    private ArrayList<Card> alreadyWatchedList = new ArrayList<>();
+
     public ArrayList<String> alreadyWatchedTitles = new ArrayList<>();
 
     private ProposalListAdapter materialListViewAdapter;
@@ -318,6 +318,10 @@ public class ProposalFragment extends BaseFragment {
 
                     // Add watched movie
                     addWatched(url, movieId, date);
+
+                    MainActivity base = (MainActivity) getActivity();
+                    // In this way, watched fragment has to ignore the savedinstancestate
+                    base.setRefresh(true);
                 }
             });
 
@@ -424,10 +428,17 @@ public class ProposalFragment extends BaseFragment {
 
                     materialListViewAdapter.remove(card);
 
+                    materialListViewAdapter.notifyDataSetChanged();
+
                     // Generate URL
                     String url = Utils.SERVER_API + "watched/" + account;
                     // Add watched movie, with a special date 01-01-1900 to recognize these movies
                     addWatched(url, proposal.getIdIMDB(), "01-01-1900");
+
+                    MainActivity base = (MainActivity) getActivity();
+                    // In this way, watched fragment has to ignore the savedinstancestate
+                    base.setRefresh(true);
+
 
                 }
             });

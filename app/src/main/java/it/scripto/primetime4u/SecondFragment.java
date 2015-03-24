@@ -84,6 +84,7 @@ public class SecondFragment extends ColorFragment {
                 adventure.setVisibility(View.INVISIBLE);
             }
         });
+
         final TextView comedy = (TextView)  view.findViewById(R.id.genre_comedy);
         comedy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +95,7 @@ public class SecondFragment extends ColorFragment {
                 comedy.setVisibility(View.INVISIBLE);
             }
         });
+
         final TextView fantasy = (TextView)  view.findViewById(R.id.genre_fantasy);
         fantasy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,24 +178,23 @@ public class SecondFragment extends ColorFragment {
         // Create JSON object
         JsonObject json = new JsonObject();
         json.addProperty("data", id);
-        String body = json.toString();
+
 
         // Do connection
-        Ion.with(context)
+        Ion.with(getActivity().getApplicationContext())
                 .load("POST", url)
                 .progressBar(progressBar)
-                .setHeader("content-type","application/json")
-                .setStringBody(body)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
                     @Override
-                    public void onCompleted(Exception e, String result) {
+                    public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
                             Log.e(TAG, e.toString());
                             Toast.makeText(context, getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Log.i(TAG,result);
+                        Log.i(TAG,result.toString());
                         // Unset progressbar
                         progressBar.setVisibility(View.INVISIBLE);
                         Toast.makeText(context,R.string.taste_added,Toast.LENGTH_LONG).show();

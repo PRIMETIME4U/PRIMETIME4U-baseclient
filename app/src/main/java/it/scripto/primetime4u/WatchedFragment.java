@@ -163,7 +163,7 @@ public class WatchedFragment extends RefreshFragment {
 
         }
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && base.getRefresh()==false) {
             Log.i(TAG, "Restore watchedList");
             watchedList = savedInstanceState.getParcelableArrayList(STATE_WATCHED_LIST);
             Log.i(TAG, "Restore nextPage");
@@ -183,7 +183,7 @@ public class WatchedFragment extends RefreshFragment {
             // Clear data
             clearData();
             toBeDrawn.clear();
-
+            base.setRefresh(false);
             // Generate URL
             String url = Utils.SERVER_API + "watched/" + account;
             // Get watched
@@ -235,12 +235,13 @@ public class WatchedFragment extends RefreshFragment {
      */
     @Override
     public void refresh() {
+        Log.i(TAG,"Called method refresh on watched");
         // Clear data
         clearData();
         toBeDrawn.clear();
         // Clear adapter
         clearAdapter();
-
+        nextPage=null;
         // Since I've cleared the adapter I have to recheck the tutorial card
         addTutorialCard();
         // Generate URL

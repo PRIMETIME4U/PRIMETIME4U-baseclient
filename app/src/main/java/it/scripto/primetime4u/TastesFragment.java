@@ -215,7 +215,8 @@ public class TastesFragment extends RefreshFragment {
 
         // Generate URL
         String url = Utils.SERVER_API + "tastes/" + account + "/all";
-
+        // Unset progressbar
+        progressBar.setVisibility(View.INVISIBLE);
         // Get tastes
         get(url);
 
@@ -632,8 +633,7 @@ public class TastesFragment extends RefreshFragment {
                         // Refresh tastes
                         onTasteChangeListener.onTasteChanged();
 
-                        // Unset progressbar
-                        progressBar.setVisibility(View.INVISIBLE);
+
                         // Create snackbar
                         new SnackBar.Builder(getActivity().getApplicationContext(), view)
 //                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
