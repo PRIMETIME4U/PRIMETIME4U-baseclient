@@ -2,17 +2,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="first_preferencescreen">
     <PreferenceCategory
+        android:layout="@layout/custom_layout_preference_category_material"
         android:title="@string/choose_tv_type"
         android:key="pref_key_storage_settings">
         <CheckBoxPreference
+            android:layout="@layout/custom_preference"
             android:key="free_enabled"
             android:title="Free"
             android:defaultValue="true"/>
         <CheckBoxPreference
+            android:layout="@layout/custom_preference"
             android:key="premium_enabled"
             android:title="Mediaset Premium"
             android:defaultValue="false"/>
         <CheckBoxPreference
+            android:layout="@layout/custom_preference"
             android:key="sky_enabled"
             android:title="Sky"
             android:defaultValue="false"/>
@@ -22,10 +26,12 @@
         android:title="@string/notification"
         android:key="pref_key_storage_settings">
         <SwitchPreference
+            android:layout="@layout/custom_preference"
             android:key="notification_enabled"
             android:title="@string/notification"
             android:defaultValue="true"/>
         <it.scripto.primetime4u.utils.TimePreference
+            android:layout="@layout/custom_preference"
             android:key="time_notification"
             android:title="@string/notification_time"
             android:defaultValue="64800000"
@@ -36,6 +42,7 @@
         android:title="@string/more"
         android:key="pref_key_storage_settings">
         <CheckBoxPreference
+            android:layout="@layout/custom_preference"
             android:key="repeat_choice_enable"
             android:title="@string/repeat_choice"
             android:defaultValue="false"/>

@@ -498,7 +498,7 @@ public class ProposalFragment extends BaseFragment {
                                     //                            .withActionMessageId(R.string.undo)
                                     .withMessage(String.format(getResources().getString(R.string.dislike), italian ? proposal.getTitle() : proposal.getOriginalTitle()))
                                     .show();
-
+                            break;
                         case R.id.share_facebook:
                             if (FacebookDialog.canPresentShareDialog(getActivity(),
                                     FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
@@ -528,16 +528,13 @@ public class ProposalFragment extends BaseFragment {
                                         .setDescription(proposal.getChannel()+", "+proposal.getTime()+"\n"+proposal.getItalianPlot()+"\n"+suggested) //description of the post, will show up in mobile posts
                                         .setCaption(suggested) //is the title setted up in web based facebook
                                         .build();
-
-
-
-
                                 uiHelper.trackPendingDialogCall(shareDialog.present());
 
                             } else {
                                 // FB App not installed
                                 Toast.makeText(context,R.string.facebook_not_installed,Toast.LENGTH_LONG).show();
                             }
+                            break;
                     }
                     return true;
                 }

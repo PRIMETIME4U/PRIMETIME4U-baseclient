@@ -12,15 +12,10 @@
         <!-- PagerSlidingTabStrip -->
         <item name="pstsIndicatorColor">@color/accent</item>
         <item name="android:textViewStyle">@style/PrimeTimeTheme</item>
-    </style>
 
-    <style name="SettingsTheme">
-        <!-- Override properties according to your need -->
-        <item name="android:textColorPrimary">@android:color/darker_gray</item>
-        <item name="android:textColorSecondary">@android:color/darker_gray</item>
-        <item name="android:textColorLink">@color/accent</item>
+        <item name="android:listChoiceIndicatorSingle">@drawable/btn_check</item>
+        <item name="android:listChoiceIndicatorMultiple">@drawable/btn_check</item>
     </style>
-
 
     <style name="PrimeTimeTheme" parent="PrimeTimeTheme.Base">
     </style>
