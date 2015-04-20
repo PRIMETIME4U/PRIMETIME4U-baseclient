@@ -11,7 +11,7 @@
     <string name="channel_text">Canale: %1$s - %2$s</string>
     <string name="time_text">Orario: %1$s</string>
     <string name="movie_info_text">Canale: %1$s - Orario: %2$s</string>
-    <string name="feedback_text">Hai visto \"%1$s\" come suggerito l'ultima volta?</string>
+    <string name="feedback_text">Hai visto \"%1$s\" come suggerito l\'ultima volta?</string>
     <string name="poster_content_description">Poster</string>
     <string name="no_text">No</string>
     <string name="yes_text">Sì</string>

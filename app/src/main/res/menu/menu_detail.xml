@@ -14,4 +14,9 @@
         android:title="@string/already_watched_text"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/details_share_on_fb"
+        android:title="@string/share"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
 </menu>

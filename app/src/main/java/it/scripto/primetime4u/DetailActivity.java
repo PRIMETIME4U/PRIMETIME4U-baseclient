@@ -3,6 +3,7 @@ package it.scripto.primetime4u;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -19,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.FacebookDialog;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -35,11 +38,12 @@ import it.scripto.primetime4u.utils.BaseActivity;
 import it.scripto.primetime4u.utils.Utils;
 
 public class DetailActivity extends BaseActivity {
-    
+
     private ProgressBar progressBar;
     private boolean italian;
     private Movie movie;
     private SharedPreferences preferences;
+    private UiLifecycleHelper uiHelper;
 
     @Override
     protected String getTagLog() {
@@ -52,8 +56,30 @@ public class DetailActivity extends BaseActivity {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        uiHelper.onActivityResult(requestCode, resultCode, data, new FacebookDialog.Callback() {
+            @Override
+            public void onError(FacebookDialog.PendingCall pendingCall, Exception error, Bundle data) {
+                Log.e("Activity", String.format("Error: %s", error.toString()));
+            }
+
+            @Override
+            public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
+                Log.i("Activity", "Success!");
+                boolean didCancel = FacebookDialog.getNativeDialogDidComplete(data);
+                String didCancelS = Boolean.toString(didCancel);
+                Log.i("DetailActivity",didCancelS);
+            }
+        });
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        uiHelper = new UiLifecycleHelper(this, null);
+        uiHelper.onCreate(savedInstanceState);
 
         // Get and set toolbar as action bar
         Toolbar detailActivityToolbar = (Toolbar) findViewById(R.id.detail_activity_toolbar);
@@ -67,7 +93,7 @@ public class DetailActivity extends BaseActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(getString(R.color.accent)), PorterDuff.Mode.SRC_IN);
 
         // Pref
-        preferences = getSharedPreferences(TutorialActivity.PREFERENCES,Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(TutorialActivity.PREFERENCES, Context.MODE_PRIVATE);
 
         // Get if is italian or not
         italian = Locale.getDefault().getLanguage().equals("it");
@@ -148,11 +174,11 @@ public class DetailActivity extends BaseActivity {
                     public void onCompleted(Exception e, ServerResponse.DetailResponse result) {
                         if (e != null) {
                             Log.e(TAG, e.toString());
-                            Toast.makeText(getBaseContext(), getString(R.string.generic_error) , Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), getString(R.string.generic_error), Toast.LENGTH_LONG).show();
                             return;
                         }
                         drawResult(result);
-                        
+
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -162,7 +188,7 @@ public class DetailActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
-        for(int i = 0; i < menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
             spanString.setSpan(new ForegroundColorSpan(Color.DKGRAY), 0, spanString.length(), 0); //fix the color to white
@@ -183,13 +209,12 @@ public class DetailActivity extends BaseActivity {
         String account = preferences.getString(TutorialActivity.ACCOUNT, null);
 
 
-
         switch (item.getItemId()) {
             case R.id.details_dislike:
 
-                String url = Utils.SERVER_API+"untaste/"+account;
+                String url = Utils.SERVER_API + "untaste/" + account;
                 JsonObject json = new JsonObject();
-                json.addProperty("data",movie.getIdIMDB());
+                json.addProperty("data", movie.getIdIMDB());
                 Ion.with(this)
                         .load("POST", url)
                         .setJsonObjectBody(json)
@@ -199,20 +224,20 @@ public class DetailActivity extends BaseActivity {
                             public void onCompleted(Exception e, JsonObject result) {
                                 if (e != null) {
                                     Log.e(TAG, e.toString());
-                                    Toast.makeText(getBaseContext(),getString(R.string.generic_error) ,Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getBaseContext(), getString(R.string.generic_error), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
-                String msg= String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
-                Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+                String msg = String.format(getResources().getString(R.string.dislike), italian ? movie.getTitle() : movie.getOriginalTitle());
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 
                 editor = preferences.edit();
-                if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                if (!preferences.contains("ALREADY_WATCHED_LIST")) {
                     editor.putString("ALREADY_WATCHED_LIST", movie.getTitle());
                 } else {
-                    String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                    String s = preferences.getString("ALREADY_WATCHED_LIST", "");
                     s = s + "|" + movie.getTitle();
-                    editor.putString("ALREADY_WATCHED_LIST",s);
+                    editor.putString("ALREADY_WATCHED_LIST", s);
                 }
                 editor.apply();
 
@@ -220,12 +245,12 @@ public class DetailActivity extends BaseActivity {
                 return true;
             case R.id.details_already_watched:
                 editor = preferences.edit();
-                if (!preferences.contains("ALREADY_WATCHED_LIST")){
+                if (!preferences.contains("ALREADY_WATCHED_LIST")) {
                     editor.putString("ALREADY_WATCHED_LIST", movie.getTitle());
                 } else {
-                    String s = preferences.getString("ALREADY_WATCHED_LIST","");
+                    String s = preferences.getString("ALREADY_WATCHED_LIST", "");
                     s = s + "|" + movie.getTitle();
-                    editor.putString("ALREADY_WATCHED_LIST",s);
+                    editor.putString("ALREADY_WATCHED_LIST", s);
                 }
                 editor.apply();
 
@@ -234,13 +259,52 @@ public class DetailActivity extends BaseActivity {
                 // Add watched movie, with a special date 01-01-1900 to recognize these movies
                 addWatched(url2, movie.getIdIMDB(), "01-01-1900");
 
-                Toast.makeText(this,R.string.watched_added,Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.watched_added, Toast.LENGTH_LONG).show();
 
                 return true;
+            case R.id.details_share_on_fb:
+                //condividi su facebook
+                if (FacebookDialog.canPresentShareDialog(this,
+                        FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+                    Toast.makeText(getBaseContext(), R.string.please_wait, Toast.LENGTH_LONG).show();
+                    /**I set up a Open Graph story, this is generated but not postable, idk why
+                     OpenGraphObject movieObj = OpenGraphObject.Factory.createForPost("video");
+                     movieObj.setProperty("title",proposal.getTitle());
+                     movieObj.setProperty("image",proposal.getPoster());
+                     movieObj.setProperty("description",R.string.suggested);
+
+
+                     OpenGraphAction action = GraphObject.Factory.create(OpenGraphAction.class);
+                     action.setProperty("video.wants_to_watch",movieObj);
+                     action.setType("video.wants_to_watch");
+                     // Publish the post using the Share Dialog
+                     FacebookDialog shareDialog = new FacebookDialog.OpenGraphActionDialogBuilder
+                     (getActivity(),action,"video.wants_to_watch").build();
+                     **/
+                    String suggested = getResources().getString(R.string.suggested);
+
+                    String link = "http://www.imdb.com/title/" + movie.getIdIMDB();
+
+                    FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(this)
+                            .setLink(link) // a link, required
+                            .setPicture(movie.getPoster()) //link to a picture for facebook post
+                            .setName(movie.getTitle()) //name of the post, will show up in mobile posts
+                            .setDescription(movie.getChannel() + ", " + movie.getTime() + "\n" + movie.getItalianPlot() + "\n" + suggested) //description of the post, will show up in mobile posts
+                            .setCaption(suggested) //is the title setted up in web based facebook
+                            .build();
+                    uiHelper.trackPendingDialogCall(shareDialog.present());
+
+                } else {
+                    // FB App not installed
+                    Toast.makeText(getBaseContext(), R.string.facebook_not_installed, Toast.LENGTH_LONG).show();
+                }
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
+    }}
+
+
 
     private void addWatched(String url, String id, String date) {
         JsonObject json = new JsonObject();
@@ -261,5 +325,22 @@ public class DetailActivity extends BaseActivity {
                     }
                 });
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        uiHelper.onResume();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        uiHelper.onPause();
+    }
+
+    @Override
+    public void onDestroy () {
+        super.onDestroy();
+        uiHelper.onDestroy();
     }
 }
