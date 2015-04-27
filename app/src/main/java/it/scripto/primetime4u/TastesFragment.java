@@ -132,7 +132,6 @@ public class TastesFragment extends RefreshFragment {
 
             tutorialCard.setLeftButtonText(getString(R.string.no_more_tutorial));
             tutorialCard.setRightButtonText(getString(R.string.got_it));
-
             tutorialCard.setOnLeftButtonPressedListener(new OnButtonPressListener() {
                 @Override
                 public void onButtonPressedListener(View view, Card card) {
