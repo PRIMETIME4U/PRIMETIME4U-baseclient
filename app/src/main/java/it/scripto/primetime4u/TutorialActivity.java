@@ -231,7 +231,7 @@ public class TutorialActivity extends BaseActivity {
         // Generate URL
         String url = Utils.SERVER_API + "subscribe/";
 
-        // TODO: generify request
+
         JsonObject json = new JsonObject();
         json.addProperty("userId", accountName);
         json.addProperty("userName", "Utente");

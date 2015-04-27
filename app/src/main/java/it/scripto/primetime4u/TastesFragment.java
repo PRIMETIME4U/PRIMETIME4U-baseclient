@@ -287,7 +287,7 @@ public class TastesFragment extends RefreshFragment {
                             String curr = st.nextToken();
                             curr = curr.toLowerCase();
                             if (dictionary.containsKey(curr)){
-                                //se sii tratta di un genere del dizionario, traduciamo prima di fare la request
+                                //se si tratta di un genere del dizionario, traduciamo prima di fare la request
                                 s = dictionary.get(curr);
                             }
 
@@ -304,18 +304,7 @@ public class TastesFragment extends RefreshFragment {
 
                     @Override
                     public boolean onQueryTextChange(String s) {
-                        /*if (s.length() > 0) {
-                            modified = true;
-                            String url = Utils.SERVER_API + "suggest/" + account + "/" + sanitize(s, true);
 
-                            getSuggest(url);
-                            return true;
-                        } else if (s.length() == 0 && modified) {
-                            clearData();
-                            refresh();
-                            return true;
-                        }
-                        */
                         if (s.length() == 0 && modified) {
                             clearData();
                             refresh();
@@ -412,7 +401,7 @@ public class TastesFragment extends RefreshFragment {
 //                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                    @Override
 //                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
+//
 //                                    }
 //                                })
 //                                .withActionMessageId(R.string.undo)
@@ -639,7 +628,7 @@ public class TastesFragment extends RefreshFragment {
 //                                .withOnClickListener(new SnackBar.OnMessageClickListener() {
 //                                    @Override
 //                                    public void onMessageClick(Parcelable parcelable) {
-//                                        //TODO: create UNDO
+//
 //                                    }
 //                                })
 //                                .withActionMessageId(R.string.undo)
@@ -658,7 +647,7 @@ public class TastesFragment extends RefreshFragment {
     @Override
     public void onSaveInstanceState(Bundle toSave) {
         super.onSaveInstanceState(toSave);
-        // TODO: save tastesListMovie in order to reuse after
+
 
     }
 
