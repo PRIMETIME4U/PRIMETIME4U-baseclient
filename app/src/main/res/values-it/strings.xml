@@ -41,7 +41,7 @@
     <string name="welcome_watched_tutorial">Benvenuto nella sezione visti</string>
     <string name="welcome_proposal_tutorial">Benvenuto nella sezione proposte</string>
     <string name="watched_tutorial">In questa sezione raccoglieremo tutti i film che hai visto.</string>
-    <string name="proposal_tutorial">Qui puoi trovare tutte le proposte che abbiamo scelto solo per te.</string>
+    <string name="proposal_tutorial">Qui puoi trovare tutte le proposte che abbiamo scelto solo per te. Apri il menu impostazioni in alto per personalizzare l\'app secondo le tue preferenze!</string>
     <string name="will_watch">Guarderai \"%1$s\"</string>
     <string name="watched_added">Film aggiunto alla lista dei film visti</string>
     <string name="search_hint">Film, artisti, generi</string>

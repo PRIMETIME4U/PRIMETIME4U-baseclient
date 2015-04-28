@@ -42,7 +42,7 @@
     <string name="welcome_watched_tutorial">Welcome into Watched section</string>
     <string name="welcome_proposal_tutorial">Welcome into Proposal section</string>
     <string name="watched_tutorial">In this section we collect all your watched movies</string>
-    <string name="proposal_tutorial">Here you can find all movie proposal evaluated just for you</string>
+    <string name="proposal_tutorial">Here you can find all movie proposal evaluated just for you! Check the overflow button on the top-right to setup your app according your preferences!</string>
     <string name="will_watch">You\'ll watch \"%1$s\"</string>
     <string name="watched_added">Movie added into watched list</string>
     <string name="search_hint">Movies, artists, genres</string>
