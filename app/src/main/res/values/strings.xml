@@ -73,7 +73,7 @@
     <string name="suggested">Suggested by PRIMETIME4U</string>
     <string name="please_wait">Please wait…</string>
     <string name="list_is_complete">All results are shown</string>
-    <string name="just_to_start">Please, before starting using the app, tell us some of your favourite movie genres between these. You can manually add others during usage of the app</string>
+    <string name="just_to_start">Please, before starting using the app, tell us some of your favourite movie genres!</string>
     <string name="genre_action">Action</string>
     <string name="genre_drama">Drama</string>
     <string name="genre_horror">Horror</string>
