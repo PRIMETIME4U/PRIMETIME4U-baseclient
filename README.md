@@ -11,7 +11,14 @@ PRIMETIME4U is an app that simply helps you choosing your movie for your evening
 
 [PRIMETIME4U Server](https://github.com/PRIMETIME4U/PRIMETIME4U-server)
 
-[DIRECT DOWNLOAD LINK .apk](https://raw.githubusercontent.com/PRIMETIME4U/PRIMETIME4U-baseclient/master/app/app-debug.apk)
+<a href="https://raw.githubusercontent.com/PRIMETIME4U/PRIMETIME4U-baseclient/master/app/app-debug.apk">
+  <img src="http://www.seagrant.wisc.edu/home/Portals/0/Files/Fish%20and%20Fisheries/download_android.png" alt="HTML tutorial" width="200">
+</a>
+
+[Installation and Usage guide](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/wiki/Installation-and-Usage-guide)
+
+[Recommender System Document] (https://docs.google.com/document/d/1AALG1tcJMI-OZP4XGkd6WfMp2avsg1fm1Zuzbw3WY84/edit?usp=sharing)
+
 
 Google Technologies for Cloud and Web Development - Rome 2014/2015
 
@@ -21,5 +28,5 @@ Google Technologies for Cloud and Web Development - Rome 2014/2015
 * [Second Milestone - Release Candidate](https://docs.google.com/presentation/d/1kWeeZnHb7-r61PwAKrXXs_ju91rtxJQp4NqhB4pkPWM/edit?usp=sharing)
 * [Third Milestone - Final](https://docs.google.com/presentation/d/1pG_mtee2JS781fDr59QpuWwJXesfn4GTx23WXP1SNig/edit?usp=sharing)
 
-## Author
+## Authors
 Claudio Pastorini, Dorel Coman, Giovanni Colonna, Marius Ionita
