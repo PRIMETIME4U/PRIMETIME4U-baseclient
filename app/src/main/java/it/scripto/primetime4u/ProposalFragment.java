@@ -154,6 +154,9 @@ public class ProposalFragment extends BaseFragment {
 
         // Create and set adapter
         materialListViewAdapter = new ProposalListAdapter(getActivity());
+
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.show_more, null, false);
             Button footerButton = (Button) footerView.findViewById(R.id.button);

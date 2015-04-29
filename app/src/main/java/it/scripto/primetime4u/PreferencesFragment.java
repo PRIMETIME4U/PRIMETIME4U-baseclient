@@ -56,6 +56,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             editor.putBoolean("free_enabled", true);
             editor.apply();
         }
+        sendSettings();
     }
 
     @Override
@@ -69,6 +70,13 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
     public void onPause() {
         super.onPause();
 
+
+        sendSettings();
+
+
+    }
+
+    private void sendSettings(){
         if (pref != null) {
             JsonObject json = new JsonObject();
             JsonArray list = new JsonArray();
