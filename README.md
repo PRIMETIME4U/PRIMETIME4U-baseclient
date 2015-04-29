@@ -26,5 +26,5 @@ Google Technologies for Cloud and Web Development - Rome 2014/2015
 * [Second Milestone - Release Candidate](https://docs.google.com/presentation/d/1kWeeZnHb7-r61PwAKrXXs_ju91rtxJQp4NqhB4pkPWM/edit?usp=sharing)
 * [Third Milestone - Final](https://docs.google.com/presentation/d/1pG_mtee2JS781fDr59QpuWwJXesfn4GTx23WXP1SNig/edit?usp=sharing)
 
-## Author
+## Authors
 Claudio Pastorini, Dorel Coman, Giovanni Colonna, Marius Ionita
