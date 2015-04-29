@@ -57,6 +57,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             editor.apply();
         }
         sendSettings();
+
     }
 
     @Override
@@ -73,9 +74,10 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
 
         sendSettings();
 
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
 
     }
-
     private void sendSettings(){
         if (pref != null) {
             JsonObject json = new JsonObject();
@@ -110,8 +112,5 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                     .setJsonObjectBody(json)
                     .asJsonObject();
         }
-
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
     }
 }

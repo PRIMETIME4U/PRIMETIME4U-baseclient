@@ -329,7 +329,10 @@ public class ProposalFragment extends BaseFragment {
             });
 
             materialListViewAdapter.add(welcomeCard);
+
+
         }
+
     }
 
     /**
