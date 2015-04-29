@@ -17,6 +17,8 @@ PRIMETIME4U is an app that simply helps you choosing your movie for your evening
 
 [Installation and Usage guide](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/wiki/Installation-and-Usage-guide)
 
+[Documentation of client structure (overview)](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/wiki/Client---Documentation)
+
 [Recommender System Document] (https://docs.google.com/document/d/1AALG1tcJMI-OZP4XGkd6WfMp2avsg1fm1Zuzbw3WY84/edit?usp=sharing)
 
 
