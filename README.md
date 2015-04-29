@@ -11,7 +11,7 @@ PRIMETIME4U is an app that simply helps you choosing your movie for your evening
 
 [PRIMETIME4U Server](https://github.com/PRIMETIME4U/PRIMETIME4U-server)
 
-[![Android Download Image](http://www.seagrant.wisc.edu/home/Portals/0/Files/Fish%20and%20Fisheries/download_android.png)](https://raw.githubusercontent.com/PRIMETIME4U/PRIMETIME4U-baseclient/master/app/app-debug.apk)
+[![Android Download Image](http://www.seagrant.wisc.edu/home/Portals/0/Files/Fish%20and%20Fisheries/download_android.png =200x)](https://raw.githubusercontent.com/PRIMETIME4U/PRIMETIME4U-baseclient/master/app/app-debug.apk)
 
 
 Google Technologies for Cloud and Web Development - Rome 2014/2015
