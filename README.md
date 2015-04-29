@@ -18,8 +18,6 @@ PRIMETIME4U is an app that simply helps you choosing your movie for your evening
 [Installation and Usage guide](https://github.com/PRIMETIME4U/PRIMETIME4U-baseclient/wiki/Installation-and-Usage-guide)
 
 
-
-
 Google Technologies for Cloud and Web Development - Rome 2014/2015
 
 ## Milestones Presentations
