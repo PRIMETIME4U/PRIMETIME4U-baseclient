@@ -23,6 +23,8 @@ PRIMETIME4U is an app that simply helps you choosing your movie for your evening
 
 [How PRIMETIME4U recommendation system works] (https://docs.google.com/document/d/1AALG1tcJMI-OZP4XGkd6WfMp2avsg1fm1Zuzbw3WY84/edit?usp=sharing)
 
+[Video of the Application](https://youtu.be/z3dKZtEeyHY)
+
 
 Google Technologies for Cloud and Web Development - Rome 2014/2015
 
