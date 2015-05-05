@@ -87,7 +87,7 @@ public class TutorialActivity extends BaseActivity {
             skipTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //register();
+                    register();
                     goToMain();
                 }
             });
@@ -97,7 +97,7 @@ public class TutorialActivity extends BaseActivity {
                 public void onClick(View v) {
                     Log.i(TAG, "Position: " + String.valueOf(tutorialViewPager.getCurrentItem()));
                     if (tutorialViewPager.getCurrentItem() == tutorialAdapter.getCount() - 1) {
-                        //register();
+                        register();
                         goToMain();
                     } else {
                         tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);

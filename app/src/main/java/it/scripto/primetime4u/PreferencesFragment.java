@@ -80,19 +80,20 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
     }
     private void sendSettings(){
         if (pref != null) {
+
             JsonObject json = new JsonObject();
             JsonArray list = new JsonArray();
             json.addProperty("repeatChoice", (Boolean) pref.get("repeat_choice_enable"));
             json.addProperty("timeNotification", (Long) pref.get("time_notification"));
             json.addProperty("enableNotification",(Boolean)  pref.get("notification_enabled"));
 
-            if ((Boolean) pref.get("free_enabled")) {
+            if ((pref.get("free_enabled") != null)&&((Boolean)pref.get("free_enabled"))) {
                 list.add(new JsonPrimitive("free"));
             }
-            if ((Boolean) pref.get("premium_enabled")) {
+            if ((pref.get("premium_enabled")!=null)&&((Boolean) pref.get("premium_enabled"))) {
                 list.add(new JsonPrimitive("premium"));
             }
-            if ((Boolean) pref.get("sky_enabled")) {
+            if ((pref.get("sky_enabled")!=null)&&((Boolean) pref.get("sky_enabled"))) {
                 list.add(new JsonPrimitive("sky"));
             }
 
